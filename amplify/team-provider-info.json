@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-woxsenapp-dev-500c8-authRole",
+      "UnauthRoleArn": "arn:aws:iam::604057963334:role/amplify-woxsenapp-dev-500c8-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::604057963334:role/amplify-woxsenapp-dev-500c8-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-woxsenapp-dev-500c8-deployment",
+      "UnauthRoleName": "amplify-woxsenapp-dev-500c8-unauthRole",
+      "StackName": "amplify-woxsenapp-dev-500c8",
+      "StackId": "arn:aws:cloudformation:ap-south-1:604057963334:stack/amplify-woxsenapp-dev-500c8/02a77900-384a-11ef-be21-025d3f94e9db",
+      "AmplifyAppId": "d2rkoc0vchvbcn"
+    },
+    "categories": {
+      "auth": {
+        "woxsenappb06a6062": {}
+      }
+    }
+  }
+}

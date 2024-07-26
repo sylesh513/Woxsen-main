@@ -1,0 +1,57 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-woxsenapp-dev-500c8-authRole",
+      "UnauthRoleArn": "arn:aws:iam::604057963334:role/amplify-woxsenapp-dev-500c8-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::604057963334:role/amplify-woxsenapp-dev-500c8-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-woxsenapp-dev-500c8-deployment",
+      "UnauthRoleName": "amplify-woxsenapp-dev-500c8-unauthRole",
+      "StackName": "amplify-woxsenapp-dev-500c8",
+      "StackId": "arn:aws:cloudformation:ap-south-1:604057963334:stack/amplify-woxsenapp-dev-500c8/02a77900-384a-11ef-be21-025d3f94e9db",
+      "AmplifyAppId": "d2rkoc0vchvbcn"
+    }
+  },
+  "auth": {
+    "woxsenappb06a6062": {
+      "customAuth": false,
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "output": {
+        "UserPoolId": "ap-south-1_9Czhjvsd5",
+        "AppClientIDWeb": "5au9ec3ntct8smcu85ccklgso6",
+        "AppClientID": "64tocdjqrlbvbej714fv9d0tv6",
+        "IdentityPoolId": "ap-south-1:00aaec40-2ae8-4b1f-a1b9-97fe01c9b895",
+        "UserPoolArn": "arn:aws:cognito-idp:ap-south-1:604057963334:userpool/ap-south-1_9Czhjvsd5",
+        "IdentityPoolName": "woxsenappb06a6062_identitypool_b06a6062__dev",
+        "UserPoolName": "woxsenappb06a6062_userpool_b06a6062"
+      },
+      "lastPushTimeStamp": "2024-07-17T05:30:30.132Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-woxsenapp-dev-500c8-deployment/amplify-cfn-templates/auth/woxsenappb06a6062-cloudformation-template.json",
+        "logicalId": "authwoxsenappb06a6062"
+      }
+    }
+  }
+}
