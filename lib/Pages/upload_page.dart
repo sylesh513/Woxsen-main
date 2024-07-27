@@ -576,10 +576,10 @@ class _UploadPageState extends State<UploadPage> {
       File file = File(result.files.single.path!);
       String directoryPath = (await getTemporaryDirectory()).path;
       String? newFileName;
-      if (str == 'TT' && _selSpec == 'MBA GEN') {
+      if (str == 'TT' && store.specWithSec.contains(_selSpec)) {
         newFileName =
             "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSect.pdf";
-      } else if (str == 'TT' && _selSpec != 'MBA GEN') {
+      } else if (str == 'TT' && !store.specWithSec.contains(_selSpec)) {
         newFileName = "${str}_${_selCourse}_${_selSem}_$_selSpec.pdf";
       } else if (str == 'CO') {
         newFileName =

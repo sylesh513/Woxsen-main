@@ -295,6 +295,7 @@ class ListStore {
     'Semester 7',
     'Semester 8'
   ];
+  final List<String> specWithSec = ['BBA ECDM', 'BBA FS', 'MBA GEN'];
 
   final List<String> courses = [
     'B.Tech',
