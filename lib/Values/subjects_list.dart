@@ -167,11 +167,11 @@ class ListStore {
   ];
   List<String> bbaEdSem5 = [
     'Business Strategy',
-    'Dissertation Dissertation (Planning, Literature Review and Proposal)',
+    'Dissertation Dissertation ',
     'Existential Dialogue',
     'Design Thinking',
     'Managing Family Businesses',
-    'Entrepreneurship and Innovation',
+    'Intellectual Property Rights',
   ];
   List<String> bbaFsSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
@@ -295,6 +295,7 @@ class ListStore {
     'Semester 7',
     'Semester 8'
   ];
+  final List<String> specWithSec = ['BBA ECDM', 'BBA FS', 'MBA GEN'];
 
   final List<String> courses = [
     'B.Tech',

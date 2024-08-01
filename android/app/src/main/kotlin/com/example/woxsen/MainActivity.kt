@@ -1,4 +1,4 @@
-package com.example.woxsen
+package com.uni.woxsen
 
 import io.flutter.embedding.android.FlutterActivity
 

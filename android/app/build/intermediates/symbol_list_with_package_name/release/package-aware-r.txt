@@ -1,4 +1,4 @@
-com.example.woxsen
+com.uni.woxsen
 attr activityAction
 attr activityName
 attr alpha
