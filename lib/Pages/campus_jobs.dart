@@ -1,14 +1,21 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_launcher_icons/main.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Pages/notifications_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
+import 'package:http/http.dart' as http;
 
 class campusJobs extends StatefulWidget {
-  const campusJobs({super.key});
+  final bool isBox;
+
+  const campusJobs({super.key, required this.isBox});
 
   @override
   _campusJobsState createState() => _campusJobsState();
@@ -51,6 +58,95 @@ class _campusJobsState extends State<campusJobs> {
 
     // Add more items as needed
   ];
+  late Future<List<dynamic>> futureJobs;
+
+  @override
+  void initState() {
+    super.initState();
+    futureJobs = fetchJobs();
+  }
+
+  Future<List<dynamic>> fetchJobs() async {
+    final response =
+        await http.get(Uri.parse('http://100.29.97.185:5000/api/jobs_list'));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body) as List<dynamic>;
+      return jsonResponse;
+    } else {
+      throw Exception('Failed to load jobs');
+    }
+  }
+
+  String? _getString(dynamic value) {
+    if (value == null) {
+      return 'No Data';
+    } else if (value is int) {
+      return value.toString();
+    } else if (value is String) {
+      return value;
+    } else {
+      return 'Invalid Data';
+    }
+  }
+
+  Future<void> _downloadAndViewPDF(String documentPath) async {
+    loadingOnScreen(context);
+    const baseUrl =
+        'http://100.29.97.185:5000'; // Replace with your base API URL
+    final formattedDocumentPath =
+        documentPath.startsWith('/') ? documentPath.substring(1) : documentPath;
+
+    // Ensure a single slash between baseUrl and formattedDocumentPath
+    final url = Uri.parse('$baseUrl/$formattedDocumentPath');
+    final directory = await getTemporaryDirectory();
+    final filePath = '${directory.path}/temp.pdf';
+    final file = File(filePath);
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        await file.writeAsBytes(response.bodyBytes);
+        Navigator.of(context).pop();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => pdfViewJobs(
+                file: file,
+                title: 'Job',
+              ),
+            ));
+      } else {
+        throw Exception('Failed to download PDF');
+      }
+    } catch (e) {
+      print('Error downloading PDF: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error downloading PDF')),
+      );
+    }
+  }
+
+  Future<dynamic> loadingOnScreen(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.black.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          width: 100,
+          child: Center(
+            child: SpinKitSpinningLines(
+              color: Colors.red.shade800,
+              size: 70.0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,250 +209,146 @@ class _campusJobsState extends State<campusJobs> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.07,
-            decoration: const BoxDecoration(
-              color: Color(0xffFA6978),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text(
-                  'Campus Jobs',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // const SizedBox(height: 20),
-          Expanded(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height *
-                    0.5, // Changeable height
-                width: MediaQuery.of(context).size.width * 0.89,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => pdfViewJobs(
-                                        pdfPath: items[index]["pdfLink"],
-                                        title: 'Job',
-                                      )));
-                          // showDialog(
-                          //   context: context,
-                          //   builder: (BuildContext context) {
-                          //     return AlertDialog(
-                          //       title: Text(
-                          //         "${items[index]["title"]}",
-                          //         style: const TextStyle(
-                          //             fontSize: 22,
-                          //             fontWeight: FontWeight.bold),
-                          //       ),
-                          //       content: Column(
-                          //         crossAxisAlignment: CrossAxisAlignment.start,
-                          //         children: [
-                          //           Text(
-                          //             "Department: ${items[index]["department"]}",
-                          //             style: const TextStyle(
-                          //                 fontSize: 15,
-                          //                 fontWeight: FontWeight.bold),
-                          //           ),
-                          //           const Text(
-                          //             "Description: ",
-                          //             style: TextStyle(
-                          //                 fontSize: 15,
-                          //                 fontWeight: FontWeight.bold),
-                          //           ),
-                          //           Text("${items[index]["description"]}"),
-                          //         ],
-                          //       ),
-                          //       actions: [
-                          //         TextButton(
-                          //           onPressed: () {
-                          //             Navigator.of(context).pop();
-                          //           },
-                          //           child: Text(
-                          //             "Close",
-                          //             style: TextStyle(
-                          //               color: Colors.red.shade800,
-                          //               fontSize: 20,
-                          //             ),
-                          //           ),
-                          //         ),
-                          //         TextButton(
-                          //           onPressed: () {
-                          //             Navigator.push(
-                          //               context,
-                          //               MaterialPageRoute(
-                          //                 builder: (context) =>
-                          //                     const CustomWebViewPage(
-                          //                   pageTitle: 'Campus Jobs',
-                          //                   pageUrl:
-                          //                       'https://forms.office.com/r/0YGLHKwqVc',
-                          //                 ),
-                          //               ),
-                          //             );
-                          //           },
-                          //           child: Text(
-                          //             "Apply",
-                          //             style: TextStyle(
-                          //               color: Colors.green.shade800,
-                          //               fontSize: 20,
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     );
-                          //   },
-                          // );
-                        },
-                        child: Card(
-                          color: const Color(0xffF2C9CD),
-                          child: ListTile(
-                            title: Text(
-                              items[index]["title"],
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
+      body: FutureBuilder<List<dynamic>>(
+        future: futureJobs,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SpinKitSpinningLines(
+                color: Colors.red,
+                size: 70.0,
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No jobs found'));
+          } else {
+            return Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final job = snapshot.data![index] as Map<String, dynamic>;
+                    print(job);
+                    return GestureDetector(
+                      onTap: () {
+                        _downloadAndViewPDF(job['document_path']);
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.all(10.0),
+                        color: Colors.red.shade200,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _getString(job['designation'])!,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  _buildKeyValue('ID', _getString(job['id'])),
+                                  _buildKeyValue('Department',
+                                      _getString(job['department'])),
+                                ],
                               ),
                             ),
-                            subtitle: Text(
-                                "Number of applicants: ${items[index]["applicants"]}"),
-                            // trailing: Row(
-                            //   mainAxisSize: MainAxisSize.min,
-                            //   children: [
-                            //     TextButton(
-                            //       onPressed: () {
-                            //         Navigator.push(
-                            //           context,
-                            //           MaterialPageRoute(
-                            //             builder: (context) =>
-                            //                 const CustomWebViewPage(
-                            //               pageTitle: 'Campus Jobs',
-                            //               pageUrl:
-                            //                   'https://forms.office.com/r/0YGLHKwqVc',
-                            //             ),
-                            //           ),
-                            //         );
-                            //       },
-                            //       child: Text(
-                            //         "Apply",
-                            //         style: TextStyle(
-                            //           color: Colors.green.shade800,
-                            //           fontSize: 20,
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                          ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
-            ],
-          )),
-        ],
+            );
+          }
+        },
       ),
+    );
+  }
+
+  Widget _buildKeyValue(String key, String? value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            '$key:',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value ?? 'No Data',
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class pdfViewJobs extends StatefulWidget {
-  final String pdfPath;
+  final File file;
   final String title;
 
-  const pdfViewJobs({super.key, required this.pdfPath, required this.title});
+  const pdfViewJobs({
+    super.key,
+    required this.file,
+    required this.title,
+  });
   @override
   _pdfViewJobsState createState() => _pdfViewJobsState();
 }
 
 class _pdfViewJobsState extends State<pdfViewJobs> {
-  String? _localFile;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPDF().then((path) {
-      setState(() {
-        _localFile = path;
-      });
-    });
-  }
-
-  Future<String> _loadPDF() async {
-    final byteData = await rootBundle.load(widget.pdfPath);
-    final file =
-        File('${(await getTemporaryDirectory()).path}/my_document.pdf');
-    await file.writeAsBytes(byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-    return file.path;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          FloatingActionButton(
-            heroTag: 'apply',
-            onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CustomWebViewPage(
-                    pageTitle: 'Campus Jobs',
-                    pageUrl: 'https://forms.office.com/r/0YGLHKwqVc',
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: 'apply',
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CustomWebViewPage(
+                      pageTitle: 'Campus Jobs',
+                      pageUrl: 'https://forms.office.com/r/0YGLHKwqVc',
+                    ),
                   ),
-                ),
-              );
-            },
-            backgroundColor: Colors.green,
-            child: const Text("Apply"),
-          ),
-          const SizedBox(width: 20),
-          FloatingActionButton(
-            heroTag: 'close',
-            onPressed: () async {
-              Navigator.of(context).pop();
-            },
-            backgroundColor: Colors.red,
-            child: const Text("close"),
-          ),
+                );
+              },
+              backgroundColor: Colors.green,
+              child: const Text("Apply"),
+            ),
+            const SizedBox(width: 20),
+            FloatingActionButton(
+              heroTag: 'close',
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              backgroundColor: Colors.red,
+              child: const Text("close"),
+            ),
 
-          // Spacing between the buttons
-        ],
-      ),
-      body: _localFile != null
-          ? PDFView(
-              filePath: _localFile,
-            )
-          : const Center(child: CircularProgressIndicator()),
-    );
+            // Spacing between the buttons
+          ],
+        ),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: SfPdfViewer.file(
+          widget.file,
+        ));
   }
 }

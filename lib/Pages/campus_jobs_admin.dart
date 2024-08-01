@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:woxsen/Pages/campus_jobs.dart';
 import 'package:woxsen/Values/app_routes.dart';
 
 class campusJobsAdmin extends StatefulWidget {
@@ -186,39 +187,42 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                     width: 2,
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        color: const Color(0xffF2C9CD),
-                        child: ListTile(
-                          title: Text(items[index]["title"]),
-                          subtitle: Text(
-                              "Number of applicants: ${items[index]["applicants"]}"),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  // Handle edit action
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () {
-                                  // Handle delete action
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                child: campusJobs(
+                  isBox: true,
                 ),
+                // child: Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: ListView.builder(
+                //     itemCount: items.length,
+                //     itemBuilder: (context, index) {
+                //       return Card(
+                //         color: const Color(0xffF2C9CD),
+                //         child: ListTile(
+                //           title: Text(items[index]["title"]),
+                //           subtitle: Text(
+                //               "Number of applicants: ${items[index]["applicants"]}"),
+                //           trailing: Row(
+                //             mainAxisSize: MainAxisSize.min,
+                //             children: [
+                //               IconButton(
+                //                 icon: const Icon(Icons.edit),
+                //                 onPressed: () {
+                //                   // Handle edit action
+                //                 },
+                //               ),
+                //               IconButton(
+                //                 icon: const Icon(Icons.delete),
+                //                 onPressed: () {
+                //                   // Handle delete action
+                //                 },
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
               ),
               const SizedBox(
                 height: 15,

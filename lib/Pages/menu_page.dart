@@ -357,7 +357,11 @@ class PDFViewerPage extends StatefulWidget {
   final String pdfPath;
   final String title;
 
-  const PDFViewerPage({super.key, required this.pdfPath, required this.title});
+  const PDFViewerPage({
+    super.key,
+    required this.pdfPath,
+    required this.title,
+  });
   @override
   _PDFViewerPageState createState() => _PDFViewerPageState();
 }

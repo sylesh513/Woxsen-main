@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:woxsen/Pages/academics_page.dart';
+import 'package:woxsen/Pages/campus_jobs.dart';
+import 'package:woxsen/Pages/campus_jobs_admin.dart';
 import 'package:woxsen/Pages/feedback_complaints.dart';
 import 'package:woxsen/Pages/services_page.dart';
 import 'package:woxsen/Pages/upload_page.dart';
@@ -214,53 +216,24 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: ElevatedButton(
                             onPressed: () async {
-                              if (Platform.isWindows) {
-                                _launchUrl(
-                                    Uri.parse('http://100.29.97.185:5000/'));
-                              }
-                              if (Platform.isAndroid) {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation,
-                                            secondaryAnimation) =>
-                                        const CustomWebViewPage(
-                                            pageTitle: 'Campus Jobs',
-                                            pageUrl:
-                                                'http://100.29.97.185:5000/'), // Assuming HomePage is the page you want to navigate to
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    transitionDuration: const Duration(
-                                        milliseconds:
-                                            200), // Customize duration
-                                  ),
-                                );
-                              }
-                              // showDialog(
-                              //   barrierColor: Colors.black.withOpacity(0.5),
-                              //   context: context,
-                              //   barrierDismissible: false,
-                              //   builder: (BuildContext context) {
-                              //     return Container(
-                              //       height: 100,
-                              //       width: 100,
-                              //       child: Center(
-                              //         child: SpinKitSpinningLines(
-                              //           color: Colors.red.shade800,
-                              //           size: 70.0,
-                              //         ),
-                              //       ),
-                              //     );
-                              //   },
-                              // );
-                              // await sendJsonData('campus_jobs');
-                              // Navigator.pushNamed(
-                              //     context, AppRoutes.campusJobsAdmin);
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const campusJobsAdmin(),
+                                  // Assuming HomePage is the page you want to navigate to
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration: const Duration(
+                                      milliseconds: 200), // Customize duration
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               shadowColor: Colors.black,
@@ -330,49 +303,25 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             } else {
-                              // Navigator.push(
-                              //   context,
-                              //   PageRouteBuilder(
-                              //     pageBuilder: (context, animation,
-                              //             secondaryAnimation) =>
-                              //         const campusJobs(), // Assuming HomePage is the page you want to navigate to
-                              //     transitionsBuilder: (context, animation,
-                              //         secondaryAnimation, child) {
-                              //       return FadeTransition(
-                              //         opacity: animation,
-                              //         child: child,
-                              //       );
-                              //     },
-                              //     transitionDuration: const Duration(
-                              //         milliseconds: 200), // Customize duration
-                              //   ),
-                              // );
-                              Platform.isAndroid
-                                  ? Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                                secondaryAnimation) =>
-                                            const CustomWebViewPage(
-                                                pageTitle: 'Campus Jobs',
-                                                pageUrl:
-                                                    'http://100.29.97.185:5000/'), // Assuming HomePage is the page you want to navigate to
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          return FadeTransition(
-                                            opacity: animation,
-                                            child: child,
-                                          );
-                                        },
-                                        transitionDuration: const Duration(
-                                            milliseconds:
-                                                200), // Customize duration
-                                      ),
-                                    )
-                                  : _launchUrl(
-                                      Uri.parse('http://100.29.97.185:5000/'));
-
-                              // Navigator.pushNamed(context, AppRoutes.loginP);
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const campusJobs(
+                                    isBox: false,
+                                  ), // Assuming HomePage is the page you want to navigate to
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration: const Duration(
+                                      milliseconds: 200), // Customize duration
+                                ),
+                              );
                             }
                             // Navigator.pushNamed(context, AppRoutes.loginPage);
                           },

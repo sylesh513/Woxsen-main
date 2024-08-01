@@ -1,4 +1,4 @@
-com.example.woxsen
+com.uni.woxsen
 attr activityAction
 attr activityName
 attr alpha
@@ -34,6 +34,10 @@ attr splitMinSmallestWidth
 attr splitMinWidth
 attr splitRatio
 attr ttcIndex
+bool enable_system_alarm_service_default
+bool enable_system_foreground_service_default
+bool enable_system_job_service_default
+bool workmanager_test_configuration
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
 color browser_actions_bg_grey
@@ -87,6 +91,7 @@ drawable notification_bg_low_pressed
 drawable notification_bg_normal
 drawable notification_bg_normal_pressed
 drawable notification_icon_background
+drawable notification_oversize_large_icon_bg
 drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
@@ -139,7 +144,9 @@ id browser_actions_menu_items
 id browser_actions_menu_view
 id chronometer
 id dialog_button
+id edit_text_id
 id forever
+id hide_ime_id
 id icon
 id icon_group
 id info
@@ -173,10 +180,13 @@ id text2
 id time
 id title
 id view_tree_lifecycle_owner
+id view_tree_view_model_store_owner
 integer status_bar_notification_info_maxnum
 layout browser_actions_context_menu_page
 layout browser_actions_context_menu_row
 layout custom_dialog
+layout ime_base_split_test_activity
+layout ime_secondary_split_test_activity
 layout notification_action
 layout notification_action_tombstone
 layout notification_template_custom_big
@@ -184,6 +194,7 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 mipmap ic_launcher
+string androidx_startup
 string call_notification_answer_action
 string call_notification_answer_video_action
 string call_notification_decline_action
@@ -195,6 +206,14 @@ string copy_toast_msg
 string fallback_menu_item_copy_link
 string fallback_menu_item_open_in_browser
 string fallback_menu_item_share_link
+string flutter_downloader_notification_canceled
+string flutter_downloader_notification_channel_description
+string flutter_downloader_notification_channel_name
+string flutter_downloader_notification_complete
+string flutter_downloader_notification_failed
+string flutter_downloader_notification_in_progress
+string flutter_downloader_notification_paused
+string flutter_downloader_notification_started
 string status_bar_notification_info_overflow
 style LaunchTheme
 style NormalTheme
@@ -218,3 +237,4 @@ styleable SplitPairFilter primaryActivityName secondaryActivityAction secondaryA
 styleable SplitPairRule clearTop finishPrimaryWithSecondary finishSecondaryWithPrimary splitLayoutDirection splitMinSmallestWidth splitMinWidth splitRatio
 styleable SplitPlaceholderRule placeholderActivityName splitLayoutDirection splitMinSmallestWidth splitMinWidth splitRatio
 xml image_share_filepaths
+xml provider_paths
