@@ -2,20 +2,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_launcher_icons/main.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:woxsen/Pages/notifications_page.dart';
+import 'package:woxsen/Pages/apply_campusjob.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
 
 class campusJobs extends StatefulWidget {
   final bool isBox;
+  final Function? updateCount;
 
-  const campusJobs({super.key, required this.isBox});
+  const campusJobs({super.key, required this.isBox, this.updateCount});
 
   @override
   _campusJobsState createState() => _campusJobsState();
@@ -90,7 +88,10 @@ class _campusJobsState extends State<campusJobs> {
     }
   }
 
-  Future<void> _downloadAndViewPDF(String documentPath) async {
+  bool isAlredyCalled = false;
+
+  Future<void> _downloadAndViewPDF(
+      String documentPath, String title, String jobId) async {
     loadingOnScreen(context);
     const baseUrl =
         'http://100.29.97.185:5000'; // Replace with your base API URL
@@ -113,7 +114,8 @@ class _campusJobsState extends State<campusJobs> {
             MaterialPageRoute(
               builder: (context) => pdfViewJobs(
                 file: file,
-                title: 'Job',
+                title: title,
+                jobId: jobId,
               ),
             ));
       } else {
@@ -152,124 +154,167 @@ class _campusJobsState extends State<campusJobs> {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffFA6978),
-        shape: const CircleBorder(),
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, AppRoutes.homePage);
-        },
-        child: const Icon(
-          Icons.home_rounded,
-          size: 40,
-        ),
-      ),
+      floatingActionButton: widget.isBox
+          ? FloatingActionButton(
+              heroTag: 'homebutton',
+              backgroundColor: Color(0xffFA6978),
+              shape: const CircleBorder(),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, AppRoutes.homePage);
+              },
+              child: const Icon(
+                Icons.home_rounded,
+                size: 40,
+              ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.08,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(40)),
-        ),
-        child: const BottomAppBar(
-          color: Color(0xffDBDBDB),
-          shape: CircularNotchedRectangle(),
-          notchMargin: 10.0,
-        ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        toolbarHeight: 100,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, size: 30, color: Color(0xffFA6978)),
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.menuPage);
+      bottomNavigationBar: widget.isBox
+          ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.08,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+              ),
+              child: const BottomAppBar(
+                color: Color(0xffDBDBDB),
+                shape: CircularNotchedRectangle(),
+                notchMargin: 10.0,
+              ),
+            )
+          : null,
+      appBar: widget.isBox
+          ? AppBar(
+              backgroundColor: Colors.white,
+              toolbarHeight: 100,
+              leading: IconButton(
+                icon:
+                    const Icon(Icons.menu, size: 30, color: Color(0xffFA6978)),
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.menuPage);
 
-            // Handle menu button press
-          },
-        ),
-        title: Center(
-          child: Image.asset(
-            'assets/top.png',
-            fit: BoxFit.cover,
-            height: 90, // Adjust the size according to your logo
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.notifications_active_rounded,
-              size: 30,
+                  // Handle menu button press
+                },
+              ),
+              title: Center(
+                child: Image.asset(
+                  'assets/top.png',
+                  fit: BoxFit.cover,
+                  height: 90, // Adjust the size according to your logo
+                ),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_active_rounded,
+                    size: 30,
+                    color: Color(0xffFA6978),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.notificationsPage);
+
+                    // Handle notifications button press
+                  },
+                ),
+              ],
+            )
+          : null,
+      body: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.07,
+            decoration: const BoxDecoration(
               color: Color(0xffFA6978),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.notificationsPage);
-
-              // Handle notifications button press
-            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(width: 5),
+                Text(
+                  'Campus Jobs',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: futureJobs,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SpinKitSpinningLines(
-                color: Colors.red,
-                size: 70.0,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No jobs found'));
-          } else {
-            return Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final job = snapshot.data![index] as Map<String, dynamic>;
-                    print(job);
-                    return GestureDetector(
-                      onTap: () {
-                        _downloadAndViewPDF(job['document_path']);
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.all(10.0),
-                        color: Colors.red.shade200,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: futureJobs,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: SpinKitSpinningLines(
+                      color: Colors.red,
+                      size: 70.0,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No jobs found'));
+                } else {
+                  if (widget.updateCount != null && !isAlredyCalled) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      widget.updateCount!(snapshot.data!.length);
+                      isAlredyCalled = true;
+                    });
+                  }
+                  return Center(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.93,
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final job =
+                              snapshot.data![index] as Map<String, dynamic>;
+                          return GestureDetector(
+                            onTap: () {
+                              _downloadAndViewPDF(job['document_path'],
+                                  job['designation'], job['id']);
+                            },
+                            child: Card(
+                              margin: const EdgeInsets.all(10.0),
+                              color: const Color(0xffF2C9CD),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    _getString(job['designation'])!,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getString(job['designation'])!,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        _buildKeyValue(
+                                            'ID', _getString(job['id'])),
+                                        _buildKeyValue('Department',
+                                            _getString(job['department'])),
+                                      ],
                                     ),
                                   ),
-                                  _buildKeyValue('ID', _getString(job['id'])),
-                                  _buildKeyValue('Department',
-                                      _getString(job['department'])),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
-            );
-          }
-        },
+                    ),
+                  );
+                }
+              },
+            ),
+          )
+        ],
       ),
     );
   }
@@ -298,11 +343,13 @@ class _campusJobsState extends State<campusJobs> {
 class pdfViewJobs extends StatefulWidget {
   final File file;
   final String title;
+  final String jobId;
 
   const pdfViewJobs({
     super.key,
     required this.file,
     required this.title,
+    required this.jobId,
   });
   @override
   _pdfViewJobsState createState() => _pdfViewJobsState();
@@ -321,10 +368,7 @@ class _pdfViewJobsState extends State<pdfViewJobs> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CustomWebViewPage(
-                      pageTitle: 'Campus Jobs',
-                      pageUrl: 'https://forms.office.com/r/0YGLHKwqVc',
-                    ),
+                    builder: (context) => applyJob(),
                   ),
                 );
               },

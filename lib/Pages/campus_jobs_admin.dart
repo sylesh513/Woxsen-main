@@ -23,12 +23,21 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
 
     // Add more items as needed
   ];
+  int jobCount = 0;
+  updateCount(int count) {
+    print('ca;;ed');
+    setState(() {
+      jobCount = count;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       floatingActionButton: FloatingActionButton(
+        heroTag: 'newhomebutton',
         backgroundColor: const Color(0xffFA6978),
         shape: const CircleBorder(),
         onPressed: () {
@@ -123,21 +132,21 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                       width: MediaQuery.of(context).size.width *
                           0.46, // 40% of screen width
                       height: 90,
-                      child: const Card(
+                      child: Card(
                         color: Color(0xffF2C9CD),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             ListTile(
-                              title: Text(
+                              title: const Text(
                                 'Total jobs',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w400),
                               ),
                               subtitle: Text(
-                                '59',
+                                jobCount.toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 20),
@@ -177,52 +186,59 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                   ],
                 ),
               ),
-              Container(
-                height: 380, // Changeable height
-                width: MediaQuery.of(context).size.width * 0.85,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 2,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 380, // Changeable height
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 2,
+                    ),
                   ),
+                  child: Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: campusJobs(
+                      isBox: false,
+                      updateCount: updateCount,
+                    ),
+                  ),
+                  // child: Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: ListView.builder(
+                  //     itemCount: items.length,
+                  //     itemBuilder: (context, index) {
+                  //       return Card(
+                  //         color: const Color(0xffF2C9CD),
+                  //         child: ListTile(
+                  //           title: Text(items[index]["title"]),
+                  //           subtitle: Text(
+                  //               "Number of applicants: ${items[index]["applicants"]}"),
+                  //           trailing: Row(
+                  //             mainAxisSize: MainAxisSize.min,
+                  //             children: [
+                  //               IconButton(
+                  //                 icon: const Icon(Icons.edit),
+                  //                 onPressed: () {
+                  //                   // Handle edit action
+                  //                 },
+                  //               ),
+                  //               IconButton(
+                  //                 icon: const Icon(Icons.delete),
+                  //                 onPressed: () {
+                  //                   // Handle delete action
+                  //                 },
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                 ),
-                child: campusJobs(
-                  isBox: true,
-                ),
-                // child: Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: ListView.builder(
-                //     itemCount: items.length,
-                //     itemBuilder: (context, index) {
-                //       return Card(
-                //         color: const Color(0xffF2C9CD),
-                //         child: ListTile(
-                //           title: Text(items[index]["title"]),
-                //           subtitle: Text(
-                //               "Number of applicants: ${items[index]["applicants"]}"),
-                //           trailing: Row(
-                //             mainAxisSize: MainAxisSize.min,
-                //             children: [
-                //               IconButton(
-                //                 icon: const Icon(Icons.edit),
-                //                 onPressed: () {
-                //                   // Handle edit action
-                //                 },
-                //               ),
-                //               IconButton(
-                //                 icon: const Icon(Icons.delete),
-                //                 onPressed: () {
-                //                   // Handle delete action
-                //                 },
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // ),
               ),
               const SizedBox(
                 height: 15,

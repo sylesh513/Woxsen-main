@@ -38,6 +38,7 @@ class _AcademicsState extends State<Academics> {
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       floatingActionButton: FloatingActionButton(
+        heroTag: 'homeButton1',
         backgroundColor: const Color(0xffFA6978),
         shape: const CircleBorder(),
         onPressed: () {
@@ -983,6 +984,7 @@ class pdfView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           FloatingActionButton(
+            heroTag: 'academicsButton',
             onPressed: () async {
               Navigator.pushNamed(context, AppRoutes.academicsPage);
               // await UserPreferences.getRole() == 'faculty';

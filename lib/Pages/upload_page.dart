@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -140,6 +141,9 @@ class _UploadPageState extends State<UploadPage> {
                         _subject = true;
                       } else {
                         _subject = false;
+                      }
+                      if (newValue == "Assignment") {
+                        fetchSubjects();
                       }
                       dropdownValue = newValue;
                     });
@@ -459,6 +463,43 @@ class _UploadPageState extends State<UploadPage> {
     );
   }
 
+  void fetchSubjects() async {
+    // Get email from shared preferences
+    UserPreferences userPreferences = UserPreferences();
+    String? email = await userPreferences.getEmail();
+
+    // Create the JSON payload
+    Map<String, dynamic> payload = {
+      'email': email,
+    };
+
+    // Convert the payload to JSON string
+    String jsonPayload = jsonEncode(payload);
+
+    // Send the POST request
+    Uri url = Uri.parse('http://52.20.1.249:5000/api/get_as_sub');
+    http.Response response = await http.post(url, body: jsonPayload);
+
+    // Check if the request was successful
+    if (response.statusCode == 200) {
+      // Parse the response JSON
+      List<dynamic> subjects = jsonDecode(response.body);
+
+      // Store the subjects in a variable
+      List<String> subjectList =
+          subjects.map((subject) => subject.toString()).toList();
+      setState(() {
+        store.subjectsList = subjectList;
+      });
+
+      // Use the subjectList variable as needed
+      // ...
+    } else {
+      // Handle the error
+      print('Error: ${response.statusCode}');
+    }
+  }
+
   void updateLists() {
     return setState(() {
       _selSect = null;
@@ -474,18 +515,14 @@ class _UploadPageState extends State<UploadPage> {
             ? showSection = false
             : showSection = true;
       } else if (_selSpec == 'MBA BA') {
-        dropdownValue == 'Course Outline'
-            ? showSection = false
-            : showSection = true;
+        showSection = false;
         if (_selSem == 'Semester 1') {
           store.subjectsList = store.mbaBaSem1;
         } else if (_selSem == 'Semester 4') {
           store.subjectsList = store.mbaBaSem4;
         }
       } else if (_selSpec == 'MBA FS') {
-        dropdownValue == 'Course Outline'
-            ? showSection = false
-            : showSection = true;
+        showSection = false;
         if (_selSem == 'Semester 1') {
           store.subjectsList = store.mbaFsSem1;
         } else if (_selSem == 'Semester 4') {

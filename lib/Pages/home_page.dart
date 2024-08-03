@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:woxsen/Pages/academics_page.dart';
@@ -309,7 +307,7 @@ class _HomePageState extends State<HomePage> {
                                   pageBuilder: (context, animation,
                                           secondaryAnimation) =>
                                       const campusJobs(
-                                    isBox: false,
+                                    isBox: true,
                                   ), // Assuming HomePage is the page you want to navigate to
                                   transitionsBuilder: (context, animation,
                                       secondaryAnimation, child) {
