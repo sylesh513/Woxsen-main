@@ -464,7 +464,28 @@ class _UploadPageState extends State<UploadPage> {
     );
   }
 
+  Future<dynamic> loadingOnScreen(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.black.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          width: 100,
+          child: Center(
+            child: SpinKitSpinningLines(
+              color: Colors.red.shade800,
+              size: 70.0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void fetchSubjects() async {
+    loadingOnScreen(context);
     UserPreferences userPreferences = UserPreferences();
     String? email = await userPreferences.getEmail();
     // String email = 'kalyana.jonnalagadda@woxsen.edu.in';
@@ -484,7 +505,7 @@ class _UploadPageState extends State<UploadPage> {
     print(response.body);
 
     var data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 && data['message'] != 'Email not found') {
       List<String> subjectList = (data['subjects'] as List<dynamic>)
           .map((subject) => subject.toString())
           .toList();
@@ -501,8 +522,28 @@ class _UploadPageState extends State<UploadPage> {
         store.semestersList = semesters;
         store.specList = specializations;
       });
+      Navigator.pop(context);
     } else {
       print('Error: ${response.statusCode}');
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('OOps!'),
+            content: const Text(
+                'Something went wrong. Make sure you are authorized to upload assignments.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
