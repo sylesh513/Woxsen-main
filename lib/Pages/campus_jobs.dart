@@ -221,26 +221,28 @@ class _campusJobsState extends State<campusJobs> {
           : null,
       body: Column(
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.07,
-            decoration: const BoxDecoration(
-              color: Color(0xffFA6978),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text(
-                  'Campus Jobs',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.w400,
+          if (widget.isBox)
+            Container(
+              height: MediaQuery.of(context).size.height * 0.07,
+              decoration: const BoxDecoration(
+                color: Color(0xffFA6978),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(width: 5),
+                  Text(
+                    'Campus Jobs',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          if (widget.isBox) const SizedBox(height: 10),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: futureJobs,
@@ -313,7 +315,8 @@ class _campusJobsState extends State<campusJobs> {
                 }
               },
             ),
-          )
+          ),
+          if (widget.isBox) const SizedBox(height: 40),
         ],
       ),
     );

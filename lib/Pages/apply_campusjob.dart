@@ -1,6 +1,10 @@
-import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,73 +16,13 @@ class applyJob extends StatefulWidget {
 }
 
 class _applyJobState extends State<applyJob> {
-  final List<Map<String, dynamic>> items = [
-    {
-      "title": "Stuent Engagement Coordinator",
-      "applicants": 7,
-      "department": "VP Office",
-      "pdfLink": "assets/Student_Engagement.pdf",
-      'description':
-          "The Student Engagement Coordinator is a part-time role dedicated to fostering a vibrant and inclusive campus community by enhancing student engagement through various activities, events, and programs. This position involves supporting administrative tasks, coordinating student initiatives, and collaborating with the schools, Centers of Excellence (COEs), student council, clubs, and other departments at Woxsen University to ensure a positive student experiene."
-    },
-    {
-      "title": "Mobile Application Developer",
-      "applicants": 4,
-      "department": "AI research center",
-      "pdfLink": "assets/App_Development.pdf",
-      'description':
-          'We are looking for a creative Mobile Application Developer to join our team. The ideal candidate will be a fresher or have up to 1 year of experience in mobile app development.'
-    },
-    {
-      "title": "Web application developer",
-      "applicants": 71,
-      "department": "AI research center",
-      "pdfLink": "assets/Student_Engagement.pdf",
-      'description':
-          'we are looking for a creative web developer to join our team.'
-    },
-    {
-      "title": "Cloud engineer",
-      "applicants": 21,
-      "department": "AI research center",
-      "pdfLink": "assets/Student_Engagement.pdf",
-      'description':
-          'we are looking for an experienced cloud engineer to join our team.'
-    },
-
-    // Add more items as needed
-  ];
-  late Future<List<dynamic>> futureJobs;
-
   @override
   void initState() {
     super.initState();
-    futureJobs = fetchJobs();
   }
 
-  Future<List<dynamic>> fetchJobs() async {
-    final response =
-        await http.get(Uri.parse('http://100.29.97.185:5000/api/jobs_list'));
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body) as List<dynamic>;
-      return jsonResponse;
-    } else {
-      throw Exception('Failed to load jobs');
-    }
-  }
-
-  String? _getString(dynamic value) {
-    if (value == null) {
-      return 'No Data';
-    } else if (value is int) {
-      return value.toString();
-    } else if (value is String) {
-      return value;
-    } else {
-      return 'Invalid Data';
-    }
-  }
+  TextEditingController _batchController = TextEditingController();
+  TextEditingController _experienceController = TextEditingController();
 
   bool isAlredyCalled = false;
 
@@ -165,47 +109,169 @@ class _applyJobState extends State<applyJob> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.07,
-            decoration: const BoxDecoration(
-              color: Color(0xffFA6978),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(width: 5),
-                Text(
-                  'Campus Jobs',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.w400,
-                  ),
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.07,
+                decoration: const BoxDecoration(
+                  color: Color(0xffFA6978),
                 ),
-              ],
-            ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(width: 5),
+                    Text(
+                      'Job Application',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 28.0,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.black,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: TextField(
+                          controller: _experienceController,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          decoration: const InputDecoration(
+                            hintText:
+                                'Please mention if you have any \n prior work experience \n (job/internship/volunteering)',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    buildRow(context, 'Batch (Ex: BBA_2025)'),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.08,
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                4, 7), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius:
+                            BorderRadius.circular(16), // Add border radius
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_batchController.text.isNotEmpty) {
+                            FilePickerResult? result =
+                                await FilePicker.platform.pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['pdf'],
+                            );
+                            if (result != null) {
+                              String selectedFile = result.files.single.path!;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ResumePdfViewer(pdfPath: selectedFile),
+                                ),
+                              );
+                            }
+                          }
+                          if (_batchController.text.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title:
+                                      const Text('Please fill all the fields'),
+                                  content: const Text(
+                                      'Please enter your batch details'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(
+                              0xffF2C9CD), // Change background color to white
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16), // Adjust padding if needed
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ), // Adjust border radius if
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.upload_rounded,
+                              color: Colors.black,
+                            ),
+                            SizedBox(width: 12), // Space between logo and text
+                            Text(
+                              'Upload Resume',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-          Expanded(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                buildRow(context, 'Full Name', TextEditingController()),
-              ],
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
 
-  Container buildRow(
-      BuildContext context, String hintText, TextEditingController controller) {
+  Container buildRow(BuildContext context, String hintText) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.83,
+      width: MediaQuery.of(context).size.width * 0.8,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -217,7 +283,7 @@ class _applyJobState extends State<applyJob> {
         ],
       ),
       child: TextField(
-        controller: controller,
+        controller: _batchController,
         keyboardType: TextInputType.emailAddress,
         onChanged: (value) {
           setState(() {
@@ -242,5 +308,149 @@ class _applyJobState extends State<applyJob> {
         ),
       ),
     );
+  }
+}
+
+class ResumePdfViewer extends StatelessWidget {
+  final String pdfPath;
+  const ResumePdfViewer({super.key, required this.pdfPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SfPdfViewer.file(File(pdfPath)),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            heroTag: 'upload',
+            onPressed: () async {
+              loadingOnScreen(context);
+
+              uploadFiles(pdfPath, context);
+            },
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.check),
+          ),
+          const SizedBox(width: 20),
+          // Spacing between the buttons
+
+          FloatingActionButton(
+            heroTag: 'close',
+            onPressed: () async {
+              Navigator.pop(context);
+              // Handle "wrong" action
+            },
+            backgroundColor: Colors.red,
+            child: const Icon(Icons.close),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Future<dynamic> loadingOnScreen(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.black.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          width: 100,
+          child: Center(
+            child: SpinKitSpinningLines(
+              color: Colors.red.shade800,
+              size: 70.0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void uploadFiles(String newPath, BuildContext context) async {
+    List<File> files = [];
+
+    files.add(File(newPath));
+
+    if (files.isNotEmpty) {
+      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      var request = http.MultipartRequest('POST', uri);
+
+      for (var file in files) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'pdf', // The field name for the file in the API
+          file.path,
+        ));
+      }
+
+      // Add other fields if needed
+      request.fields['id'] = '12345'; // Replace with the actual id
+      request.fields['email'] =
+          'example@example.com'; // Replace with the actual email
+
+      // Add other fields if needed
+      // request.fields['key'] = 'value';
+
+      try {
+        var response = await request.send();
+        var responseString = await response.stream.bytesToString();
+        print("response is:");
+        print(responseString);
+
+        if (response.statusCode == 200) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Files uploaded successfully'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushNamed(context, AppRoutes.uploadPage);
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          // Handle response
+          print('Files uploaded successfully');
+        } else {
+          Navigator.pop(context);
+
+          print('Failed to upload files');
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Oops!'),
+                content:
+                    const Text('Something went wrong while uploading files.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } catch (e) {
+        print('Error uploading files: $e');
+      }
+    } else {
+      print("No file selected");
+    }
+    // Upload the files to the server
   }
 }

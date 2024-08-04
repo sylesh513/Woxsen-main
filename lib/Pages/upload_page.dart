@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -464,136 +465,143 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   void fetchSubjects() async {
-    // Get email from shared preferences
     UserPreferences userPreferences = UserPreferences();
     String? email = await userPreferences.getEmail();
+    // String email = 'kalyana.jonnalagadda@woxsen.edu.in';
 
-    // Create the JSON payload
-    Map<String, dynamic> payload = {
-      'email': email,
-    };
+    // Map<String, dynamic> payload = {
+    //   'email': 'kalyana.jonnalagadda@woxsen.edu.in',
+    // };
 
-    // Convert the payload to JSON string
-    String jsonPayload = jsonEncode(payload);
+    // String jsonPayload = jsonEncode(payload);
 
-    // Send the POST request
     Uri url = Uri.parse('http://52.20.1.249:5000/api/get_as_sub');
-    http.Response response = await http.post(url, body: jsonPayload);
+    http.Response response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    print(response.body);
 
-    // Check if the request was successful
+    var data = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      // Parse the response JSON
-      List<dynamic> subjects = jsonDecode(response.body);
+      List<String> subjectList = (data['subjects'] as List<dynamic>)
+          .map((subject) => subject.toString())
+          .toList();
+      print(subjectList);
+      List<String> semesters = (data['semester'] as List<dynamic>)
+          .map((semester) => semester.toString())
+          .toList();
+      List<String> specializations = (data['specialization'] as List<dynamic>)
+          .map((specialization) => specialization.toString())
+          .toList();
 
-      // Store the subjects in a variable
-      List<String> subjectList =
-          subjects.map((subject) => subject.toString()).toList();
       setState(() {
         store.subjectsList = subjectList;
+        store.semestersList = semesters;
+        store.specList = specializations;
       });
-
-      // Use the subjectList variable as needed
-      // ...
     } else {
-      // Handle the error
       print('Error: ${response.statusCode}');
     }
   }
 
   void updateLists() {
     return setState(() {
-      _selSect = null;
-      _selSub = null;
-      print(_selSpec);
-      if (_selSpec == 'MBA GEN') {
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.mbaGenSem1;
-        } else if (_selSem == 'Semester 4') {
-          store.subjectsList = store.mbaGenSem4;
-        }
-        dropdownValue == 'Course Outline'
-            ? showSection = false
-            : showSection = true;
-      } else if (_selSpec == 'MBA BA') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.mbaBaSem1;
-        } else if (_selSem == 'Semester 4') {
-          store.subjectsList = store.mbaBaSem4;
-        }
-      } else if (_selSpec == 'MBA FS') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.mbaFsSem1;
-        } else if (_selSem == 'Semester 4') {
-          store.subjectsList = store.mbaFsSem4;
-        }
-      } else if (_selSpec == 'BBA GEN') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.bbaGenSem1;
-        } else if (_selSem == 'Semester 3') {
-          store.subjectsList = store.bbaGenSem3;
-        } else if (_selSem == 'Semester 5') {
-          store.subjectsList = store.bbaGenSem5;
-        }
-      } else if (_selSpec == 'BBA DSAI') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.bbaAiSem1;
-        } else if (_selSem == 'Semester 3') {
-          store.subjectsList = store.bbaAiSem3;
-        } else if (_selSem == 'Semester 5') {
-          store.subjectsList = store.bbaAiSem5;
-        }
-      } else if (_selSpec == 'BBA FS') {
-        if (_selSem == 'Semester 1') {
+      if (dropdownValue != 'Assignment') {
+        _selSect = null;
+        _selSub = null;
+        print(_selSpec);
+        if (_selSpec == 'MBA GEN') {
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.mbaGenSem1;
+          } else if (_selSem == 'Semester 4') {
+            store.subjectsList = store.mbaGenSem4;
+          }
           dropdownValue == 'Course Outline'
               ? showSection = false
               : showSection = true;
-          store.subjectsList = store.bbaFsSem1;
-        } else if (_selSem == 'Semester 3') {
-          dropdownValue == 'Course Outline'
-              ? showSection = false
-              : showSection = true;
-          store.subjectsList = store.bbaFsSem3;
-        } else if (_selSem == 'Semester 5') {
-          dropdownValue == 'Course Outline'
-              ? showSection = false
-              : showSection = true;
+        } else if (_selSpec == 'MBA BA') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.mbaBaSem1;
+          } else if (_selSem == 'Semester 4') {
+            store.subjectsList = store.mbaBaSem4;
+          }
+        } else if (_selSpec == 'MBA FS') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.mbaFsSem1;
+          } else if (_selSem == 'Semester 4') {
+            store.subjectsList = store.mbaFsSem4;
+          }
+        } else if (_selSpec == 'BBA GEN') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.bbaGenSem1;
+          } else if (_selSem == 'Semester 3') {
+            store.subjectsList = store.bbaGenSem3;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.bbaGenSem5;
+          }
+        } else if (_selSpec == 'BBA DSAI') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.bbaAiSem1;
+          } else if (_selSem == 'Semester 3') {
+            store.subjectsList = store.bbaAiSem3;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.bbaAiSem5;
+          }
+        } else if (_selSpec == 'BBA FS') {
+          if (_selSem == 'Semester 1') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaFsSem1;
+          } else if (_selSem == 'Semester 3') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaFsSem3;
+          } else if (_selSem == 'Semester 5') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
 
-          store.subjectsList = store.bbaFsSem5;
-        }
-      } else if (_selSpec == 'BBA ECDM') {
-        if (_selSem == 'Semester 1') {
-          dropdownValue == 'Course Outline'
-              ? showSection = false
-              : showSection = true;
-          store.subjectsList = store.bbaDmSem1;
-        } else if (_selSem == 'Semester 3') {
-          dropdownValue == 'Course Outline'
-              ? showSection = false
-              : showSection = true;
-          store.subjectsList = store.bbaDmSem3;
-        } else if (_selSem == 'Semester 5') {
-          dropdownValue == 'Course Outline'
-              ? showSection = false
-              : showSection = true;
-          store.subjectsList = store.bbaDmSem5;
-        }
-      } else if (_selSpec == 'BBA ED') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.bbaEdSem1;
-        } else if (_selSem == 'Semester 3') {
-          store.subjectsList = store.bbaEdSem3;
-        } else if (_selSem == 'Semester 5') {
-          store.subjectsList = store.bbaEdSem5;
-        }
-      } else if (_selSpec == 'BBA INT') {
-        showSection = false;
-        if (_selSem == 'Semester 1') {
-          store.subjectsList = store.bbaIntSem1;
+            store.subjectsList = store.bbaFsSem5;
+          }
+        } else if (_selSpec == 'BBA ECDM') {
+          if (_selSem == 'Semester 1') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem1;
+          } else if (_selSem == 'Semester 3') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem3;
+          } else if (_selSem == 'Semester 5') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem5;
+          }
+        } else if (_selSpec == 'BBA ED') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.bbaEdSem1;
+          } else if (_selSem == 'Semester 3') {
+            store.subjectsList = store.bbaEdSem3;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.bbaEdSem5;
+          }
+        } else if (_selSpec == 'BBA INT') {
+          showSection = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.bbaIntSem1;
+          }
         }
       }
     });
