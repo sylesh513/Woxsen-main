@@ -7,6 +7,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/subjects_list.dart';
 
 class applyJob extends StatefulWidget {
   const applyJob({super.key});
@@ -25,6 +26,8 @@ class _applyJobState extends State<applyJob> {
   TextEditingController _experienceController = TextEditingController();
 
   bool isAlredyCalled = false;
+  ListStore store = ListStore();
+  String? selectedSchool;
 
   Future<dynamic> loadingOnScreen(BuildContext context) {
     return showDialog(
@@ -166,11 +169,54 @@ class _applyJobState extends State<applyJob> {
                       ),
                     ),
                     const SizedBox(
-                      height: 30,
+                      height: 20,
                     ),
                     buildRow(context, 'Batch (Ex: BBA_2025)'),
                     const SizedBox(
-                      height: 30,
+                      height: 20,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.83,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                4, 7), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius:
+                            BorderRadius.circular(16), // Add border radius
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            dropdownColor: Colors.white,
+                            value: selectedSchool,
+                            hint: const Text('Select School'),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedSchool = newValue;
+                              });
+                            },
+                            items: store.schools
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                     Container(
                       height: MediaQuery.of(context).size.height * 0.08,

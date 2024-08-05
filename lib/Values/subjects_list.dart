@@ -307,4 +307,11 @@ class ListStore {
     'Law',
     'Sciences',
   ];
+  final List<String> schools = [
+    'School of Technology',
+    'School of Design and Architecture',
+    'School of Business',
+    'School of Law',
+    'School of Sciences',
+  ];
 }
