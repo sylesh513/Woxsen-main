@@ -1,12 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
 
 class applyJob extends StatefulWidget {
@@ -22,8 +24,8 @@ class _applyJobState extends State<applyJob> {
     super.initState();
   }
 
-  TextEditingController _batchController = TextEditingController();
-  TextEditingController _experienceController = TextEditingController();
+  final TextEditingController _batchController = TextEditingController();
+  final TextEditingController _experienceController = TextEditingController();
 
   bool isAlredyCalled = false;
   ListStore store = ListStore();
@@ -56,7 +58,7 @@ class _applyJobState extends State<applyJob> {
       resizeToAvoidBottomInset: true,
       floatingActionButton: FloatingActionButton(
         heroTag: 'homebutton',
-        backgroundColor: Color(0xffFA6978),
+        backgroundColor: const Color(0xffFA6978),
         shape: const CircleBorder(),
         onPressed: () {
           Navigator.pushReplacementNamed(context, AppRoutes.homePage);
@@ -113,7 +115,7 @@ class _applyJobState extends State<applyJob> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: Column(
@@ -155,7 +157,7 @@ class _applyJobState extends State<applyJob> {
                         ),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: TextField(
                           controller: _experienceController,
                           keyboardType: TextInputType.multiline,
@@ -248,8 +250,11 @@ class _applyJobState extends State<applyJob> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResumePdfViewer(pdfPath: selectedFile),
+                                  builder: (context) => ResumePdfViewer(
+                                      pdfPath: selectedFile,
+                                      experience: _experienceController.text,
+                                      batch: _batchController.text,
+                                      school: selectedSchool),
                                 ),
                               );
                             }
@@ -358,8 +363,16 @@ class _applyJobState extends State<applyJob> {
 }
 
 class ResumePdfViewer extends StatelessWidget {
+  final String batch;
+  final String? school;
   final String pdfPath;
-  const ResumePdfViewer({super.key, required this.pdfPath});
+  final String? experience;
+  const ResumePdfViewer(
+      {super.key,
+      required this.pdfPath,
+      this.experience,
+      required this.batch,
+      this.school});
 
   @override
   Widget build(BuildContext context) {
@@ -418,29 +431,69 @@ class ResumePdfViewer extends StatelessWidget {
 
   void uploadFiles(String newPath, BuildContext context) async {
     List<File> files = [];
+    UserPreferences userPreferences = UserPreferences();
+    String email = await userPreferences.getEmail();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jobId = prefs.getString('jobId');
+    var name;
+    var Id;
+    var program;
+    var academicYear;
+    var phone;
+
+    final userResponse = await http.post(
+      Uri.parse('http://52.20.1.249:5000/api/fetch_profile'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'required': 'profile_details',
+        'email': email,
+      }),
+    );
+    print(userResponse.body);
+
+    if (userResponse.statusCode == 200) {
+      var data = jsonDecode(userResponse.body);
+      name = data['name'];
+      Id = data['id'];
+      program = data['course'];
+      academicYear = data['specialization'];
+      phone = data['phone'];
+    } else {
+      print('Request failed with status: ${userResponse.statusCode}');
+    }
 
     files.add(File(newPath));
 
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      var uri = Uri.parse('http://10.106.26.206:8000/apply_job/$jobId');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {
         request.files.add(await http.MultipartFile.fromPath(
-          'pdf', // The field name for the file in the API
+          'pdf',
           file.path,
         ));
       }
-
-      // Add other fields if needed
-      request.fields['id'] = '12345'; // Replace with the actual id
-      request.fields['email'] =
-          'example@example.com'; // Replace with the actual email
+      request.headers['Content-Type'] = 'application/json';
+      request.fields['id'] = jobId!;
+      request.fields['email'] = email.toString();
+      request.fields['name'] = name;
+      request.fields['id'] = Id;
+      request.fields['program'] = program;
+      request.fields['academic_year'] = academicYear;
+      request.fields['phone'] = phone;
+      request.fields['experience'] = experience.toString();
+      request.fields['batch'] = batch;
+      request.fields['school'] = school.toString();
 
       // Add other fields if needed
       // request.fields['key'] = 'value';
 
       try {
+        print("The request is: ");
+        print(request);
         var response = await request.send();
         var responseString = await response.stream.bytesToString();
         print("response is:");

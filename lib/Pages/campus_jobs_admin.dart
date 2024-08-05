@@ -133,7 +133,7 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                           0.46, // 40% of screen width
                       height: 90,
                       child: Card(
-                        color: Color(0xffF2C9CD),
+                        color: const Color(0xffF2C9CD),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -148,7 +148,7 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                               subtitle: Text(
                                 jobCount.toString(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 20),
                               ),
                             ),
@@ -199,7 +199,7 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(5.0),
                     child: campusJobs(
                       isBox: false,
                       updateCount: updateCount,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -190,16 +189,19 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSect = null;
                       _selSpec = null;
-                      print(newValue);
                       _selCourse = newValue;
-                      if (newValue == 'B.Tech') {
-                        store.specList = store.btechSpecializations;
-                      } else if (newValue == 'M.B.A') {
-                        store.specList = store.mbaSpecializations;
-                      } else if (newValue == 'B.B.A') {
-                        store.specList = store.bbaSpecializations;
-                      }
                     });
+                    if (dropdownValue != 'Assignment') {
+                      setState(() {
+                        if (newValue == 'B.Tech') {
+                          store.specList = store.btechSpecializations;
+                        } else if (newValue == 'M.B.A') {
+                          store.specList = store.mbaSpecializations;
+                        } else if (newValue == 'B.B.A') {
+                          store.specList = store.bbaSpecializations;
+                        }
+                      });
+                    }
                   },
                   items: store.courses
                       .map<DropdownMenuItem<String>>((String value) {
@@ -239,6 +241,7 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSem = newValue;
                     });
+
                     updateLists();
                   },
                   items: store.semestersList
@@ -279,6 +282,7 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSpec = newValue;
                     });
+
                     updateLists();
                   },
                   items: store.specList
@@ -500,7 +504,7 @@ class _UploadPageState extends State<UploadPage> {
     http.Response response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
+      body: jsonEncode({'email': 'kalyana.jonnalagadda@woxsen.edu.in'}),
     );
     print(response.body);
 
@@ -518,9 +522,9 @@ class _UploadPageState extends State<UploadPage> {
           .toList();
 
       setState(() {
-        store.subjectsList = subjectList;
-        store.semestersList = semesters;
-        store.specList = specializations;
+        store.subjectsList = subjectList.toSet().toList();
+        store.semestersList = semesters.toSet().toList();
+        store.specList = specializations.toSet().toList();
       });
       Navigator.pop(context);
     } else {
@@ -654,11 +658,56 @@ class _UploadPageState extends State<UploadPage> {
 
     // Use FilePicker to select the PDF
     FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
+    if (result != null && dropdownValue == 'Assignment') {
+      List<File> files = result.paths.map((path) => File(path!)).toList();
 
-    if (result != null) {
+      // Rename files
+      List<File> renamedFiles = [];
+      for (int i = 0; i < files.length; i++) {
+        String newPath = path.join(
+          path.dirname(files[i].path),
+          'renamed_file_$i.pdf',
+        );
+        File renamedFile = files[i].renameSync(newPath);
+        renamedFiles.add(renamedFile);
+      }
+
+      // Send files to API endpoint
+      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      var request = http.MultipartRequest('POST', uri);
+
+      for (var file in renamedFiles) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'pdf', // The field name for the file in the API
+          file.path,
+        ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenPdfViewer(pdfPath: file.path),
+          ),
+        );
+      }
+
+      // Add other fields if needed
+
+      try {
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          print('Files uploaded successfully');
+        } else {
+          print('Failed to upload files: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error uploading files: $e');
+      }
+    }
+
+    if (result != null && dropdownValue != 'Assignment') {
       File file = File(result.files.single.path!);
       String directoryPath = (await getTemporaryDirectory()).path;
       String? newFileName;

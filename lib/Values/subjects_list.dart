@@ -6,6 +6,8 @@ class ListStore {
     course = await UserPreferences.getCourse();
   }
 
+  String? jobId;
+
   List<String> mbaBaSem1 = [
     'Introduction to Python',
     'Introduction to Marketing Mgmt',
@@ -309,9 +311,10 @@ class ListStore {
   ];
   final List<String> schools = [
     'School of Technology',
-    'School of Design and Architecture',
+    'School of Architecture and Planning',
     'School of Business',
     'School of Law',
     'School of Sciences',
+    'School of Arts and Design'
   ];
 }
