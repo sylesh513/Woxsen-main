@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Pages/apply_campusjob.dart';
+import 'package:woxsen/Pages/create_job.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:woxsen/Values/subjects_list.dart';
@@ -293,22 +294,99 @@ class _campusJobsState extends State<campusJobs> {
                                   Padding(
                                     padding: const EdgeInsets.all(10.0),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _getString(job['designation'])!,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _getString(job['designation'])!,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        _buildKeyValue(
-                                            'ID', _getString(job['id'])),
-                                        _buildKeyValue('Department',
-                                            _getString(job['department'])),
-                                      ],
-                                    ),
+                                          _buildKeyValue(
+                                              'ID', _getString(job['id'])),
+                                          _buildKeyValue('Department',
+                                              _getString(job['department'])),
+                                          if (!widget.isBox)
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit,
+                                                      size: 30),
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context,
+                                                            animation,
+                                                            secondaryAnimation) {
+                                                          return FadeTransition(
+                                                            opacity: animation,
+                                                            child: CreateJob(
+                                                              title:
+                                                                  'Edit a Job',
+                                                              id: job['id'],
+                                                              department: job[
+                                                                  'department'],
+                                                              role: job[
+                                                                  'designation'],
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+
+                                                    // Handle edit button press
+                                                  },
+                                                ),
+                                                const SizedBox(width: 10),
+                                                IconButton(
+                                                  icon: const Icon(Icons.delete,
+                                                      size: 30),
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                              'Delete Job'),
+                                                          content: const Text(
+                                                              'Are you sure you want to delete this job?'),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              child: const Text(
+                                                                  'No'),
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            ),
+                                                            TextButton(
+                                                              child: const Text(
+                                                                  'Yes'),
+                                                              onPressed: () {
+                                                                // Perform delete operation here
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+
+                                                    // Handle delete button press
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                        ]),
                                   ),
                                 ],
                               ),

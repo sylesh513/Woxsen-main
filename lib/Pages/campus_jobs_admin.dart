@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:woxsen/Pages/academics_page.dart';
 import 'package:woxsen/Pages/campus_jobs.dart';
+import 'package:woxsen/Pages/create_job.dart';
 import 'package:woxsen/Values/app_routes.dart';
+import 'package:http/http.dart' as http;
 
 class campusJobsAdmin extends StatefulWidget {
   const campusJobsAdmin({super.key});
@@ -21,7 +28,7 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
     {"title": "Job 8", "applicants": 150},
     {"title": "Job 9", "applicants": 200},
 
-    // Add more items as needed
+    // Add more items as
   ];
   int jobCount = 0;
   updateCount(int count) {
@@ -205,60 +212,94 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                       updateCount: updateCount,
                     ),
                   ),
-                  // child: Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: ListView.builder(
-                  //     itemCount: items.length,
-                  //     itemBuilder: (context, index) {
-                  //       return Card(
-                  //         color: const Color(0xffF2C9CD),
-                  //         child: ListTile(
-                  //           title: Text(items[index]["title"]),
-                  //           subtitle: Text(
-                  //               "Number of applicants: ${items[index]["applicants"]}"),
-                  //           trailing: Row(
-                  //             mainAxisSize: MainAxisSize.min,
-                  //             children: [
-                  //               IconButton(
-                  //                 icon: const Icon(Icons.edit),
-                  //                 onPressed: () {
-                  //                   // Handle edit action
-                  //                 },
-                  //               ),
-                  //               IconButton(
-                  //                 icon: const Icon(Icons.delete),
-                  //                 onPressed: () {
-                  //                   // Handle delete action
-                  //                 },
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
                 ),
               ),
               const SizedBox(
-                height: 15,
+                height: 10,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                height: 60, // Set height
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200, // Background color
-                  borderRadius:
-                      BorderRadius.circular(10), // Optional: Rounded corners
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.add_circle,
-                      size: 40,
-                      color: Colors.green), // Add button with green color
-                  onPressed: () {
-                    // Action to perform on button press
-                  },
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.42,
+                    height: 60, // Set height
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200, // Background color
+                      borderRadius: BorderRadius.circular(
+                          10), // Optional: Rounded corners
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.add_circle,
+                          size: 40,
+                          color: Colors.green), // Add button with green color
+                      onPressed: () {
+                        print("add job");
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: CreateJob(
+                                  title: "Post a job",
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                        // Action to perform on button press
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.42,
+                    height: 60, // Set height
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200, // Background color
+                      borderRadius: BorderRadius.circular(
+                          10), // Optional: Rounded corners
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.download,
+                          size: 40,
+                          color: Colors.green), // Add button with green color
+                      onPressed: () async {
+                        print("download jobs");
+                        const String apiUrl =
+                            'http://10.106.23.119:8000/api/download_applications';
+                        final response = await http.post(
+                          Uri.parse(apiUrl),
+                          headers: <String, String>{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                          },
+                        );
+                        if (response.statusCode == 200) {
+                          final bytes = response.bodyBytes;
+                          final dir = await getApplicationDocumentsDirectory();
+                          final file =
+                              File('${dir?.path}/JobsApplications.csv');
+
+                          await file.writeAsBytes(bytes);
+                          setState(() {
+                            var _pdfPath = file.path;
+                            print(_pdfPath);
+
+                            // Navigator.push(context,
+                            //     MaterialPageRoute(builder: (context) {
+                            //   return pdfView(pdfPath: _pdfPath);
+                            // }));
+                          });
+                        }
+
+                        // Action to perform on button press
+                      },
+                    ),
+                  ),
+                ],
               )
             ],
           )),
