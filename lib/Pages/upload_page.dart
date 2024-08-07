@@ -143,6 +143,10 @@ class _UploadPageState extends State<UploadPage> {
                         _subject = false;
                       }
                       if (newValue == "Assignment") {
+                        _selSem = null;
+                        _selSpec = null;
+                        _selSub = null;
+                        _selSect = null;
                         fetchSubjects();
                       }
                       dropdownValue = newValue;
@@ -429,7 +433,9 @@ class _UploadPageState extends State<UploadPage> {
                   } else if (dropdownValue == 'Course Outline') {
                     await selectAndRenamePDF('CO');
                   } else {
-                    await selectAndRenamePDF('AS');
+                    await selectAndRenamePDF(
+                      'AS',
+                    );
                   }
                 }
               },
@@ -652,63 +658,18 @@ class _UploadPageState extends State<UploadPage> {
     });
   }
 
-  Future<void> selectAndRenamePDF(String str) async {
-    // String? pathCO;
-    // String? pathTT;
-
-    // Use FilePicker to select the PDF
+  Future<void> selectAndRenamePDF(String str, [String? index]) async {
+    print(index ?? 'No index');
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
-    if (result != null && dropdownValue == 'Assignment') {
+    List<File> editedFiles = [];
+
+    if (result != null) {
       List<File> files = result.paths.map((path) => File(path!)).toList();
 
-      // Rename files
-      List<File> renamedFiles = [];
-      for (int i = 0; i < files.length; i++) {
-        String newPath = path.join(
-          path.dirname(files[i].path),
-          'renamed_file_$i.pdf',
-        );
-        File renamedFile = files[i].renameSync(newPath);
-        renamedFiles.add(renamedFile);
-      }
-
-      // Send files to API endpoint
-      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
-      var request = http.MultipartRequest('POST', uri);
-
-      for (var file in renamedFiles) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'pdf', // The field name for the file in the API
-          file.path,
-        ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FullScreenPdfViewer(pdfPath: file.path),
-          ),
-        );
-      }
-
-      // Add other fields if needed
-
-      try {
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print('Files uploaded successfully');
-        } else {
-          print('Failed to upload files: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error uploading files: $e');
-      }
-    }
-
-    if (result != null && dropdownValue != 'Assignment') {
-      File file = File(result.files.single.path!);
       String directoryPath = (await getTemporaryDirectory()).path;
       String? newFileName;
       if (str == 'TT' && store.specWithSec.contains(_selSpec)) {
@@ -719,30 +680,51 @@ class _UploadPageState extends State<UploadPage> {
       } else if (str == 'CO') {
         newFileName =
             "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSub.pdf";
-      } else if (str == 'AS' && _selSpec == 'MBA GEN') {
-        newFileName =
-            "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_$_selSect.pdf";
-      } else if (str == 'AS' && _selSpec != 'MBA GEN') {
-        newFileName = "${str}_${_selCourse}_${_selSem}_$_selSpec.pdf";
       }
-      String newPath = path.join(directoryPath, newFileName);
+      if (str == 'AS') {
+        for (var file in files) {
+          print("path path path");
+          String fileName = path.basename(file.path);
+          fileName = fileName
+              .replaceAll(' ', '')
+              .replaceAll('_', '')
+              .replaceAll('.pdf', '');
+          print(fileName);
+          if (store.specWithSec.contains(_selSpec)) {
+            newFileName =
+                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_${_selSect}_$fileName.pdf";
+            editedFiles.add(File(path.join(directoryPath, newFileName)));
+          } else if (!store.specWithSec.contains(_selSpec)) {
+            newFileName =
+                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_$fileName.pdf";
+            editedFiles.add(File(path.join(directoryPath, newFileName)));
+          }
+          for (var newFile in editedFiles) {
+            await file.copy(newFile.path);
+          }
+        }
 
-      // if (str == 'CO') {
-      //   pathCO = newPath;
-      // } else if (str == 'TT') {
-      //   pathTT = newPath;
-      // }
-      newPath = path.join(directoryPath, newFileName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenPdfViewer(files: editedFiles),
+          ),
+        );
+      } else {
+        String newPath = path.join(directoryPath, newFileName);
+        newPath = path.join(directoryPath, newFileName);
+        for (var file in files) {
+          await file.copy(newPath);
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenPdfViewer(files: [File(newPath)]),
+          ),
+        );
 
-      await file.copy(newPath);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FullScreenPdfViewer(pdfPath: newPath),
-        ),
-      );
-
-      print("File has been renamed and saved to: $newPath");
+        print("File has been renamed and saved to: $newPath");
+      }
     } else {
       print("No file selected");
     }
@@ -750,13 +732,13 @@ class _UploadPageState extends State<UploadPage> {
 }
 
 class FullScreenPdfViewer extends StatelessWidget {
-  final String pdfPath;
-  const FullScreenPdfViewer({super.key, required this.pdfPath});
+  final List<File> files;
+  const FullScreenPdfViewer({super.key, required this.files});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SfPdfViewer.file(File(pdfPath)),
+      body: SfPdfViewer.file(File(files[0].path)),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
@@ -767,7 +749,7 @@ class FullScreenPdfViewer extends StatelessWidget {
 
               bool faculty = await UserPreferences.getRole() == 'faculty';
               if (faculty) {
-                uploadFiles(pdfPath, context);
+                uploadFiles(files, context);
               }
             },
             backgroundColor: Colors.green,
@@ -811,13 +793,11 @@ class FullScreenPdfViewer extends StatelessWidget {
     );
   }
 
-  void uploadFiles(String newpath, BuildContext context) async {
-    List<File> files = [];
-
-    files.add(File(newpath));
+  void uploadFiles(List<File> newpath, BuildContext context) async {
+    List<File> files = newpath;
 
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      var uri = Uri.parse('http://10.106.23.119:5000/api/upload');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {

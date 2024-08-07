@@ -467,7 +467,7 @@ class ResumePdfViewer extends StatelessWidget {
     files.add(File(newPath));
 
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://10.106.26.206:8000/apply_job/$jobId');
+      var uri = Uri.parse('http://10.106.16.71:8000/apply_job/$jobId');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {
@@ -477,14 +477,12 @@ class ResumePdfViewer extends StatelessWidget {
         ));
       }
       request.headers['Content-Type'] = 'application/json';
-      request.fields['id'] = jobId!;
+
+      request.fields['jobId'] = jobId!;
       request.fields['email'] = email.toString();
       request.fields['name'] = name;
-      request.fields['id'] = Id;
-      request.fields['program'] = program;
-      request.fields['academic_year'] = academicYear;
       request.fields['phone'] = phone;
-      request.fields['experience'] = experience.toString();
+      request.fields['previous_experience'] = experience.toString();
       request.fields['batch'] = batch;
       request.fields['school'] = school.toString();
 
@@ -498,7 +496,6 @@ class ResumePdfViewer extends StatelessWidget {
         var responseString = await response.stream.bytesToString();
         print("response is:");
         print(responseString);
-
         if (response.statusCode == 200) {
           showDialog(
             context: context,
@@ -510,7 +507,7 @@ class ResumePdfViewer extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.pushNamed(context, AppRoutes.uploadPage);
+                      Navigator.pushNamed(context, AppRoutes.homePage);
                     },
                     child: const Text('OK'),
                   ),
