@@ -496,17 +496,8 @@ class _UploadPageState extends State<UploadPage> {
 
   void fetchSubjects() async {
     loadingOnScreen(context);
-    UserPreferences userPreferences = UserPreferences();
-    String? email = await userPreferences.getEmail();
-    // String email = 'kalyana.jonnalagadda@woxsen.edu.in';
 
-    // Map<String, dynamic> payload = {
-    //   'email': 'kalyana.jonnalagadda@woxsen.edu.in',
-    // };
-
-    // String jsonPayload = jsonEncode(payload);
-
-    Uri url = Uri.parse('http://52.20.1.249:5000/api/get_as_sub');
+    Uri url = Uri.parse('${store.woxUrl}/api/get_as_sub');
     http.Response response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -795,9 +786,9 @@ class FullScreenPdfViewer extends StatelessWidget {
 
   void uploadFiles(List<File> newpath, BuildContext context) async {
     List<File> files = newpath;
-
+    ListStore store = ListStore();
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://10.106.23.119:5000/api/upload');
+      var uri = Uri.parse('${store.woxUrl}/api/upload');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {

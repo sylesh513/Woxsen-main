@@ -180,40 +180,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
-
-                // Container(
-                //   width: MediaQuery.of(context).size.width * 0.83,
-                //   decoration: BoxDecoration(
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.black.withOpacity(0.5),
-                //         spreadRadius: 1,
-                //         blurRadius: 9,
-                //         offset: const Offset(4, 7), // changes position of shadow
-                //       ),
-                //     ],
-                //   ),
-                //   child: TextField(
-                //     controller: _passwordController,
-                //     keyboardType: TextInputType.visiblePassword,
-                //     decoration: const InputDecoration(
-                //       fillColor: Colors.white,
-                //       filled: true,
-                //       hintText: '  Password',
-                //       hintStyle: TextStyle(
-                //         color: Colors.black,
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.w600,
-                //       ),
-                //       border: OutlineInputBorder(
-                //         borderSide: BorderSide.none,
-                //         borderRadius: BorderRadius.all(
-                //           Radius.circular(16),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(height: 20),
                 const Text("Forgot Password?",
                     style: TextStyle(
@@ -472,8 +438,7 @@ class _SignUpPageState extends State<SignUpPage> {
     print('called signup');
     var userPrefs = UserPreferences();
     await userPrefs.setEmail(email);
-    const String apiUrl =
-        'http://52.20.1.249:5000/api/register'; // Replace with your API URL
+    String apiUrl = '${store.woxUrl}/api/register'; // Replace with your API URL
     final response = await httpp.post(
       Uri.parse(apiUrl),
       headers: <String, String>{

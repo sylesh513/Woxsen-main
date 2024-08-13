@@ -2,8 +2,14 @@ import 'package:woxsen/Values/login_status.dart';
 
 class ListStore {
   String? course;
+  bool isFaculty = false;
+
+  get woxUrl => null;
+
+  get jobsUrl => null;
   Future<void> getCourse() async {
     course = await UserPreferences.getCourse();
+    isFaculty = await UserPreferences.getRole() == 'faculty';
   }
 
   String? jobId;

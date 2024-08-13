@@ -70,7 +70,7 @@ class _campusJobsState extends State<campusJobs> {
 
   Future<List<dynamic>> fetchJobs() async {
     final response =
-        await http.get(Uri.parse('http://100.29.97.185:5000/api/jobs_list'));
+        await http.get(Uri.parse('${store.jobsUrl}/api/jobs_list'));
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as List<dynamic>;
@@ -100,8 +100,7 @@ class _campusJobsState extends State<campusJobs> {
     prefs.setString('jobId', jobId);
 
     loadingOnScreen(context);
-    const baseUrl =
-        'http://100.29.97.185:5000'; // Replace with your base API URL
+    var baseUrl = store.jobsUrl; // Replace with your base API URL
     final formattedDocumentPath =
         documentPath.startsWith('/') ? documentPath.substring(1) : documentPath;
 

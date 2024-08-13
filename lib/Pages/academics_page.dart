@@ -315,7 +315,7 @@ class _AcademicsState extends State<Academics> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Container(
                 child: ElevatedButton(
                   onPressed: () async {
@@ -510,192 +510,109 @@ class _AcademicsState extends State<Academics> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              // Container(
-              //   child: ElevatedButton(
-              //     onPressed: () {},
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: const Color(
-              //           0xffFE7E7E7), // Change background color to white
-              //       minimumSize:
-              //           const Size(270, 63), // Change dimensions of the button
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 16), // Adjust padding if needed
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(18),
-              //       ), // Adjust border radius if
-              //     ),
-              //     child: const Text(
-              //       'Attendance',
-              //       style: TextStyle(color: Colors.black, fontSize: 24),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 16),
-              // Container(
-              //   child: ElevatedButton(
-              //     onPressed: () {},
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: const Color(
-              //           0xffE7E7E7), // Change background color to white
-              //       minimumSize:
-              //           const Size(270, 63), // Change dimensions of the button
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 16), // Adjust padding if needed
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(18),
-              //       ), // Adjust border radius if
-              //     ),
-              //     child: const Text(
-              //       'Exam Schedule',
-              //       style: TextStyle(color: Colors.black, fontSize: 24),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 16),
-              // Container(
-              //   child: ElevatedButton(
-              //     onPressed: () {},
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: const Color(
-              //           0xffE7E7E7), // Change background color to white
-              //       minimumSize:
-              //           const Size(270, 63), // Change dimensions of the button
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 16), // Adjust padding if needed
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(18),
-              //       ), // Adjust border radius if
-              //     ),
-              //     child: const Text(
-              //       'Results',
-              //       style: TextStyle(color: Colors.black, fontSize: 24),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 16),
-              Container(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (dropdownValue == null) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Please select a semester'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    } else if (dropdownValue != null) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return AlertDialog(
-                                title: const Text('Select Options'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    DropdownButton<String>(
-                                      value: selectedSpecialization,
-                                      hint: const Text('Select Specialization'),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          // Subjects.clear();
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  if (dropdownValue == null) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Please select a semester'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else if (dropdownValue != null) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return AlertDialog(
+                              title: const Text('Select Options'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  DropdownButton<String>(
+                                    value: selectedSpecialization,
+                                    hint: const Text('Select Specialization'),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        // Subjects.clear();
+                                        selectedSection = null;
+                                        selectedSubject = null;
+
+                                        selectedSpecialization = newValue;
+                                        if (selectedSpecialization ==
+                                            'MBA GEN') {
+                                          if (dropdownValue == 'Semester 1') {
+                                            store.subjectsList =
+                                                store.mbaGenSem1;
+                                          } else if (dropdownValue ==
+                                              'Semester 4') {
+                                            store.subjectsList =
+                                                store.mbaGenSem4;
+                                          }
+
+                                          showSection = true;
+                                        } else if (selectedSpecialization !=
+                                            'MBA GEN') {
                                           selectedSection = null;
-                                          selectedSubject = null;
-
-                                          selectedSpecialization = newValue;
-                                          if (selectedSpecialization ==
-                                              'MBA GEN') {
-                                            if (dropdownValue == 'Semester 1') {
-                                              store.subjectsList =
-                                                  store.mbaGenSem1;
-                                            } else if (dropdownValue ==
-                                                'Semester 4') {
-                                              store.subjectsList =
-                                                  store.mbaGenSem4;
-                                            }
-
-                                            showSection = true;
-                                          } else if (selectedSpecialization !=
-                                              'MBA GEN') {
-                                            selectedSection = null;
-                                            showSection = false;
+                                          showSection = false;
+                                        }
+                                        if (selectedSpecialization ==
+                                            'MBA BA') {
+                                          if (dropdownValue == 'Semester 1') {
+                                            store.subjectsList =
+                                                store.mbaBaSem1;
+                                          } else if (dropdownValue ==
+                                              'Semester 4') {
+                                            store.subjectsList =
+                                                store.mbaBaSem4;
                                           }
-                                          if (selectedSpecialization ==
-                                              'MBA BA') {
-                                            if (dropdownValue == 'Semester 1') {
-                                              store.subjectsList =
-                                                  store.mbaBaSem1;
-                                            } else if (dropdownValue ==
-                                                'Semester 4') {
-                                              store.subjectsList =
-                                                  store.mbaBaSem4;
-                                            }
-                                          } else if (selectedSpecialization ==
-                                              'MBA FS') {
-                                            if (dropdownValue == 'Semester 1') {
-                                              store.subjectsList =
-                                                  store.mbaFsSem1;
-                                            } else if (dropdownValue ==
-                                                'Semester 4') {
-                                              store.subjectsList =
-                                                  store.mbaFsSem4;
-                                            }
+                                        } else if (selectedSpecialization ==
+                                            'MBA FS') {
+                                          if (dropdownValue == 'Semester 1') {
+                                            store.subjectsList =
+                                                store.mbaFsSem1;
+                                          } else if (dropdownValue ==
+                                              'Semester 4') {
+                                            store.subjectsList =
+                                                store.mbaFsSem4;
                                           }
-                                        });
-                                        updateLists();
-                                      },
-                                      items: store.specList
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: SizedBox(
-                                              width: 250, child: Text(value)),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    if (showSection)
-                                      DropdownButton<String>(
-                                        value: selectedSection,
-                                        hint: const Text('Select Section'),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedSection = newValue;
-                                          });
-                                          updateLists();
-                                        },
-                                        items: store.sectionsList
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: SizedBox(
-                                                width: 250, child: Text(value)),
-                                          );
-                                        }).toList(),
-                                      ),
+                                        }
+                                      });
+                                      updateLists();
+                                    },
+                                    items: store.specList
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: SizedBox(
+                                            width: 250, child: Text(value)),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  if (showSection)
                                     DropdownButton<String>(
-                                      value: selectedSubject,
-                                      hint: const Text('Select Subject'),
+                                      value: selectedSection,
+                                      hint: const Text('Select Section'),
                                       onChanged: (String? newValue) {
                                         setState(() {
-                                          selectedSubject = newValue;
+                                          selectedSection = newValue;
                                         });
                                         updateLists();
                                       },
-                                      items: store.subjectsList
+                                      items: store.sectionsList
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
                                         return DropdownMenuItem<String>(
@@ -705,57 +622,96 @@ class _AcademicsState extends State<Academics> {
                                         );
                                       }).toList(),
                                     ),
-                                  ],
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      if (selectedSection == null &&
-                                          selectedSubject == null) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Please select a section and subject'),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('OK'),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      } else {
-                                        getPdf(
-                                          'AS',
-                                          selectedSpecialization,
-                                          selectedSection ?? 'N/A',
-                                          selectedSubject,
-                                        );
-                                      }
-                                      // Handle OK action
+                                  DropdownButton<String>(
+                                    value: selectedSubject,
+                                    hint: const Text('Select Subject'),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        selectedSubject = newValue;
+                                      });
+                                      updateLists();
                                     },
-                                    child: const Text('OK'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // Handle Cancel action
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Cancel'),
+                                    items: store.subjectsList
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: SizedBox(
+                                            width: 250, child: Text(value)),
+                                      );
+                                    }).toList(),
                                   ),
                                 ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    }
-                  },
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    if (selectedSection == null &&
+                                        selectedSubject == null) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                'Please select a section and subject'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      getPdf(
+                                        'AS',
+                                        selectedSpecialization,
+                                        selectedSection ?? 'N/A',
+                                        selectedSubject,
+                                      );
+                                    }
+                                    // Handle OK action
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Handle Cancel action
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(
+                      0xffE7E7E7), // Change background color to white
+                  minimumSize:
+                      const Size(270, 63), // Change dimensions of the button
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16), // Adjust padding if needed
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ), // Adjust border radius if
+                ),
+                child: const Text(
+                  'Assignments',
+                  style: TextStyle(color: Colors.black, fontSize: 24),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (store.isFaculty)
+                ElevatedButton(
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(
                         0xffE7E7E7), // Change background color to white
@@ -768,11 +724,10 @@ class _AcademicsState extends State<Academics> {
                     ), // Adjust border radius if
                   ),
                   child: const Text(
-                    'Assignments',
+                    'Subject List',
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),
-              ),
             ],
           )),
         ],
@@ -780,43 +735,11 @@ class _AcademicsState extends State<Academics> {
     );
   }
 
-  // Future<void> selectAndRenamePDF(String str) async {
-  //   // Use FilePicker to select the PDF
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.custom,
-  //     allowedExtensions: ['pdf'],
-  //   );
-
-  //   if (result != null) {
-  //     File file = File(result.files.single.path!);
-  //     String directoryPath = (await getTemporaryDirectory()).path;
-  //     // String selCourse = await UserPreferences.getCourse();
-  //     String selCourse = 'B.Tech';
-
-  //     String newFileName = "TT_${selCourse}_${dropdownValue}_Tigers.pdf";
-  //     String newPath = path.join(directoryPath, newFileName);
-
-  //     newPath = path.join(directoryPath, newFileName);
-
-  //     await file.copy(newPath);
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => FullScreenPdfViewer(pdfPath: newPath),
-  //       ),
-  //     );
-
-  //     print("File has been renamed and saved to: $newPath");
-  //   } else {
-  //     print("No file selected");
-  //   }
-  // }
-
   Future<void> getPdf(String what, String? specialization, String? section,
       [String? subject]) async {
     loadingOnScreen(context);
 
-    const String apiUrl = 'http://52.20.1.249:5000/api/view_files';
+    const String apiUrl = '/api/view_files';
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: <String, String>{
@@ -1007,7 +930,8 @@ class pdfView extends StatelessWidget {
     files.add(File(newpath));
 
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      ListStore store = ListStore();
+      var uri = Uri.parse('${store.woxUrl}/api/upload');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {

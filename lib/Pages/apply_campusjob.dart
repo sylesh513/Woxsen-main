@@ -436,13 +436,11 @@ class ResumePdfViewer extends StatelessWidget {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jobId = prefs.getString('jobId');
     var name;
-    var Id;
-    var program;
-    var academicYear;
     var phone;
+    ListStore store = ListStore();
 
     final userResponse = await http.post(
-      Uri.parse('http://52.20.1.249:5000/api/fetch_profile'),
+      Uri.parse('${store.woxUrl}/api/fetch_profile'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -456,9 +454,9 @@ class ResumePdfViewer extends StatelessWidget {
     if (userResponse.statusCode == 200) {
       var data = jsonDecode(userResponse.body);
       name = data['name'];
-      Id = data['id'];
-      program = data['course'];
-      academicYear = data['specialization'];
+      // Id = data['id'];
+      // program = data['course'];
+      // academicYear = data['specialization'];
       phone = data['phone'];
     } else {
       print('Request failed with status: ${userResponse.statusCode}');
@@ -467,7 +465,7 @@ class ResumePdfViewer extends StatelessWidget {
     files.add(File(newPath));
 
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://10.106.16.71:8000/apply_job/$jobId');
+      var uri = Uri.parse('${store.jobsUrl}/apply_job/$jobId');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {

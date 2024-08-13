@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:woxsen/Pages/academics_page.dart';
 import 'package:woxsen/Pages/campus_jobs.dart';
 import 'package:woxsen/Pages/create_job.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/subjects_list.dart';
 
 class campusJobsAdmin extends StatefulWidget {
   const campusJobsAdmin({super.key});
@@ -268,9 +267,11 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                           size: 40,
                           color: Colors.green), // Add button with green color
                       onPressed: () async {
+                        loadingOnScreen(context);
                         print("download jobs");
-                        const String apiUrl =
-                            'http://10.106.23.119:8000/api/download_applications';
+                        ListStore store = ListStore();
+                        String apiUrl =
+                            '${store.jobsUrl}/api/download_applications';
                         final response = await http.post(
                           Uri.parse(apiUrl),
                           headers: <String, String>{
@@ -278,21 +279,30 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
                           },
                         );
                         if (response.statusCode == 200) {
+                          Navigator.pop(context);
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('File Saved'),
+                                content: const Text(
+                                    'The file has been saved to Documents.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                           final bytes = response.bodyBytes;
                           final dir = await getApplicationDocumentsDirectory();
-                          final file =
-                              File('${dir?.path}/JobsApplications.csv');
+                          final file = File('${dir.path}/JobsApplications.csv');
 
                           await file.writeAsBytes(bytes);
-                          setState(() {
-                            var _pdfPath = file.path;
-                            print(_pdfPath);
-
-                            // Navigator.push(context,
-                            //     MaterialPageRoute(builder: (context) {
-                            //   return pdfView(pdfPath: _pdfPath);
-                            // }));
-                          });
                         }
 
                         // Action to perform on button press
@@ -305,6 +315,26 @@ class _campusJobsAdminState extends State<campusJobsAdmin> {
           )),
         ],
       ),
+    );
+  }
+
+  Future<dynamic> loadingOnScreen(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.black.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          width: 100,
+          child: Center(
+            child: SpinKitSpinningLines(
+              color: Colors.red.shade800,
+              size: 70.0,
+            ),
+          ),
+        );
+      },
     );
   }
 }
