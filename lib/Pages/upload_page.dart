@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -144,6 +143,10 @@ class _UploadPageState extends State<UploadPage> {
                         _subject = false;
                       }
                       if (newValue == "Assignment") {
+                        _selSem = null;
+                        _selSpec = null;
+                        _selSub = null;
+                        _selSect = null;
                         fetchSubjects();
                       }
                       dropdownValue = newValue;
@@ -190,16 +193,19 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSect = null;
                       _selSpec = null;
-                      print(newValue);
                       _selCourse = newValue;
-                      if (newValue == 'B.Tech') {
-                        store.specList = store.btechSpecializations;
-                      } else if (newValue == 'M.B.A') {
-                        store.specList = store.mbaSpecializations;
-                      } else if (newValue == 'B.B.A') {
-                        store.specList = store.bbaSpecializations;
-                      }
                     });
+                    if (dropdownValue != 'Assignment') {
+                      setState(() {
+                        if (newValue == 'B.Tech') {
+                          store.specList = store.btechSpecializations;
+                        } else if (newValue == 'M.B.A') {
+                          store.specList = store.mbaSpecializations;
+                        } else if (newValue == 'B.B.A') {
+                          store.specList = store.bbaSpecializations;
+                        }
+                      });
+                    }
                   },
                   items: store.courses
                       .map<DropdownMenuItem<String>>((String value) {
@@ -239,6 +245,7 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSem = newValue;
                     });
+
                     updateLists();
                   },
                   items: store.semestersList
@@ -279,6 +286,7 @@ class _UploadPageState extends State<UploadPage> {
                     setState(() {
                       _selSpec = newValue;
                     });
+
                     updateLists();
                   },
                   items: store.specList
@@ -425,7 +433,9 @@ class _UploadPageState extends State<UploadPage> {
                   } else if (dropdownValue == 'Course Outline') {
                     await selectAndRenamePDF('CO');
                   } else {
-                    await selectAndRenamePDF('AS');
+                    await selectAndRenamePDF(
+                      'AS',
+                    );
                   }
                 }
               },
@@ -486,21 +496,12 @@ class _UploadPageState extends State<UploadPage> {
 
   void fetchSubjects() async {
     loadingOnScreen(context);
-    UserPreferences userPreferences = UserPreferences();
-    String? email = await userPreferences.getEmail();
-    // String email = 'kalyana.jonnalagadda@woxsen.edu.in';
 
-    // Map<String, dynamic> payload = {
-    //   'email': 'kalyana.jonnalagadda@woxsen.edu.in',
-    // };
-
-    // String jsonPayload = jsonEncode(payload);
-
-    Uri url = Uri.parse('http://52.20.1.249:5000/api/get_as_sub');
+    Uri url = Uri.parse('${store.woxUrl}/api/get_as_sub');
     http.Response response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
+      body: jsonEncode({'email': 'kalyana.jonnalagadda@woxsen.edu.in'}),
     );
     print(response.body);
 
@@ -518,9 +519,9 @@ class _UploadPageState extends State<UploadPage> {
           .toList();
 
       setState(() {
-        store.subjectsList = subjectList;
-        store.semestersList = semesters;
-        store.specList = specializations;
+        store.subjectsList = subjectList.toSet().toList();
+        store.semestersList = semesters.toSet().toList();
+        store.specList = specializations.toSet().toList();
       });
       Navigator.pop(context);
     } else {
@@ -648,18 +649,18 @@ class _UploadPageState extends State<UploadPage> {
     });
   }
 
-  Future<void> selectAndRenamePDF(String str) async {
-    // String? pathCO;
-    // String? pathTT;
-
-    // Use FilePicker to select the PDF
+  Future<void> selectAndRenamePDF(String str, [String? index]) async {
+    print(index ?? 'No index');
     FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
+    List<File> editedFiles = [];
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      List<File> files = result.paths.map((path) => File(path!)).toList();
+
       String directoryPath = (await getTemporaryDirectory()).path;
       String? newFileName;
       if (str == 'TT' && store.specWithSec.contains(_selSpec)) {
@@ -670,30 +671,51 @@ class _UploadPageState extends State<UploadPage> {
       } else if (str == 'CO') {
         newFileName =
             "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSub.pdf";
-      } else if (str == 'AS' && _selSpec == 'MBA GEN') {
-        newFileName =
-            "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_$_selSect.pdf";
-      } else if (str == 'AS' && _selSpec != 'MBA GEN') {
-        newFileName = "${str}_${_selCourse}_${_selSem}_$_selSpec.pdf";
       }
-      String newPath = path.join(directoryPath, newFileName);
+      if (str == 'AS') {
+        for (var file in files) {
+          print("path path path");
+          String fileName = path.basename(file.path);
+          fileName = fileName
+              .replaceAll(' ', '')
+              .replaceAll('_', '')
+              .replaceAll('.pdf', '');
+          print(fileName);
+          if (store.specWithSec.contains(_selSpec)) {
+            newFileName =
+                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_${_selSect}_$fileName.pdf";
+            editedFiles.add(File(path.join(directoryPath, newFileName)));
+          } else if (!store.specWithSec.contains(_selSpec)) {
+            newFileName =
+                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_$fileName.pdf";
+            editedFiles.add(File(path.join(directoryPath, newFileName)));
+          }
+          for (var newFile in editedFiles) {
+            await file.copy(newFile.path);
+          }
+        }
 
-      // if (str == 'CO') {
-      //   pathCO = newPath;
-      // } else if (str == 'TT') {
-      //   pathTT = newPath;
-      // }
-      newPath = path.join(directoryPath, newFileName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenPdfViewer(files: editedFiles),
+          ),
+        );
+      } else {
+        String newPath = path.join(directoryPath, newFileName);
+        newPath = path.join(directoryPath, newFileName);
+        for (var file in files) {
+          await file.copy(newPath);
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullScreenPdfViewer(files: [File(newPath)]),
+          ),
+        );
 
-      await file.copy(newPath);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FullScreenPdfViewer(pdfPath: newPath),
-        ),
-      );
-
-      print("File has been renamed and saved to: $newPath");
+        print("File has been renamed and saved to: $newPath");
+      }
     } else {
       print("No file selected");
     }
@@ -701,13 +723,13 @@ class _UploadPageState extends State<UploadPage> {
 }
 
 class FullScreenPdfViewer extends StatelessWidget {
-  final String pdfPath;
-  const FullScreenPdfViewer({super.key, required this.pdfPath});
+  final List<File> files;
+  const FullScreenPdfViewer({super.key, required this.files});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SfPdfViewer.file(File(pdfPath)),
+      body: SfPdfViewer.file(File(files[0].path)),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
@@ -718,7 +740,7 @@ class FullScreenPdfViewer extends StatelessWidget {
 
               bool faculty = await UserPreferences.getRole() == 'faculty';
               if (faculty) {
-                uploadFiles(pdfPath, context);
+                uploadFiles(files, context);
               }
             },
             backgroundColor: Colors.green,
@@ -762,13 +784,11 @@ class FullScreenPdfViewer extends StatelessWidget {
     );
   }
 
-  void uploadFiles(String newpath, BuildContext context) async {
-    List<File> files = [];
-
-    files.add(File(newpath));
-
+  void uploadFiles(List<File> newpath, BuildContext context) async {
+    List<File> files = newpath;
+    ListStore store = ListStore();
     if (files.isNotEmpty) {
-      var uri = Uri.parse('http://52.20.1.249:5000/api/upload');
+      var uri = Uri.parse('${store.woxUrl}/api/upload');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {

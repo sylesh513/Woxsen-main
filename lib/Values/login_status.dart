@@ -4,7 +4,9 @@ class UserPreferences {
   static const _isLoggedInKey = 'isLoggedIn';
   static const _role = 'role';
   static const _course = 'course';
-  bool faculty = true;
+  bool faculty = false;
+  static const String woxUrl = "http://52.20.1.249:5000";
+  static const String jobsUrl = "http://10.106.16.71:8000";
 
   static Future<void> saveLoginStatus(bool isLoggedIn) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

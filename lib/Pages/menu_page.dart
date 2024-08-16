@@ -10,6 +10,7 @@ import 'package:woxsen/Pages/profile_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:woxsen/Values/subjects_list.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -64,12 +65,12 @@ class _MenuPageState extends State<MenuPage> {
         },
       );
     });
-
+    ListStore store = ListStore();
     var userPreferences = UserPreferences();
     var email = await userPreferences.getEmail();
     print(email);
-    const String apiUrl =
-        'http://52.20.1.249:5000/api/fetch_profile'; // Replace with your API URL
+    String apiUrl =
+        '${store.woxUrl}/api/fetch_profile'; // Replace with your API URL
     final response = await httpp.post(
       Uri.parse(apiUrl),
       headers: <String, String>{

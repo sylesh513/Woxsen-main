@@ -6,6 +6,7 @@ import 'package:woxsen/Pages/signup_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/Values/subjects_list.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -323,8 +324,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<http.Response> loginUser(String email, String password) async {
-    const String apiUrl =
-        'http://52.20.1.249:5000/api/login'; // Replace with your API URL
+    ListStore store = ListStore();
+    String apiUrl = '${store.woxUrl}/api/login'; // Replace with your API URL
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: <String, String>{

@@ -1,54 +1,37 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
-import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
 
-class applyJob extends StatefulWidget {
-  const applyJob({super.key});
+class CreateJob extends StatefulWidget {
+  final String? id;
+  final String? department;
+  final String? role;
+  final String title;
+  CreateJob(
+      {super.key, this.id, this.department, this.role, required this.title});
 
   @override
-  _applyJobState createState() => _applyJobState();
+  _CreateJobState createState() => _CreateJobState();
 }
 
-class _applyJobState extends State<applyJob> {
+class _CreateJobState extends State<CreateJob> {
+  TextEditingController jobId = TextEditingController();
+  TextEditingController department = TextEditingController();
+  TextEditingController designation = TextEditingController();
+  TextEditingController description = TextEditingController();
+  ListStore store = ListStore();
   @override
   void initState() {
     super.initState();
-  }
-
-  final TextEditingController _batchController = TextEditingController();
-  final TextEditingController _experienceController = TextEditingController();
-
-  bool isAlredyCalled = false;
-  ListStore store = ListStore();
-  String? selectedSchool;
-
-  Future<dynamic> loadingOnScreen(BuildContext context) {
-    return showDialog(
-      barrierColor: Colors.black.withOpacity(0.5),
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return SizedBox(
-          height: 100,
-          width: 100,
-          child: Center(
-            child: SpinKitSpinningLines(
-              color: Colors.red.shade800,
-              size: 70.0,
-            ),
-          ),
-        );
-      },
-    );
+    jobId.text = widget.id ?? '';
+    department.text = widget.department ?? '';
+    designation.text = widget.role ?? '';
   }
 
   @override
@@ -57,7 +40,6 @@ class _applyJobState extends State<applyJob> {
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       floatingActionButton: FloatingActionButton(
-        heroTag: 'homebutton',
         backgroundColor: const Color(0xffFA6978),
         shape: const CircleBorder(),
         onPressed: () {
@@ -117,21 +99,20 @@ class _applyJobState extends State<applyJob> {
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
           child: Column(
-            children: [
+            children: <Widget>[
               Container(
                 height: MediaQuery.of(context).size.height * 0.07,
                 decoration: const BoxDecoration(
                   color: Color(0xffFA6978),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text(
-                      'Job Application',
-                      style: TextStyle(
+                      widget.title,
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 28.0,
                         fontWeight: FontWeight.w400,
@@ -143,11 +124,15 @@ class _applyJobState extends State<applyJob> {
               Expanded(
                 child: Column(
                   children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
+                    const SizedBox(height: 30),
+                    buildRow(context, "Job Id", jobId),
+                    const SizedBox(height: 20),
+                    buildRow(context, "Department", department),
+                    const SizedBox(height: 20),
+                    buildRow(context, "Designation / Job Role", designation),
+                    const SizedBox(height: 20),
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.3,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       width: MediaQuery.of(context).size.width * 0.8,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade300,
@@ -159,67 +144,17 @@ class _applyJobState extends State<applyJob> {
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: TextField(
-                          controller: _experienceController,
+                          controller: description,
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           decoration: const InputDecoration(
-                            hintText:
-                                'Please mention if you have any \n prior work experience \n (job/internship/volunteering)',
+                            hintText: 'Job Description',
                             border: InputBorder.none,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    buildRow(context, 'Batch (Ex: BBA_2025)'),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.83,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            spreadRadius: 1,
-                            blurRadius: 9,
-                            offset: const Offset(
-                                4, 7), // changes position of shadow
-                          ),
-                        ],
-                        borderRadius:
-                            BorderRadius.circular(16), // Add border radius
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 5),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            dropdownColor: Colors.white,
-                            value: selectedSchool,
-                            hint: const Text('Select School'),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedSchool = newValue;
-                              });
-                            },
-                            items: store.schools
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     Container(
                       height: MediaQuery.of(context).size.height * 0.08,
                       width: MediaQuery.of(context).size.width * 0.80,
@@ -239,45 +174,24 @@ class _applyJobState extends State<applyJob> {
                       ),
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (_batchController.text.isNotEmpty) {
-                            FilePickerResult? result =
-                                await FilePicker.platform.pickFiles(
-                              type: FileType.custom,
-                              allowedExtensions: ['pdf'],
-                            );
-                            if (result != null) {
-                              String selectedFile = result.files.single.path!;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ResumePdfViewer(
-                                      pdfPath: selectedFile,
-                                      experience: _experienceController.text,
-                                      batch: _batchController.text,
-                                      school: selectedSchool),
-                                ),
-                              );
-                            }
-                          }
-                          if (_batchController.text.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title:
-                                      const Text('Please fill all the fields'),
-                                  content: const Text(
-                                      'Please enter your batch details'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
-                                );
-                              },
+                          var result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf'],
+                          );
+                          if (result != null) {
+                            List<File> files = result.paths
+                                .map((path) => File(path!))
+                                .toList();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => postJobPdf(
+                                    files: files,
+                                    jobId: jobId.text,
+                                    department: department.text,
+                                    designation: designation.text,
+                                    description: description.text),
+                              ),
                             );
                           }
                         },
@@ -299,7 +213,7 @@ class _applyJobState extends State<applyJob> {
                             ),
                             SizedBox(width: 12), // Space between logo and text
                             Text(
-                              'Upload Resume',
+                              'Upload pdf',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 26,
@@ -310,9 +224,79 @@ class _applyJobState extends State<applyJob> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 20),
+                    if (widget.title == 'Edit a Job')
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.08,
+                        width: MediaQuery.of(context).size.width * 0.80,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 9,
+                              offset: const Offset(
+                                  4, 7), // changes position of shadow
+                            ),
+                          ],
+                          borderRadius:
+                              BorderRadius.circular(16), // Add border radius
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            loadingOnScreen(context);
+                            var uri = Uri.parse(
+                                '${store.jobsUrl}/api/edit_job/${jobId.text}');
+                            var request = http.MultipartRequest('POST', uri);
+
+                            request.fields['job_id'] = jobId.text;
+                            request.fields['department'] = department.text;
+                            request.fields['designation'] = designation.text;
+                            request.fields['description'] = description.text;
+                            var response = await request.send();
+                            if (response.statusCode == 200) {
+                              Navigator.pop(context);
+                              print("OK");
+                            } else if (response.statusCode != 200) {
+                              Navigator.pop(context);
+                              print("error");
+                              print(response.headers);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                                0xffF2C9CD), // Change background color to white
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16), // Adjust padding if needed
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ), // Adjust border radius if
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(
+                                Icons.save,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                  width: 12), // Space between logo and text
+                              Text(
+                                'Submit',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-              )
+              ), // Add your widgets here
             ],
           ),
         ),
@@ -320,7 +304,28 @@ class _applyJobState extends State<applyJob> {
     );
   }
 
-  Container buildRow(BuildContext context, String hintText) {
+  Future<dynamic> loadingOnScreen(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.black.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          width: 100,
+          child: Center(
+            child: SpinKitSpinningLines(
+              color: Colors.red.shade800,
+              size: 70.0,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Container buildRow(
+      BuildContext context, String hintText, TextEditingController controller) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       decoration: BoxDecoration(
@@ -334,7 +339,7 @@ class _applyJobState extends State<applyJob> {
         ],
       ),
       child: TextField(
-        controller: _batchController,
+        controller: controller,
         keyboardType: TextInputType.emailAddress,
         onChanged: (value) {
           setState(() {
@@ -362,22 +367,24 @@ class _applyJobState extends State<applyJob> {
   }
 }
 
-class ResumePdfViewer extends StatelessWidget {
-  final String batch;
-  final String? school;
-  final String pdfPath;
-  final String? experience;
-  const ResumePdfViewer(
-      {super.key,
-      required this.pdfPath,
-      this.experience,
-      required this.batch,
-      this.school});
+class postJobPdf extends StatelessWidget {
+  final String jobId;
+  final String department;
+  final String designation;
+  final String description;
 
+  final List<File> files;
+  const postJobPdf(
+      {super.key,
+      required this.files,
+      required this.jobId,
+      required this.department,
+      required this.designation,
+      required this.description});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SfPdfViewer.file(File(pdfPath)),
+      body: SfPdfViewer.file(File(files[0].path)),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
@@ -386,7 +393,7 @@ class ResumePdfViewer extends StatelessWidget {
             onPressed: () async {
               loadingOnScreen(context);
 
-              uploadFiles(pdfPath, context);
+              uploadFiles(files, context);
             },
             backgroundColor: Colors.green,
             child: const Icon(Icons.check),
@@ -429,71 +436,33 @@ class ResumePdfViewer extends StatelessWidget {
     );
   }
 
-  void uploadFiles(String newPath, BuildContext context) async {
-    List<File> files = [];
-    UserPreferences userPreferences = UserPreferences();
-    String email = await userPreferences.getEmail();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jobId = prefs.getString('jobId');
-    var name;
-    var phone;
+  void uploadFiles(List<File> newpath, BuildContext context) async {
     ListStore store = ListStore();
-
-    final userResponse = await http.post(
-      Uri.parse('${store.woxUrl}/api/fetch_profile'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'required': 'profile_details',
-        'email': email,
-      }),
-    );
-    print(userResponse.body);
-
-    if (userResponse.statusCode == 200) {
-      var data = jsonDecode(userResponse.body);
-      name = data['name'];
-      // Id = data['id'];
-      // program = data['course'];
-      // academicYear = data['specialization'];
-      phone = data['phone'];
-    } else {
-      print('Request failed with status: ${userResponse.statusCode}');
-    }
-
-    files.add(File(newPath));
-
+    List<File> files = newpath;
     if (files.isNotEmpty) {
-      var uri = Uri.parse('${store.jobsUrl}/apply_job/$jobId');
+      var uri = Uri.parse('${store.jobsUrl}/api/edit_job/$jobId');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {
         request.files.add(await http.MultipartFile.fromPath(
-          'pdf',
+          'pdf', // The field name for the file in the API
           file.path,
         ));
       }
-      request.headers['Content-Type'] = 'application/json';
-
-      request.fields['jobId'] = jobId!;
-      request.fields['email'] = email.toString();
-      request.fields['name'] = name;
-      request.fields['phone'] = phone;
-      request.fields['previous_experience'] = experience.toString();
-      request.fields['batch'] = batch;
-      request.fields['school'] = school.toString();
+      request.fields['job_id'] = jobId;
+      request.fields['department'] = department;
+      request.fields['designation'] = designation;
+      request.fields['description'] = description;
 
       // Add other fields if needed
       // request.fields['key'] = 'value';
 
       try {
-        print("The request is: ");
-        print(request);
         var response = await request.send();
         var responseString = await response.stream.bytesToString();
         print("response is:");
         print(responseString);
+
         if (response.statusCode == 200) {
           showDialog(
             context: context,
@@ -505,7 +474,12 @@ class ResumePdfViewer extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.pushNamed(context, AppRoutes.homePage);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CreateJob(
+                                    title: 'Post a Job',
+                                  )));
                     },
                     child: const Text('OK'),
                   ),

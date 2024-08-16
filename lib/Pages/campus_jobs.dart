@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:woxsen/Pages/apply_campusjob.dart';
+import 'package:woxsen/Pages/create_job.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/subjects_list.dart';
 
 class campusJobs extends StatefulWidget {
   final bool isBox;
@@ -20,6 +23,7 @@ class campusJobs extends StatefulWidget {
 }
 
 class _campusJobsState extends State<campusJobs> {
+  ListStore store = ListStore();
   final List<Map<String, dynamic>> items = [
     {
       "title": "Stuent Engagement Coordinator",
@@ -66,7 +70,7 @@ class _campusJobsState extends State<campusJobs> {
 
   Future<List<dynamic>> fetchJobs() async {
     final response =
-        await http.get(Uri.parse('http://100.29.97.185:5000/api/jobs_list'));
+        await http.get(Uri.parse('${store.jobsUrl}/api/jobs_list'));
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body) as List<dynamic>;
@@ -92,9 +96,11 @@ class _campusJobsState extends State<campusJobs> {
 
   Future<void> _downloadAndViewPDF(
       String documentPath, String title, String jobId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('jobId', jobId);
+
     loadingOnScreen(context);
-    const baseUrl =
-        'http://100.29.97.185:5000'; // Replace with your base API URL
+    var baseUrl = store.jobsUrl; // Replace with your base API URL
     final formattedDocumentPath =
         documentPath.startsWith('/') ? documentPath.substring(1) : documentPath;
 
@@ -157,7 +163,7 @@ class _campusJobsState extends State<campusJobs> {
       floatingActionButton: widget.isBox
           ? FloatingActionButton(
               heroTag: 'homebutton',
-              backgroundColor: Color(0xffFA6978),
+              backgroundColor: const Color(0xffFA6978),
               shape: const CircleBorder(),
               onPressed: () {
                 Navigator.pushReplacementNamed(context, AppRoutes.homePage);
@@ -266,7 +272,7 @@ class _campusJobsState extends State<campusJobs> {
                     });
                   }
                   return Center(
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.93,
                       child: ListView.builder(
                         itemCount: snapshot.data!.length,
@@ -287,22 +293,99 @@ class _campusJobsState extends State<campusJobs> {
                                   Padding(
                                     padding: const EdgeInsets.all(10.0),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _getString(job['designation'])!,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _getString(job['designation'])!,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        _buildKeyValue(
-                                            'ID', _getString(job['id'])),
-                                        _buildKeyValue('Department',
-                                            _getString(job['department'])),
-                                      ],
-                                    ),
+                                          _buildKeyValue(
+                                              'ID', _getString(job['id'])),
+                                          _buildKeyValue('Department',
+                                              _getString(job['department'])),
+                                          if (!widget.isBox)
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit,
+                                                      size: 30),
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context,
+                                                            animation,
+                                                            secondaryAnimation) {
+                                                          return FadeTransition(
+                                                            opacity: animation,
+                                                            child: CreateJob(
+                                                              title:
+                                                                  'Edit a Job',
+                                                              id: job['id'],
+                                                              department: job[
+                                                                  'department'],
+                                                              role: job[
+                                                                  'designation'],
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+
+                                                    // Handle edit button press
+                                                  },
+                                                ),
+                                                const SizedBox(width: 10),
+                                                IconButton(
+                                                  icon: const Icon(Icons.delete,
+                                                      size: 30),
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                              'Delete Job'),
+                                                          content: const Text(
+                                                              'Are you sure you want to delete this job?'),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              child: const Text(
+                                                                  'No'),
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            ),
+                                                            TextButton(
+                                                              child: const Text(
+                                                                  'Yes'),
+                                                              onPressed: () {
+                                                                // Perform delete operation here
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+
+                                                    // Handle delete button press
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                        ]),
                                   ),
                                 ],
                               ),
@@ -371,7 +454,7 @@ class _pdfViewJobsState extends State<pdfViewJobs> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => applyJob(),
+                    builder: (context) => const applyJob(),
                   ),
                 );
               },

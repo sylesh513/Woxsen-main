@@ -34,7 +34,6 @@ class _SplashPageState extends State<SplashPage> {
       future: initialization,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          print("Initialization complete");
           if (loginStat) {
             return const HomePage();
           } else {

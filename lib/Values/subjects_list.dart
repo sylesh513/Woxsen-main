@@ -2,9 +2,17 @@ import 'package:woxsen/Values/login_status.dart';
 
 class ListStore {
   String? course;
+  bool isFaculty = false;
+
+  get woxUrl => null;
+
+  get jobsUrl => null;
   Future<void> getCourse() async {
     course = await UserPreferences.getCourse();
+    isFaculty = await UserPreferences.getRole() == 'faculty';
   }
+
+  String? jobId;
 
   List<String> mbaBaSem1 = [
     'Introduction to Python',
@@ -309,9 +317,10 @@ class ListStore {
   ];
   final List<String> schools = [
     'School of Technology',
-    'School of Design and Architecture',
+    'School of Architecture and Planning',
     'School of Business',
     'School of Law',
     'School of Sciences',
+    'School of Arts and Design'
   ];
 }
