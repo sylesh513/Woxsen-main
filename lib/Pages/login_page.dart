@@ -28,14 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   RegExp emailPattern = RegExp(r'_[0-9]{4}');
 
   String? selectedCourse = 'B.Tech';
-  final List<String> courses = [
-    'B.Tech',
-    'B.Des',
-    'B.Arch',
-    'B.B.A',
-    'M.B.A',
-    'B.A'
-  ];
+  final List<String> courses = ListStore().courses;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

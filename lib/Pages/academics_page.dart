@@ -781,6 +781,8 @@ class _AcademicsState extends State<Academics> {
   }
 
   void updateLists() {
+    print(store.course);
+    print(store.specList);
     return setState(() {
       print(selectedSpecialization);
       if (store.course == 'B.Tech') {
@@ -789,6 +791,8 @@ class _AcademicsState extends State<Academics> {
         store.specList = store.mbaSpecializations;
       } else if (store.course == 'B.B.A') {
         store.specList = store.bbaSpecializations;
+      } else if (store.course == "SOL") {
+        store.specList = store.SOLSpecializations;
       }
 
       if (selectedSpecialization == 'MBA GEN') {
@@ -940,9 +944,6 @@ class pdfView extends StatelessWidget {
           file.path,
         ));
       }
-
-      // Add other fields if needed
-      // request.fields['key'] = 'value';
 
       try {
         var response = await request.send();

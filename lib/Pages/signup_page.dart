@@ -36,14 +36,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String? selectedCourse;
   String? selectedSpecialization;
-  final List<String> courses = [
-    'B.Tech',
-    'B.Des',
-    'B.Arch',
-    'B.B.A',
-    'M.B.A',
-    'B.A'
-  ];
+  final List<String> courses = ListStore().courses;
   final List<String> specializations = ['MBA Gen', 'MBA BA', 'MBA FS'];
   @override
   Widget build(BuildContext context) {
@@ -120,8 +113,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             store.specList = store.bdesSpecializations;
                           } else if (newValue == 'B.B.A') {
                             store.specList = store.bbaSpecializations;
-                          } else if (newValue == 'Law') {
-                            store.specList = store.lawSpecializations;
+                          } else if (newValue == 'SOL') {
+                            store.specList = store.SOLSpecializations;
                           } else if (newValue == 'Sciences') {
                             store.specList = store.sciSpecializations;
                           }
