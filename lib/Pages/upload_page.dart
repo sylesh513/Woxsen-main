@@ -24,6 +24,7 @@ class _UploadPageState extends State<UploadPage> {
 
   bool _subject = false;
   bool showSection = false;
+  bool showSpecialization = true;
   String? dropdownValue;
   String? _selCourse;
   String? _selSem;
@@ -169,7 +170,7 @@ class _UploadPageState extends State<UploadPage> {
           const SizedBox(height: 30),
           Container(
             height: MediaQuery.of(context).size.height * 0.07,
-            width: MediaQuery.of(context).size.width * 0.80,
+            width: MediaQuery.of(context).size.width * 0.90,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -198,9 +199,12 @@ class _UploadPageState extends State<UploadPage> {
                     if (dropdownValue != 'Assignment') {
                       setState(() {
                         if (newValue == 'B.Tech') {
+                          showSpecialization = true;
                           store.specList = store.btechSpecializations;
                         } else if (newValue == 'M.B.A') {
+                          showSpecialization = true;
                           store.specList = store.mbaSpecializations;
+                          showSpecialization = true;
                         } else if (newValue == 'B.B.A') {
                           store.specList = store.bbaSpecializations;
                         }
@@ -221,7 +225,7 @@ class _UploadPageState extends State<UploadPage> {
           const SizedBox(height: 18),
           Container(
             height: MediaQuery.of(context).size.height * 0.07,
-            width: MediaQuery.of(context).size.width * 0.80,
+            width: MediaQuery.of(context).size.width * 0.90,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -248,63 +252,41 @@ class _UploadPageState extends State<UploadPage> {
 
                     updateLists();
                   },
-                  items: store.semestersList
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items: (() {
+                    if (_selCourse == 'B.Arch') {
+                      // Ensure 'Semester 9' and 'Semester 10' are added only once
+                      if (!store.semestersList.contains('Semester 9')) {
+                        store.semestersList.add('Semester 9');
+                      }
+                      if (!store.semestersList.contains('Semester 10')) {
+                        store.semestersList.add('Semester 10');
+                      }
+                    } else if (_selCourse != 'B.Arch') {
+                      if (store.semestersList.contains('Semester 9')) {
+                        store.semestersList.remove('Semester 9');
+                      }
+                      if (store.semestersList.contains('Semester 10')) {
+                        store.semestersList.remove('Semester 10');
+                      }
+                    }
+                    return store.semestersList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList();
+                  })(),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 18),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.07,
-            width: MediaQuery.of(context).size.width * 0.80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  spreadRadius: 1,
-                  blurRadius: 9,
-                  offset: const Offset(4, 7), // changes position of shadow
-                ),
-              ],
-              borderRadius: BorderRadius.circular(16), // Add border radius
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  dropdownColor: Colors.white,
-                  value: _selSpec,
-                  hint: const Text('Select Specialization'),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selSpec = newValue;
-                    });
-
-                    updateLists();
-                  },
-                  items: store.specList
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-          if (showSection) const SizedBox(height: 18),
-          if (showSection)
+          if (showSpecialization && _selCourse != 'B.Arch')
+            const SizedBox(height: 18),
+          if (showSpecialization && _selCourse != 'B.Arch')
             Container(
               height: MediaQuery.of(context).size.height * 0.07,
-              width: MediaQuery.of(context).size.width * 0.80,
+              width: MediaQuery.of(context).size.width * 0.90,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -323,14 +305,16 @@ class _UploadPageState extends State<UploadPage> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     dropdownColor: Colors.white,
-                    value: _selSect,
-                    hint: const Text('Select Section'),
+                    value: _selSpec,
+                    hint: const Text('Select Specialization'),
                     onChanged: (String? newValue) {
                       setState(() {
-                        _selSect = newValue;
+                        _selSpec = newValue;
                       });
+
+                      updateLists();
                     },
-                    items: store.sectionsList
+                    items: store.specList
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -341,12 +325,53 @@ class _UploadPageState extends State<UploadPage> {
                 ),
               ),
             ),
+          // if (showSection)
+          const SizedBox(height: 18),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.07,
+            width: MediaQuery.of(context).size.width * 0.90,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 9,
+                  offset: const Offset(4, 7), // changes position of shadow
+                ),
+              ],
+              borderRadius: BorderRadius.circular(16), // Add border radius
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  dropdownColor: Colors.white,
+                  value: _selSect,
+                  hint: const Text('Select Section'),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selSect = newValue;
+                    });
+                  },
+                  items: store.sectionsList
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          // if (showSection)
           const SizedBox(height: 18),
           Visibility(
             visible: _subject,
             child: Container(
               height: MediaQuery.of(context).size.height * 0.07,
-              width: MediaQuery.of(context).size.width * 0.80,
+              width: MediaQuery.of(context).size.width * 0.90,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -553,8 +578,32 @@ class _UploadPageState extends State<UploadPage> {
       if (dropdownValue != 'Assignment') {
         _selSect = null;
         _selSub = null;
-        print(_selSpec);
-        if (_selSpec == 'MBA GEN') {
+        showSpecialization = true;
+
+        if (_selCourse == 'B.Arch') {
+          showSpecialization = false;
+          if (_selSem == 'Semester 1') {
+            store.subjectsList = store.soapsem1;
+          } else if (_selSem == 'Semester 2') {
+            store.subjectsList = store.soapsem2;
+          } else if (_selSem == 'Semester 3') {
+            store.subjectsList = store.soapsem3;
+          } else if (_selSem == 'Semester 4') {
+            store.subjectsList = store.soapsem4;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.soapsem5;
+          } else if (_selSem == 'Semester 6') {
+            store.subjectsList = store.soapsem6;
+          } else if (_selSem == 'Semester 7') {
+            store.subjectsList = store.soapsem7;
+          } else if (_selSem == 'Semester 8') {
+            store.subjectsList = store.soapsem8;
+          } else if (_selSem == 'Semester 9') {
+            store.subjectsList = store.soapsem9;
+          } else if (_selSem == 'Semester 10') {
+            store.subjectsList = store.soapsem10;
+          }
+        } else if (_selSpec == 'MBA GEN') {
           if (_selSem == 'Semester 1') {
             store.subjectsList = store.mbaGenSem1;
           } else if (_selSem == 'Semester 4') {
@@ -663,34 +712,42 @@ class _UploadPageState extends State<UploadPage> {
 
       String directoryPath = (await getTemporaryDirectory()).path;
       String? newFileName;
+
+      // For Time-Table with Specialization
       if (str == 'TT' && store.specWithSec.contains(_selSpec)) {
         newFileName =
             "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSect.pdf";
+        // For Time-Table without Specialization
       } else if (str == 'TT' && !store.specWithSec.contains(_selSpec)) {
         newFileName = "${str}_${_selCourse}_${_selSem}_$_selSpec.pdf";
+        // For Course Outline
       } else if (str == 'CO') {
-        newFileName =
-            "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSub.pdf";
+        newFileName = _selCourse == 'B.Arch'
+            ? "${str}_${_selCourse}_${_selSem}_$_selSub.pdf"
+            : "${str}_${_selCourse}_${_selSem}_${_selSpec}_$_selSub.pdf";
       }
+
+      // For Assignments
       if (str == 'AS') {
+        Map<String, dynamic> params = {
+          'course': _selCourse,
+          'semester': _selSem,
+          'subject': _selSub,
+          'specialization': _selSpec,
+          'section': _selSect
+          // Add more parameters here
+        };
+
         for (var file in files) {
-          print("path path path");
           String fileName = path.basename(file.path);
-          fileName = fileName
-              .replaceAll(' ', '')
-              .replaceAll('_', '')
-              .replaceAll('.pdf', '');
-          print(fileName);
-          if (store.specWithSec.contains(_selSpec)) {
-            newFileName =
-                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_${_selSect}_$fileName.pdf";
-            editedFiles.add(File(path.join(directoryPath, newFileName)));
-          } else if (!store.specWithSec.contains(_selSpec)) {
-            newFileName =
-                "${str}_${_selCourse}_${_selSem}_${_selSpec}_${_selSub}_$fileName.pdf";
-            editedFiles.add(File(path.join(directoryPath, newFileName)));
-          }
+          fileName = fileName.replaceAll(' ', '').replaceAll('_', '');
+          // .replaceAll('.pdf', '');
+
+          newFileName = '${str}_$fileName';
+          editedFiles.add(File(path.join(directoryPath, newFileName)));
+
           for (var newFile in editedFiles) {
+            debugPrint('new file $newFile.path');
             await file.copy(newFile.path);
           }
         }
@@ -698,7 +755,10 @@ class _UploadPageState extends State<UploadPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FullScreenPdfViewer(files: editedFiles),
+            builder: (context) => FullScreenPdfViewer(
+              files: editedFiles,
+              params: params,
+            ),
           ),
         );
       } else {
@@ -724,7 +784,9 @@ class _UploadPageState extends State<UploadPage> {
 
 class FullScreenPdfViewer extends StatelessWidget {
   final List<File> files;
-  const FullScreenPdfViewer({super.key, required this.files});
+  final Map<String, dynamic>? params;
+
+  const FullScreenPdfViewer({super.key, required this.files, this.params});
 
   @override
   Widget build(BuildContext context) {
@@ -740,7 +802,9 @@ class FullScreenPdfViewer extends StatelessWidget {
 
               bool faculty = await UserPreferences.getRole() == 'faculty';
               if (faculty) {
-                uploadFiles(files, context);
+                print('uploading files');
+                print(params);
+                uploadFiles(files, context, params as Map<String, dynamic>);
               }
             },
             backgroundColor: Colors.green,
@@ -784,28 +848,51 @@ class FullScreenPdfViewer extends StatelessWidget {
     );
   }
 
-  void uploadFiles(List<File> newpath, BuildContext context) async {
+  void uploadFiles(List<File> newpath, BuildContext context,
+      Map<String, dynamic> params) async {
+    Map<String, dynamic> paramsMap = params as Map<String, dynamic>;
     List<File> files = newpath;
     ListStore store = ListStore();
+    print('Print params $paramsMap');
+
+    List<String> requiredKeys = [
+      'course',
+      'semester',
+      'specialization',
+      'subject',
+      'section'
+    ];
+
+    bool allKeysExist = requiredKeys.every((key) => paramsMap[key] != null);
+
+    print('CHECK ALL KEYS $allKeysExist');
+    print('PARAMS COURSE');
+    print(paramsMap['course']);
+    print(paramsMap['semester']);
+    print(paramsMap['specialization']);
+    print(paramsMap['subject']);
+    print(paramsMap['section']);
+
     if (files.isNotEmpty) {
       var uri = Uri.parse('${store.woxUrl}/api/upload');
       var request = http.MultipartRequest('POST', uri);
 
       for (var file in files) {
+        print('Files: $file');
         request.files.add(await http.MultipartFile.fromPath(
           'pdf', // The field name for the file in the API
           file.path,
         ));
       }
 
-      // Add other fields if needed
-      // request.fields['key'] = 'value';
+      paramsMap.forEach((key, value) {
+        print('VALUE $value');
+        request.fields[key] = value.toString();
+      });
 
       try {
         var response = await request.send();
         var responseString = await response.stream.bytesToString();
-        print("response is:");
-        print(responseString);
 
         if (response.statusCode == 200) {
           showDialog(
@@ -826,6 +913,16 @@ class FullScreenPdfViewer extends StatelessWidget {
               );
             },
           );
+
+          print('/api/upload [POST] response: $response');
+
+          paramsMap.forEach((key, value) {
+            print('KEY $key');
+            print('VALUE $value');
+          });
+
+          print('Selected Fields is: ');
+          print(paramsMap);
 
           // Handle response
           print('Files uploaded successfully');

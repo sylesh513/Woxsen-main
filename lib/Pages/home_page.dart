@@ -5,7 +5,9 @@ import 'package:woxsen/Pages/academics_page.dart';
 import 'package:woxsen/Pages/campus_jobs.dart';
 import 'package:woxsen/Pages/campus_jobs_admin.dart';
 import 'package:woxsen/Pages/feedback_complaints.dart';
+import 'package:woxsen/Pages/leave_page.dart';
 import 'package:woxsen/Pages/services_page.dart';
+import 'package:woxsen/Pages/student_leave_page.dart';
 import 'package:woxsen/Pages/upload_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
@@ -30,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   void getFacutly() async {
     _faculty = await UserPreferences.getRole() == 'faculty' ? true : false;
     // _faculty = true;
-    print(_faculty);
+    print('current user role is :  $_faculty');
     setState(() {
       _faculty = _faculty;
     });
@@ -497,6 +499,139 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.08,
+                        width: MediaQuery.of(context).size.width * 0.80,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation,
+                                        secondaryAnimation) =>
+                                    const FacultyLeavePage(), // Assuming HomePage is the page you want to navigate to
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                                transitionDuration: const Duration(
+                                    milliseconds: 200), // Customize duration
+                              ),
+                            );
+                            // Navigator.pushNamed(context, AppRoutes.loginPage);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                                0xffF2C9CD), // Change background color to white
+                            minimumSize: const Size(
+                                270, 70), // Change dimensions of the button
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16), // Adjust padding if needed
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ), // Adjust border radius if
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            // mainAxisSize: MainAxisSize
+                            //     .min,
+
+                            // Use min to wrap content inside the button
+                            children: <Widget>[
+                              Icon(
+                                Icons.design_services,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                              SizedBox(
+                                  width: 12), // Space between logo and text
+                              Text(
+                                'Leave Manager',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      if (_faculty) // ONLY FOR STUDENTS (ATTACH CONDTION FOR STUDENTS)
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          width: MediaQuery.of(context).size.width * 0.80,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const StudentLeavePage(),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration: const Duration(
+                                      milliseconds: 200), // Customize duration
+                                ),
+                              );
+                              // Navigator.pushNamed(context, AppRoutes.loginPage);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffF2C9CD),
+                              minimumSize: const Size(270, 70),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.design_services,
+                                  color: Colors.black,
+                                  size: 30,
+                                ),
+                                SizedBox(
+                                    width: 12), // Space between logo and text
+                                Text(
+                                  'Student Leave Manager',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ],

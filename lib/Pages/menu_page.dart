@@ -71,7 +71,7 @@ class _MenuPageState extends State<MenuPage> {
     print(email);
     String apiUrl =
         '${store.woxUrl}/api/fetch_profile'; // Replace with your API URL
-    final response = await httpp.post(
+    final response = await http.post(
       Uri.parse(apiUrl),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

@@ -342,8 +342,11 @@ class _LoginPageState extends State<LoginPage> {
       final userData = responseData['user_data'];
       UserPreferences.saveCourse(selectedCourse!);
       UserPreferences.saveLoginStatus(true);
+      UserPreferences.saveEmail(email);
       // UserPreferences.saveRole(userData);
+
       UserPreferences.saveRole(userData);
+
       Navigator.pushReplacementNamed(context, AppRoutes.homePage);
 
       print(userData);

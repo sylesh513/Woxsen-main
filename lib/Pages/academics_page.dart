@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:woxsen/Pages/assignments_list.dart';
+import 'package:woxsen/Pages/attendance_page.dart';
+import 'package:woxsen/Pages/faculty_attendance_page.dart';
+import 'package:woxsen/Pages/faculty_feedback.dart';
 import 'package:woxsen/Pages/home_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
@@ -24,6 +28,7 @@ class _AcademicsState extends State<Academics> {
   bool showSection = false;
   String? selectedSection;
   String? selectedSubject;
+  List<File> _pdfs = [];
 
   String? selectedSpecialization;
   @override
@@ -728,6 +733,83 @@ class _AcademicsState extends State<Academics> {
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),
+              const SizedBox(height: 20),
+              if (!store.isFaculty)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AttendancePage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 63), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'Attendance',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                ),
+              const SizedBox(height: 20),
+              if (!store.isFaculty)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FacultyFeedback()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 63), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'Feedback',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                ),
+              const SizedBox(height: 20),
+              if (store.isFaculty)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FacultyAttendancePage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 63), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'Take Attendance',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                ),
             ],
           )),
         ],
@@ -738,45 +820,65 @@ class _AcademicsState extends State<Academics> {
   Future<void> getPdf(String what, String? specialization, String? section,
       [String? subject]) async {
     loadingOnScreen(context);
+    ListStore store = ListStore();
+    var pdfs;
 
-    const String apiUrl = '/api/view_files';
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: what == "TT"
-          ? jsonEncode(<String, String>{
-              'course': await UserPreferences.getCourse(),
-              'semester': dropdownValue!.replaceAll(' ', '_'),
-              'specialization': specialization!.replaceAll(' ', '_'),
-              'section': section!.replaceAll(' ', '_'),
-              'type': what.replaceAll(' ', '_'),
-            })
-          : jsonEncode(<String, String>{
-              'course': await UserPreferences.getCourse(),
-              'semester': dropdownValue!.replaceAll(' ', '_'),
-              'type': what.replaceAll(' ', '_'),
-              'specialization': specialization!.replaceAll(' ', '_'),
-              'subject': subject!.replaceAll(' ', '_'),
-              'section': section!.replaceAll(' ', '_'),
-            }),
-    );
-    print("status code: ");
-    print(response.statusCode);
+    // final String apiUrl = '${store.woxUrl}/api/view_files';
+    final String apiUrl = '${store.woxUrl}/api/sub_as_list';
+    var bodyContent = what == "TT"
+        ? <String, String>{
+            'course': await UserPreferences.getCourse(),
+            'semester': dropdownValue!.replaceAll(' ', '_'),
+            'specialization': specialization!.replaceAll(' ', '_'),
+            'section': section!.replaceAll(' ', '_'),
+            'type': what.replaceAll(' ', '_'),
+          }
+        : <String, String>{
+            'course': await UserPreferences.getCourse(),
+            'semester': dropdownValue!.replaceAll(' ', '_'),
+            'type': what.replaceAll(' ', '_'),
+            'specialization': specialization!.replaceAll(' ', '_'),
+            'subject': subject!.replaceAll(' ', '_'),
+            'section': section!.replaceAll(' ', '_'),
+          };
 
-    if (response.statusCode == 200) {
-      final bytes = response.bodyBytes;
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/mypdf.pdf');
+    try {
+      final response = await http.post(Uri.parse(apiUrl),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(bodyContent));
 
-      await file.writeAsBytes(bytes);
-      setState(() {
-        _pdfPath = file.path;
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return pdfView(pdfPath: _pdfPath);
-        }));
-      });
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final dir = await getApplicationDocumentsDirectory();
+
+        var data = jsonDecode(response.body);
+        List<File> pdfPaths = [];
+        pdfs = data['assignments'];
+
+        print('PDFs ${pdfs}');
+
+        for (var pdf in pdfs) {
+          final filePath = '${dir.path}/$pdf';
+          final file = File(filePath);
+          pdfPaths.add(file);
+          await file.writeAsBytes(bytes);
+          print('Written to $filePath');
+        }
+
+        setState(() {
+          _pdfs = pdfPaths;
+
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            // return pdfView(pdfPath: _pdfPath);
+            return AssignmentsList(
+                pdfs: _pdfs, params: jsonEncode(bodyContent));
+          }));
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -914,7 +1016,7 @@ class pdfView extends StatelessWidget {
               // Handle "right" action
             },
             backgroundColor: Colors.green,
-            child: const Icon(Icons.check),
+            child: Text('PDF LISTS HERE'),
           ),
           const SizedBox(width: 20),
           // Spacing between the buttons
@@ -942,7 +1044,7 @@ class pdfView extends StatelessWidget {
       }
 
       // Add other fields if needed
-      // request.fields['key'] = 'value';
+      request.fields['key'] = 'some value';
 
       try {
         var response = await request.send();

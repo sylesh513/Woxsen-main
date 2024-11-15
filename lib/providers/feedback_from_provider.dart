@@ -1,0 +1,48 @@
+import 'package:flutter/material.dart';
+
+class FeedbackFormProvider with ChangeNotifier {
+  String? selectedDegree;
+  String? selectedSemester;
+  String? selectedCourse;
+  String? selectedFaculty;
+
+  Map<String, Map<String, String>> sections = {
+    'section1': {'q1': '', 'q2': ''},
+    'section2': {'q1': '', 'q2': ''},
+    'section3': {'q1': '', 'q2': ''},
+    'section4': {'q1': '', 'q2': '', 'q3': ''},
+    'section5': {'q1': '', 'q2': ''},
+    'section6': {'q1': '', 'q2': '', 'q3': '', 'q4': ''},
+  };
+
+  void updateDegree(String? value) {
+    selectedDegree = value;
+    notifyListeners();
+  }
+
+  void updateSemester(String? value) {
+    selectedSemester = value;
+    notifyListeners();
+  }
+
+  void updateCourse(String? value) {
+    selectedCourse = value;
+    notifyListeners();
+  }
+
+  void updateFaculty(String? value) {
+    selectedFaculty = value;
+    notifyListeners();
+  }
+
+  void updateSection(String section, String question, String answer) {
+    if (sections.containsKey(section)) {
+      sections[section]![question] = answer;
+      notifyListeners();
+    }
+  }
+
+  String getSectionValue(String section, String question) {
+    return sections[section]?[question] ?? '';
+  }
+}
