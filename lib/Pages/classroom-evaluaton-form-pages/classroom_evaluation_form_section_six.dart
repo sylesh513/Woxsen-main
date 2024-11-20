@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/Values/subjects_list.dart';
 import 'package:woxsen/providers/feedback_from_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ClassroomEvaluationFormSectionSix extends StatefulWidget {
   const ClassroomEvaluationFormSectionSix({Key? key}) : super(key: key);
@@ -16,6 +20,7 @@ class _EvaluationFormSection6State
   late TextEditingController _improveController;
   late TextEditingController _commentsController;
   String? _satisfactionResponse;
+  ListStore store = ListStore();
 
   @override
   void initState() {
@@ -36,6 +41,40 @@ class _EvaluationFormSection6State
     _improveController.dispose();
     _commentsController.dispose();
     super.dispose();
+  }
+
+  Future submitFeedback() async {
+    UserPreferences userPreferences = UserPreferences();
+    String? email = await userPreferences.getEmail();
+    Map<String, dynamic> user = await userPreferences.getProfile(email);
+
+    final provider = Provider.of<FeedbackFormProvider>(context, listen: false);
+
+    print('Feeback data is ${provider.sections}');
+
+    final userResponse = await http.post(
+      Uri.parse(
+          '${store.woxUrl}/api/faculty_feedback'), // Change the api endpoint
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'school': provider.selectedDegree!,
+        'semester': provider.selectedSemester!,
+        'subject': provider.selectedCourse!,
+        'user_email': user['email'],
+        'faculty_name': provider.selectedFaculty!,
+        'answer': provider.sections.toString(),
+      }),
+    );
+    debugPrint(userResponse.body);
+
+    if (userResponse.statusCode == 200) {
+      var data = jsonDecode(userResponse.body);
+      debugPrint('Response data: $data');
+    } else {
+      debugPrint('Request failed with status: ${userResponse.statusCode}');
+    }
   }
 
   @override
@@ -126,9 +165,7 @@ class _EvaluationFormSection6State
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        print('feedback data  ${provider.sections}');
-                        // Handle form submission
+                      onPressed: () async {
                         provider.updateSection(
                             'section6', 'q1', _satisfactionResponse ?? '');
                         provider.updateSection(
@@ -137,7 +174,24 @@ class _EvaluationFormSection6State
                             'section6', 'q3', _improveController.text);
                         provider.updateSection(
                             'section6', 'q4', _commentsController.text);
-                        // Navigate to the next screen or show a success message
+
+                        if (provider.validateSection('section6')) {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) =>
+                          //             const ClassroomEvaluationFormSectionTwo()));
+                          debugPrint('feedback data :  ${provider.sections}');
+                          // provider.clearData();po=po=po=o==
+                          await submitFeedback();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Please answer all questions before submitting your feedback.'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF8B98),

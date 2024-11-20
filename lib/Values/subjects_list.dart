@@ -5,7 +5,7 @@ class ListStore {
   bool isFaculty = false;
 
   // get woxUrl => "http://52.20.1.249:5000";
-  get woxUrl => "http://10.106.23.10:8080";
+  get woxUrl => "http://10.7.0.23:8080";
   // get woxUrl => "http://10.106.13.71:8080";
 
   get jobsUrl => "http://10.106.16.71:8000"; // 100
@@ -107,13 +107,13 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
   ];
   List<String> bbaAiSem3 = [
-    'Business Law',
-    'Organizational Behaviour',
+    'Business SOL',
+    'Organizational Behavior',
     'Statistical Techniques for Analytics',
     'Entrepreneurship & Innovation with Capstone Project',
     'International Seminar',
@@ -134,14 +134,14 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
     'Case Study Analysis and Writing - I',
   ];
   List<String> bbaDmSem3 = [
-    'Business Law',
-    'Organizational Behaviour',
+    'Business SOL',
+    'Organizational Behavior',
     'Statistical Techniques for Analytics',
     'Entrepreneurship & Innovation with Capstone Project',
     'International Seminar',
@@ -162,14 +162,14 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
     'Case Study Analysis and Writing - I',
   ];
   List<String> bbaEdSem3 = [
-    'Business Law',
-    'Organizational Behaviour',
+    'Business SOL',
+    'Organizational Behavior',
     'Statistical Techniques for Analytics',
     'Entrepreneurship & Innovation with Capstone Project',
     'International Seminar',
@@ -188,14 +188,14 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
     'Case Study Analysis and Writing - I',
   ];
   List<String> bbaFsSem3 = [
-    'Business Law',
-    'Organizational Behaviour',
+    'Business SOL',
+    'Organizational Behavior',
     'Statistical Techniques for Analytics',
     'Entrepreneurship & Innovation with Capstone Project',
     'International Seminar',
@@ -218,13 +218,13 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
   ];
   List<String> bbaGenSem3 = [
-    'Business Law',
-    'Organizational Behaviour',
+    'Business SOL',
+    'Organizational Behavior',
     'Statistical Techniques for Analytics',
     'Entrepreneurship & Innovation with Capstone Project',
     'International Seminar',
@@ -245,7 +245,7 @@ class ListStore {
     'Environmental Education & UN SDGs',
     'Introduction to Business Communication and Etiquette',
     'Introduction to the world of A.I.',
-    'Theories of Organizational Behaviour',
+    'Theories of Organizational Behavior',
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
   ];
@@ -412,9 +412,8 @@ class ListStore {
     'History',
     'Sociology and Anthropology',
   ];
-  List<String> lawSpecializations = [
-    'BA LLB',
-    'BBA LLB',
+  List<String> SOLSpecializations = [
+    "N/A",
   ];
   List<String> sciSpecializations = [
     'Applied Maths',
@@ -445,15 +444,66 @@ class ListStore {
     'B.B.A',
     'M.B.A',
     'B.A',
-    'Law',
+    'SOL',
     'Sciences',
   ];
   final List<String> schools = [
     'School of Technology',
     'School of Architecture and Planning',
     'School of Business',
-    'School of Law',
+    'School of SOL',
     'School of Sciences',
     'School of Arts and Design'
+  ];
+  final List<String> SOLSem1 = [
+    'Business English and Communication',
+    'Critical Legal Thinking ',
+    'Management and Leadership Fundamentals',
+    'Jurisprudence',
+    'Marketing Strategy and Concepts',
+    'Basics of Financial Accounting',
+    'Reflecting Self',
+  ];
+  final List<String> SOLSem2 = [
+    'Human Capital Management',
+    'SOL of Torts and Consumer Protection and MV Act',
+    'General Principles of Contract ',
+    'International Capstone Project',
+    'Legal Research Methodology ',
+    'Legal Internship',
+    'Entrepreneurship and Innovation',
+    'Principles of Economics',
+    'Foundations of Identity and Communication Skills'
+  ];
+  final List<String> SOLSem3 = [
+    'Human rights and Humanitarian SOL',
+    'Strategy for Companies in Industries and Markets',
+    'Spanish Language',
+    'Family SOL 1',
+    'Special Contract (Agency, Partnership and NI Act)',
+    'Responsible Leadership',
+    'Legal History of India and European union',
+    'Advanced Communication Skills',
+  ];
+  final List<String> SOLSem4 = [
+    'Constitutional SOL I',
+    'Bharatiya Nyaya Sanhita 2023',
+    'Company SOL',
+    'Family SOL II',
+    'Legislative Analysis Project ',
+    'Legal Internship',
+    'Business Incubator and Legal Services',
+    'Basics of Computer Applications',
+    'Personality Development Skills',
+  ];
+  final List<String> SOLSem5 = [
+    'Constitutional SOL II',
+    'Civil Procedure Code and Limitation Act ',
+    'Property SOL',
+    'Environmental SOL',
+    'Existential Dialogues ',
+    'Legal Venture Tech Challenge ',
+    'International Seminar ',
+    'Social Skills and Career Readiness Skills',
   ];
 }

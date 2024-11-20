@@ -3,21 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/subjects_list.dart';
+import 'dart:convert';
 
 class DocumentViewerScreen extends StatefulWidget {
   final String? url;
+  final String? filename;
+  final String? userId;
 
   const DocumentViewerScreen({
     Key? key,
     required this.url,
+    required this.filename,
+    required this.userId,
   }) : super(key: key);
-
-  // final Map<String, String> document_url;
-
-  // const DocumentViewerScreen({
-  //   Key? key,
-  //   required this.document_url,
-  // }) : super(key: key);
 
   @override
   _DocumentViewerScreenState createState() => _DocumentViewerScreenState();
@@ -25,57 +24,39 @@ class DocumentViewerScreen extends StatefulWidget {
 
 class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   String? _filePath;
-  bool _isLoading = true;
-  bool _isPDF = false;
+  bool _isLoading = false;
+  bool _isPDF = true;
+  // List store = ListStore();
 
   @override
   void initState() {
     super.initState();
-    _loadDocument();
+    // _loadDocument();
+    getDetails();
   }
 
-  Future<void> _loadDocument() async {
-    setState(() {
-      _isLoading = true;
-    });
+  ListStore store = ListStore();
 
-    // Replace these URLs with your actual document URLs
-    String pdfUrl =
-        'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    String imageUrl = 'https://picsum.photos/200/300';
+  Future<void> getDetails() async {
+    final response = await http.post(
+      Uri.parse('${store.woxUrl}/api/st_leave_get_doc'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'doc_is': 'document_url',
+        'user_id': '${widget.userId}',
+      }),
+    );
 
-    // Decide which type of document to load (PDF or image)
-    bool loadPDF = true; // Set this to false to load an image instead
-
-    if (loadPDF) {
-      await _loadPDF(pdfUrl);
-    } else {
-      await _loadImage(imageUrl);
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _loadPDF(String url) async {
-    final response = await http.get(Uri.parse(url));
     final bytes = response.bodyBytes;
     final tempDir = await getTemporaryDirectory();
-    final tempDocumentPath = '${tempDir.path}/temp_document.pdf';
+    final tempDocumentPath = '${tempDir.path}/${widget.filename}';
     final file = File(tempDocumentPath);
     await file.writeAsBytes(bytes);
 
     setState(() {
       _filePath = tempDocumentPath;
-      _isPDF = true;
-    });
-  }
-
-  Future<void> _loadImage(String url) async {
-    setState(() {
-      _filePath = url;
-      _isPDF = false;
     });
   }
 
@@ -84,32 +65,31 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Handle back navigation
             Navigator.of(context).pop();
           },
         ),
-        title: Text('Supporting Document'),
+        title: const Text('Supporting Document'),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _filePath == null
-              ? Center(child: Text('Error loading document'))
+              ? const Center(child: Text('Error loading document'))
               : Container(
                   color: Colors.grey[200],
                   child: Card(
-                    margin: EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.all(8.0),
                     child: _isPDF
                         ? PDFView(
-                            filePath: _filePath!,
+                            filePath: _filePath,
                             enableSwipe: true,
                             swipeHorizontal: true,
                             autoSpacing: false,
                             pageFling: false,
                           )
-                        : Image.network(
-                            _filePath!,
+                        : Image.file(
+                            File(_filePath!),
                             fit: BoxFit.contain,
                           ),
                   ),

@@ -92,11 +92,20 @@ class _EvaluationFormState extends State<ClassroomEvaluationFormSectionTwo> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ClassroomEvaluationFormSectionThree()));
+                        if (provider.validateSection('section2')) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ClassroomEvaluationFormSectionThree()));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Please answer all questions before proceeding.'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF8B98),

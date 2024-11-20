@@ -3,9 +3,30 @@ import 'package:woxsen/Pages/student_applied_for_leaves.dart';
 import 'package:woxsen/Pages/student_leave_application_form.dart';
 import 'package:woxsen/Pages/student_leave_applications.dart';
 import 'package:woxsen/Pages/student_leave_status.dart';
+import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/utils/roles.dart';
 
-class StudentLeavePage extends StatelessWidget {
+class StudentLeavePage extends StatefulWidget {
   const StudentLeavePage({Key? key}) : super(key: key);
+  @override
+  _StudentLeavePage createState() => _StudentLeavePage();
+}
+
+class _StudentLeavePage extends State<StudentLeavePage> {
+  String role = 'role';
+
+  @override
+  void initState() {
+    super.initState();
+    getRole();
+  }
+
+  void getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,94 +59,101 @@ class StudentLeavePage extends StatelessWidget {
             ),
           ),
           // TODO : ONLY FOR FACULTY
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentLeaveStatus()));
-              },
-              child: const Text('Check Status'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+          // const SizedBox(height: 20),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       Navigator.push(
+          //           context,
+          //           MaterialPageRoute(
+          //               builder: (context) => StudentLeaveStatus()));
+          //     },
+          //     child: const Text('Check Status'),
+          //     style: ElevatedButton.styleFrom(
+          //       foregroundColor: Colors.black,
+          //       backgroundColor: Colors.white,
+          //       padding: EdgeInsets.symmetric(vertical: 16),
+          //       textStyle: TextStyle(fontSize: 18),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          if (role == ROLE_STUDENT) SizedBox(height: 16),
+          if (role == ROLE_STUDENT)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentLeaveApplicationForm()));
+                },
+                child: Text('Apply For Leave'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  textStyle: TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentLeaveApplicationForm()));
-              },
-              child: Text('Apply For Leave'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+
+          // TODO : ONLY FOR STUDENTS
+          if (role == ROLE_STUDENT) const SizedBox(height: 16),
+          if (role == ROLE_STUDENT)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentLeaveApplications()));
+                },
+                child: Text('Applications'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentLeaveApplications()));
-              },
-              child: Text('Your Applications'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+
+          // TODO : ONLY FOR FACULTIES
+          if (role == ROLE_PD) const SizedBox(height: 16),
+          if (role == ROLE_PD)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentAppliedForLeaves()));
+                },
+                child: const Text('Leave Applications'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StudentAppliedForLeaves()));
-              },
-              child: Text('For Faculties'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

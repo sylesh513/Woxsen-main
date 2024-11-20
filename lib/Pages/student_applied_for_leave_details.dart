@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:woxsen/Pages/document_viewer.dart';
 import 'package:woxsen/Pages/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:woxsen/Values/subjects_list.dart';
 
-class StudentAppliedForLeaveDetails extends StatelessWidget {
+class StudentAppliedForLeaveDetails extends StatefulWidget {
   final Map<String, dynamic> application;
 
   const StudentAppliedForLeaveDetails({
@@ -11,9 +14,63 @@ class StudentAppliedForLeaveDetails extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    debugPrint('Application Details: $application');
+  _StudentAppliedForLeaveDetailsState createState() =>
+      _StudentAppliedForLeaveDetailsState();
+}
 
+class _StudentAppliedForLeaveDetailsState
+    extends State<StudentAppliedForLeaveDetails> {
+  String? status;
+
+  @override
+  void initState() {
+    super.initState();
+    status = widget.application['status'];
+  }
+
+  Future<void> _updateStatus(String newStatus, BuildContext context) async {
+    ListStore store = ListStore();
+    try {
+      final response = await http.post(
+        Uri.parse('${store.woxUrl}/api/st_update_status'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email_id': widget.application['email_id'].toString(),
+          'user_id': widget.application['user_id'].toString(),
+          'status': newStatus,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          status = newStatus;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${jsonDecode(response.body)['message']}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18),
+            ),
+            backgroundColor: newStatus == 'Accepted'
+                ? Colors.green.shade500
+                : Colors.red.shade500,
+            padding: const EdgeInsets.all(20),
+          ),
+        );
+      } else {
+        throw Exception('Something Went Wrong');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -41,63 +98,55 @@ class StudentAppliedForLeaveDetails extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  LeaveDetailsCard(application: application),
+                  LeaveDetailsCard(application: widget.application),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Application accepted',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          backgroundColor: Colors.green.shade500,
-                          padding: const EdgeInsets.all(20),
-                        ),
-                      );
-                    },
-                    child: Text('Accept',
-                        style: TextStyle(
-                          color: Colors.green.shade700,
-                          fontSize: 18,
-                        )),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade100,
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        )),
-                  ),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Application rejected',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          backgroundColor: Colors.red.shade500,
-                          padding: EdgeInsets.all(20),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Reject',
+                  if (status == 'Accepted' || status == 'Rejected') ...[
+                    Text(
+                      'Application ${status == 'Accepted' ? 'Accepted' : 'Rejected'}',
                       style: TextStyle(
-                        color: Colors.red.shade600,
+                        color: status == 'Accepted'
+                            ? Colors.green.shade700
+                            : Colors.red.shade600,
                         fontSize: 18,
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade100,
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        )),
-                  ),
+                  ] else ...[
+                    ElevatedButton(
+                      onPressed: () async {
+                        return await _updateStatus('Accepted', context);
+                      },
+                      child: Text('Accept',
+                          style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 18,
+                          )),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade100,
+                          minimumSize: Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          )),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () async {
+                        return await _updateStatus('Rejected', context);
+                      },
+                      child: Text(
+                        'Reject',
+                        style: TextStyle(
+                          color: Colors.red.shade600,
+                          fontSize: 18,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade100,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          )),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -118,11 +167,20 @@ class LeaveDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Application Details is Here: $application');
+    debugPrint(
+        'application Leave Details Card:: ${application['document_url']}');
+    debugPrint(
+        'application Leave Details Card:: ${application['video_url'].runtimeType}');
+
+    if (application['video_url'].isNotEmpty) {
+      debugPrint('video_url is not empty');
+    } else {
+      debugPrint('video_url is empty');
+    }
 
     return Card(
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -130,12 +188,12 @@ class LeaveDetailsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(application['leave_type'],
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('28th Nov 2024', style: TextStyle(color: Colors.grey)),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+                // Text('28th Nov 2024', style: TextStyle(color: Colors.grey)),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildDetailRow('Name', application['name']),
             _buildDetailRow('Email', application['email_id']),
             _buildDetailRow('Start Date', application['start_date']),
@@ -149,57 +207,46 @@ class LeaveDetailsCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (application['document_url'] != null ||
-                    application['video_url'] != null) ...[
+                if (application['document_url'] != '' ||
+                    application['video_url'] != '') ...[
                   const Text(
                     'Supporting Documents',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                 ],
-                Column(
-                  children: [
-                    if (application['document_url'] != null) ...[
-                      DocumentButton(
-                        icon: Icons.picture_as_pdf,
-                        text: application['document_url']?.split('/').last,
-                        customWidget: DocumentViewerScreen(
-                            url: application['document_url']),
-                      ),
-                      const SizedBox(width: 8),
+                if (application['document_url'].isNotEmpty ||
+                    application['video_url'].isNotEmpty) ...[
+                  Column(
+                    children: [
+                      if (application['document_url'].isNotEmpty) ...[
+                        DocumentButton(
+                          icon: Icons.picture_as_pdf,
+                          text: application['document_url']?.split('\\').last,
+                          customWidget: DocumentViewerScreen(
+                              url: application['document_url'],
+                              filename:
+                                  application['document_url']?.split('\\').last,
+                              userId: application['user_id']),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (application['video_url'].isNotEmpty) ...[
+                        DocumentButton(
+                          icon: Icons.video_library,
+                          text: application['video_url'].split('\\').last,
+                          customWidget: VideoPlayerScreen(
+                              url: application['video_url'],
+                              filename:
+                                  application['video_url'].split('\\').last,
+                              userId: application['user_id']),
+                        ),
+                      ],
                     ],
-                    if (application['video_url'] != null) ...[
-                      DocumentButton(
-                        icon: Icons.video_library,
-                        text: application['video_url'].split('/').last,
-                        customWidget:
-                            VideoPlayerScreen(url: application['video_url']),
-                      ),
-                    ],
-                  ],
-                ),
+                  ),
+                ]
               ],
             )
-
-            // const SizedBox(height: 16),
-            // const Text('Supporting Documents',
-            //     style: TextStyle(fontWeight: FontWeight.bold)),
-            // const SizedBox(height: 8),
-            // Row(
-            //   children: [
-            //     DocumentButton(
-            //       icon: Icons.picture_as_pdf,
-            //       text: 'somefile.pdf',
-            //       customWidget: DocumentViewerScreen(),
-            //     ),
-            //     const SizedBox(width: 8),
-            //     DocumentButton(
-            //       icon: Icons.video_library,
-            //       text: 'somevideo.mp4',
-            //       customWidget: VideoPlayerScreen(),
-            //     ),
-            //   ],
-            // ),
           ],
         ),
       ),
@@ -214,7 +261,8 @@ class LeaveDetailsCard extends StatelessWidget {
         children: [
           SizedBox(
             width: 100,
-            child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(label,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
           Expanded(
             child: Text(value, style: TextStyle(color: Colors.grey[600])),

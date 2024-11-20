@@ -22,7 +22,6 @@ class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
 
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body);
-      debugPrint('fetched applications :: $jsonResponse');
 
       return jsonResponse.map((data) => data).toList();
     } else {
@@ -81,7 +80,6 @@ class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       var application = snapshot.data![index];
-                      debugPrint('Each application :: $application');
                       return Column(
                         children: [
                           LeaveApplicationCard(
@@ -158,11 +156,9 @@ class LeaveApplicationCard extends StatelessWidget {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      application['status'],
-                      style: TextStyle(
-                          color: Colors.red[900], fontWeight: FontWeight.bold),
-                    ),
+                  ),
+                  _buildStatusChip(
+                    application['status'],
                   ),
                 ],
               ),
@@ -185,4 +181,33 @@ class LeaveApplicationCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildStatusChip(String status) {
+  Color backgroundColor;
+  switch (status) {
+    case 'Accepted':
+      backgroundColor = Colors.green.shade100;
+      break;
+    case 'Rejected':
+      backgroundColor = Colors.red.shade100;
+      break;
+    case 'Pending':
+      backgroundColor = Colors.yellow.shade100;
+      break;
+    default:
+      backgroundColor = Colors.grey.shade100;
+  }
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Text(
+      status,
+      style: const TextStyle(fontSize: 12),
+    ),
+  );
 }

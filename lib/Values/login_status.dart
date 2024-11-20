@@ -10,7 +10,7 @@ class UserPreferences {
   static const _course = 'course';
   bool faculty = false;
   static const _emailKey = 'email';
-  static const String woxUrl = "http://10.106.23.10:8080";
+  static const String woxUrl = "http://10.7.0.23:8080";
   // static const String woxUrl = "http://52.20.1.249:5000";
   static const String jobsUrl = "http://10.106.16.71:8000";
   ListStore store = ListStore();
@@ -77,10 +77,12 @@ class UserPreferences {
   }
 
   Future<Map<String, dynamic>> getProfile(String email) async {
-    print('EMAIL RECEIVED' + email);
+    print('FETCH PROFILE API URL ' + '${store.woxUrl}/api/fetch_profile');
+    print('EMAIL RECEIVED ' + email);
 
     try {
       String apiUrl = '${store.woxUrl}/api/fetch_profile';
+
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: <String, String>{
@@ -91,7 +93,10 @@ class UserPreferences {
           'email': email,
         }),
       );
+
       print('PROFILE DETAILS' + jsonEncode(jsonDecode(response.body)));
+      print('PROFILE DETAILS' +
+          jsonEncode(jsonDecode(response.statusCode.toString())));
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

@@ -45,4 +45,31 @@ class FeedbackFormProvider with ChangeNotifier {
   String getSectionValue(String section, String question) {
     return sections[section]?[question] ?? '';
   }
+
+  bool validateSection(String section) {
+    return sections[section]!
+        .values
+        .every((value) => value != null && value!.isNotEmpty);
+  }
+
+  bool validateForm() {
+    return [selectedDegree, selectedSemester, selectedCourse, selectedFaculty]
+        .every((value) => value != null && value!.isNotEmpty);
+  }
+
+  void clearData() {
+    selectedCourse = null;
+    selectedDegree = null;
+    selectedFaculty = null;
+    selectedSemester = null;
+    sections = {
+      'section1': {'q1': '', 'q2': ''},
+      'section2': {'q1': '', 'q2': ''},
+      'section3': {'q1': '', 'q2': ''},
+      'section4': {'q1': '', 'q2': '', 'q3': ''},
+      'section5': {'q1': '', 'q2': ''},
+      'section6': {'q1': '', 'q2': '', 'q3': '', 'q4': ''},
+    };
+    notifyListeners();
+  }
 }

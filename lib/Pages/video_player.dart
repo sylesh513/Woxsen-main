@@ -1,13 +1,23 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:woxsen/Values/subjects_list.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String? url;
+  final String? filename;
+  final String? userId;
 
   const VideoPlayerScreen({
     Key? key,
     required this.url,
+    required this.filename,
+    required this.userId,
   }) : super(key: key);
+
   @override
   _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
 }
@@ -15,21 +25,58 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
+  bool _isLoading = true;
+  String? _videoUrl;
+  ListStore store = ListStore();
 
   @override
   void initState() {
     super.initState();
-    // Replace this URL with your video URL
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(
-          'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
-    );
-    _initializeVideoPlayerFuture = _controller.initialize();
+    _fetchVideoUrl();
+  }
+
+  Future<void> _fetchVideoUrl() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${store.woxUrl}/api/st_leave_get_doc'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'doc_is': 'video_url',
+          'user_id': '${widget.userId}',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final tempDir = await getTemporaryDirectory();
+        final tempVideoPath = '${tempDir.path}/${widget.filename}';
+        final file = File(tempVideoPath);
+        await file.writeAsBytes(bytes);
+
+        setState(() {
+          _videoUrl = tempVideoPath;
+          _controller = VideoPlayerController.networkUrl(Uri.parse(_videoUrl!));
+          _initializeVideoPlayerFuture = _controller.initialize();
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load video URL');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_controller.value.isInitialized) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -44,29 +91,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             Navigator.of(context).pop();
           },
         ),
-        title: Text('Supporting Video'),
+        title: const Text('Supporting Video'),
       ),
-      body: FutureBuilder(
-        future: _initializeVideoPlayerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    VideoPlayer(_controller),
-                    _PlayPauseOverlay(controller: _controller),
-                  ],
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _videoUrl == null
+              ? Center(child: Text('Error loading video'))
+              : FutureBuilder(
+                  future: _initializeVideoPlayerFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return Center(
+                        child: AspectRatio(
+                          aspectRatio: _controller.value.aspectRatio,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              VideoPlayer(_controller),
+                              _PlayPauseOverlay(controller: _controller),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
                 ),
-              ),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
     );
   }
 }

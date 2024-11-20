@@ -2,8 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:woxsen/Pages/document_viewer.dart';
 import 'package:woxsen/Pages/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/Values/subjects_list.dart';
+import 'dart:convert';
 
 class StudentLeaveApplications extends StatelessWidget {
+  ListStore store = ListStore();
+
+  Future<List<dynamic>> fetchLeaveApplications() async {
+    UserPreferences userPreferences = UserPreferences();
+    String email = await userPreferences.getEmail();
+
+    final httpRequest =
+        await http.post(Uri.parse('${store.woxUrl}/api/st_leaves'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'email_id': email,
+            }));
+
+    final response = httpRequest;
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      return jsonResponse;
+    } else {
+      throw Exception('Failed to load leave applications');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,67 +62,59 @@ class StudentLeaveApplications extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                LeaveCard(
-                  title: 'Sick Leave',
-                  dateRange: 'From 30th Nov To 2nd Dec',
-                  status: 'Under Review',
-                  statusColor: Colors.yellow.shade100,
-                  details: LeaveDetails(
-                    totalLeave: '20days',
-                    leaveType: 'Medical',
-                    reason: 'Some Reason Should Be Here...',
-                    hasPdf: true,
-                    hasVideo: true,
-                  ),
-                ),
-                LeaveCard(
-                  title: 'Sick Leave',
-                  dateRange: 'From 30th Nov To 2nd Dec',
-                  status: 'Accepted',
-                  statusColor: Colors.green,
-                  details: LeaveDetails(
-                    totalLeave: '20days',
-                    leaveType: 'Medical',
-                    reason: 'Some Reason Should Be Here...',
-                    hasPdf: true,
-                    hasVideo: true,
-                  ),
-                ),
-                LeaveCard(
-                  title: 'Sick Leave',
-                  dateRange: 'From 30th Nov To 2nd Dec',
-                  status: 'Accepted',
-                  statusColor: Colors.green,
-                  details: LeaveDetails(
-                    totalLeave: '20days',
-                    leaveType: 'Medical',
-                    reason: 'Some Reason Should Be Here...',
-                    hasPdf: true,
-                    hasVideo: true,
-                  ),
-                ),
-                LeaveCard(
-                  title: 'Medical Leave',
-                  dateRange: 'From 30th Nov To 2nd Dec',
-                  status: 'Rejected',
-                  statusColor: Colors.red,
-                  details: LeaveDetails(
-                    totalLeave: '20days',
-                    leaveType: 'Medical',
-                    reason: 'Some Reason Should Be Here...',
-                    hasPdf: true,
-                    hasVideo: true,
-                  ),
-                ),
-              ],
+            child: FutureBuilder<List<dynamic>>(
+              future: fetchLeaveApplications(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No applications found.'));
+                } else {
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final application = snapshot.data![index];
+
+                      return LeaveCard(
+                        title: application['leave_type'],
+                        dateRange:
+                            'From ${application['start_date']} To ${application['end_date']}',
+                        reason: application['reason_for_leave'],
+                        status: application['status'],
+                        statusColor: _getStatusColor(application['status']),
+                        details: LeaveDetails(
+                          totalLeave: application['total_leaves'].toString(),
+                          leaveType: application['leave_type'],
+                          reason: application['reason_for_leave'],
+                          hasPdf: application['document_url'] != null,
+                          hasVideo: application['video_url'] != null,
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Accepted':
+        return Colors.green.shade900;
+      case 'Rejected':
+        return Colors.red.shade900;
+      case 'Pending':
+        return Colors.yellow.shade900;
+      default:
+        return Colors.grey.shade900;
+    }
   }
 }
 
@@ -100,11 +122,13 @@ class LeaveCard extends StatefulWidget {
   final String title;
   final String dateRange;
   final String status;
+  final String reason;
   final Color statusColor;
   final LeaveDetails? details;
 
   LeaveCard({
     required this.title,
+    required this.reason,
     required this.dateRange,
     required this.status,
     required this.statusColor,
@@ -126,15 +150,28 @@ class _LeaveCardState extends State<LeaveCard> {
           ListTile(
             title: Text(widget.title,
                 style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(widget.dateRange),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.dateRange),
+                Text(widget.reason),
+              ],
+            ),
             trailing: Chip(
               label: Text(widget.status),
-              backgroundColor: widget.statusColor.withOpacity(0.2),
+              backgroundColor: widget.statusColor.withOpacity(0.1),
               labelStyle: TextStyle(color: widget.statusColor),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                    color: widget.statusColor
+                        .withOpacity(0.2)), // Set the border color here
+                borderRadius:
+                    BorderRadius.circular(6), // Optional: Set the border radius
+              ),
             ),
             onTap: () {
               setState(() {
-                _isExpanded = !_isExpanded;
+                _isExpanded = false;
               });
             },
           ),
@@ -160,8 +197,11 @@ class _LeaveCardState extends State<LeaveCard> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        DocumentViewerScreen(url: '')),
+                                    builder: (context) => DocumentViewerScreen(
+                                          url: '',
+                                          filename: ''?.split('\\').last,
+                                          userId: '',
+                                        )),
                               );
                             },
                           ),
@@ -172,8 +212,10 @@ class _LeaveCardState extends State<LeaveCard> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        VideoPlayerScreen(url: '')),
+                                    builder: (context) => VideoPlayerScreen(
+                                        url: '',
+                                        filename: ''?.split('\\').last,
+                                        userId: '')),
                               );
                             },
                           ),
@@ -203,4 +245,33 @@ class LeaveDetails {
     this.hasPdf = false,
     this.hasVideo = false,
   });
+}
+
+Widget _buildStatusChip(String status) {
+  Color backgroundColor;
+  switch (status) {
+    case 'Accepted':
+      backgroundColor = Colors.green.shade100;
+      break;
+    case 'Rejected':
+      backgroundColor = Colors.red.shade100;
+      break;
+    case 'Pending':
+      backgroundColor = Colors.yellow.shade100;
+      break;
+    default:
+      backgroundColor = Colors.grey.shade100;
+  }
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Text(
+      status,
+      style: const TextStyle(fontSize: 12),
+    ),
+  );
 }

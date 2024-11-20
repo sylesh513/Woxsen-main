@@ -8,6 +8,8 @@ class FacultyFeedback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<FeedbackFormProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -28,7 +30,7 @@ class FacultyFeedback extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              color: Color(0xFFFF9999),
+              color: const Color(0xFFFF8B98),
               child: const Text(
                 'Select The Details Below\nTo Give Feedback',
                 textAlign: TextAlign.center,
@@ -43,7 +45,7 @@ class FacultyFeedback extends StatelessWidget {
               child: Column(
                 children: [
                   _buildDropdown(
-                    hint: 'Select Degree',
+                    hint: 'Select School',
                     items: ['SOB', 'SOT', 'SOS'],
                     onChanged: (value) => context
                         .read<FeedbackFormProvider>()
@@ -93,12 +95,19 @@ class FacultyFeedback extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to section 2
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ClassroomEvaluationFormSectionOne()));
+                        if (provider.validateForm()) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ClassroomEvaluationFormSectionOne()));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please select all the fields.'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF8B98),

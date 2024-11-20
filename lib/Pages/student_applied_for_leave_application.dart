@@ -74,7 +74,7 @@ class LeaveDetailsCard extends StatelessWidget {
                 Text('Sick Leave',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('28th Nov 2024', style: TextStyle(color: Colors.grey)),
+                // Text('28th Nov 2024', style: TextStyle(color: Colors.grey)),
               ],
             ),
             SizedBox(height: 16),

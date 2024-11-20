@@ -528,7 +528,6 @@ class _UploadPageState extends State<UploadPage> {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': 'kalyana.jonnalagadda@woxsen.edu.in'}),
     );
-    print(response.body);
 
     var data = jsonDecode(response.body);
     if (response.statusCode == 200 && data['message'] != 'Email not found') {

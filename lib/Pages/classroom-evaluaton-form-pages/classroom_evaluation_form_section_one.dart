@@ -92,11 +92,20 @@ class _EvaluationFormState extends State<ClassroomEvaluationFormSectionOne> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ClassroomEvaluationFormSectionTwo()));
+                        if (provider.validateSection('section1')) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ClassroomEvaluationFormSectionTwo()));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Please answer all questions before proceeding.'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF8B98),
@@ -128,9 +137,6 @@ class _EvaluationFormState extends State<ClassroomEvaluationFormSectionOne> {
     selectedValue,
     void Function(String?) onChanged,
   ) {
-    print('QUESTION :: $question');
-    print('SELECTED VALUE :: $selectedValue');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

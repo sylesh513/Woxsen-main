@@ -12,6 +12,7 @@ import 'package:woxsen/Pages/upload_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/utils/roles.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,17 +23,24 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _faculty = false;
+  String role = 'role';
+
   @override
   void initState() {
     super.initState();
-    print(_faculty);
-    getFacutly();
+    getFaculty();
+    getRole();
   }
 
-  void getFacutly() async {
+  void getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
+  }
+
+  void getFaculty() async {
     _faculty = await UserPreferences.getRole() == 'faculty' ? true : false;
-    // _faculty = true;
-    print('current user role is :  $_faculty');
     setState(() {
       _faculty = _faculty;
     });
@@ -202,8 +210,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      if (_faculty)
+                      if (role == ROLE_VP) const SizedBox(height: 20),
+                      if (role == ROLE_VP)
                         Container(
                           height: MediaQuery.of(context).size.height * 0.08,
                           width: MediaQuery.of(context).size.width * 0.80,
@@ -260,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                                 SizedBox(
                                     width: 12), // Space between logo and text
                                 Text(
-                                  'Campus Jobs',
+                                  'Post Campus Job',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 24,
@@ -271,95 +279,100 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                      if (_faculty) const SizedBox(height: 20),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width * 0.80,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 2.0,
+                      if (role == ROLE_PD ||
+                          role == ROLE_DEAN ||
+                          role == ROLE_STUDENT)
+                        const SizedBox(height: 20),
+                      if (role == ROLE_PD ||
+                          role == ROLE_DEAN ||
+                          role == ROLE_STUDENT)
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          width: MediaQuery.of(context).size.width * 0.80,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_faculty) {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      const UploadPage(), // Assuming HomePage is the page you want to navigate to
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                  transitionDuration: const Duration(
-                                      milliseconds: 200), // Customize duration
-                                ),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
-                                      const campusJobs(
-                                    isBox: true,
-                                  ), // Assuming HomePage is the page you want to navigate to
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    );
-                                  },
-                                  transitionDuration: const Duration(
-                                      milliseconds: 200), // Customize duration
-                                ),
-                              );
-                            }
-                            // Navigator.pushNamed(context, AppRoutes.loginPage);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xffF2C9CD), // Change background color to white
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16), // Adjust padding if needed
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ), // Adjust border radius if
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            // mainAxisSize: MainAxisSize
-                            //     .min,
-
-                            // Use min to wrap content inside the button
-                            children: <Widget>[
-                              Icon(
-                                _faculty ? Icons.upload_file : Icons.work,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                  width: 12), // Space between logo and text
-                              Text(
-                                _faculty ? 'Upload Documents' : 'Campus Jobs',
-                                style: const TextStyle(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (role == ROLE_PD) {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        const UploadPage(), // Assuming HomePage is the page you want to navigate to
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                    transitionDuration: const Duration(
+                                        milliseconds:
+                                            200), // Customize duration
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        const campusJobs(
+                                      isBox: true,
+                                    ), // Assuming HomePage is the page you want to navigate to
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                    transitionDuration: const Duration(
+                                        milliseconds:
+                                            200), // Customize duration
+                                  ),
+                                );
+                              }
+                              // Navigator.pushNamed(context, AppRoutes.loginPage);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(
+                                  0xffF2C9CD), // Change background color to white
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16), // Adjust padding if needed
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ), // Adjust border radius if
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  _faculty ? Icons.upload_file : Icons.work,
                                   color: Colors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w400,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                Text(
+                                  role == ROLE_PD
+                                      ? 'Upload Documents'
+                                      : 'Campus Jobs',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 20),
                       Container(
                         height: MediaQuery.of(context).size.height * 0.08,
@@ -392,30 +405,22 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xffF2C9CD), // Change background color to white
-                            minimumSize: const Size(
-                                270, 70), // Change dimensions of the button
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16), // Adjust padding if needed
+                            backgroundColor: const Color(0xffF2C9CD),
+                            minimumSize: const Size(270, 70),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ), // Adjust border radius if
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            // mainAxisSize: MainAxisSize
-                            //     .min,
-
-                            // Use min to wrap content inside the button
                             children: <Widget>[
                               Icon(
                                 Icons.supervised_user_circle_outlined,
                                 color: Colors.black,
                                 size: 30,
                               ),
-                              SizedBox(
-                                  width: 12), // Space between logo and text
+                              SizedBox(width: 12),
                               Text(
                                 'services',
                                 style: TextStyle(
@@ -456,11 +461,10 @@ class _HomePageState extends State<HomePage> {
                                     child: child,
                                   );
                                 },
-                                transitionDuration: const Duration(
-                                    milliseconds: 200), // Customize duration
+                                transitionDuration:
+                                    const Duration(milliseconds: 200),
                               ),
                             );
-                            // Navigator.pushNamed(context, AppRoutes.loginPage);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(
@@ -475,10 +479,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            // mainAxisSize: MainAxisSize
-                            //     .min,
-
-                            // Use min to wrap content inside the button
                             children: <Widget>[
                               Icon(
                                 Icons.design_services,
@@ -499,77 +499,77 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width * 0.80,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 2.0,
+                      if (role == ROLE_FACULTY ||
+                          role == ROLE_DEAN ||
+                          role == ROLE_PD)
+                        const SizedBox(height: 20),
+                      if (role == ROLE_FACULTY ||
+                          role == ROLE_DEAN ||
+                          role == ROLE_PD)
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          width: MediaQuery.of(context).size.width * 0.80,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation,
-                                        secondaryAnimation) =>
-                                    const FacultyLeavePage(), // Assuming HomePage is the page you want to navigate to
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
-                                transitionDuration: const Duration(
-                                    milliseconds: 200), // Customize duration
-                              ),
-                            );
-                            // Navigator.pushNamed(context, AppRoutes.loginPage);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(
-                                0xffF2C9CD), // Change background color to white
-                            minimumSize: const Size(
-                                270, 70), // Change dimensions of the button
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16), // Adjust padding if needed
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ), // Adjust border radius if
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            // mainAxisSize: MainAxisSize
-                            //     .min,
-
-                            // Use min to wrap content inside the button
-                            children: <Widget>[
-                              Icon(
-                                Icons.design_services,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              SizedBox(
-                                  width: 12), // Space between logo and text
-                              Text(
-                                'Leave Manager',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w400,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      const FacultyLeavePage(),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  transitionDuration:
+                                      const Duration(milliseconds: 200),
                                 ),
+                              );
+                              // Navigator.pushNamed(context, AppRoutes.loginPage);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xffF2C9CD),
+                              minimumSize: const Size(270, 70),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
                               ),
-                            ],
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.design_services,
+                                  color: Colors.black,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Faculty Leave Manager',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      if (_faculty) // ONLY FOR STUDENTS (ATTACH CONDTION FOR STUDENTS)
+                      if (role == ROLE_STUDENT || role == ROLE_PD)
+                        const SizedBox(height: 20),
+                      if (role == ROLE_STUDENT || role == ROLE_PD)
                         Container(
                           height: MediaQuery.of(context).size.height * 0.08,
                           width: MediaQuery.of(context).size.width * 0.80,

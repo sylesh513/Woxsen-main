@@ -762,11 +762,17 @@ class _AcademicsState extends State<Academics> {
               if (!store.isFaculty)
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FacultyFeedback()),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'You are not allowed to give feedback right now.')),
                     );
+                    return;
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => FacultyFeedback()),
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(
@@ -883,6 +889,8 @@ class _AcademicsState extends State<Academics> {
   }
 
   void updateLists() {
+    print(store.course);
+    print(store.specList);
     return setState(() {
       print(selectedSpecialization);
       if (store.course == 'B.Tech') {
@@ -891,6 +899,8 @@ class _AcademicsState extends State<Academics> {
         store.specList = store.mbaSpecializations;
       } else if (store.course == 'B.B.A') {
         store.specList = store.bbaSpecializations;
+      } else if (store.course == "SOL") {
+        store.specList = store.SOLSpecializations;
       }
 
       if (selectedSpecialization == 'MBA GEN') {
@@ -1042,9 +1052,6 @@ class pdfView extends StatelessWidget {
           file.path,
         ));
       }
-
-      // Add other fields if needed
-      request.fields['key'] = 'some value';
 
       try {
         var response = await request.send();

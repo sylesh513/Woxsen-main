@@ -375,8 +375,7 @@ class _StudentLeaveApplicationFormState
       if (startDate != null && endDate != null) {
         DateTime start = DateTime.parse(startDate.toString());
         DateTime end = DateTime.parse(endDate.toString());
-        totalLeaveDays =
-            end.difference(start).inDays + 1; // +1 to include the start date
+        totalLeaveDays = end.difference(start).inDays + 1;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
