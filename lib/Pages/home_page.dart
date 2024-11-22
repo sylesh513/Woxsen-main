@@ -422,7 +422,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               SizedBox(width: 12),
                               Text(
-                                'services',
+                                'Services',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 24,
@@ -556,7 +556,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 SizedBox(width: 12),
                                 Text(
-                                  'Faculty Leave Manager',
+                                  'Faculty Leave',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 24,

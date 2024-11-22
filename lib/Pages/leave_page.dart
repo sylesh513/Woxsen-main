@@ -131,29 +131,29 @@ class _FacultyLeavePage extends State<FacultyLeavePage> {
               ),
             ),
           // TODO : ONLY FOR Programme Directors
-          // const SizedBox(height: 16),
-          // if (role == ROLE_PD)
-          //   Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          //     child: ElevatedButton(
-          //       onPressed: () {
-          //         Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //                 builder: (context) => FacultiesListPage()));
-          //       },
-          //       child: Text('Faculties Leaves Availability'),
-          //       style: ElevatedButton.styleFrom(
-          //         foregroundColor: Colors.black,
-          //         backgroundColor: Colors.white,
-          //         padding: const EdgeInsets.symmetric(vertical: 16),
-          //         textStyle: const TextStyle(fontSize: 18),
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(8),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
+          if (role == ROLE_PD || role == ROLE_DEAN) const SizedBox(height: 16),
+          if (role == ROLE_PD || role == ROLE_DEAN)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FacultiesListPage()));
+                },
+                child: Text('Faculties Leaves Availability'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
