@@ -93,10 +93,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ),
         title: const Text('Supporting Video'),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _videoUrl == null
-              ? Center(child: Text('Error loading video'))
+      body: _isLoading || _videoUrl == null
+          ? const Center(child: CircularProgressIndicator())
+          : _videoUrl == null || _videoUrl!.isEmpty
+              ? const Center(child: Text('Error loading video'))
               : FutureBuilder(
                   future: _initializeVideoPlayerFuture,
                   builder: (context, snapshot) {
@@ -114,7 +114,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         ),
                       );
                     } else {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
                   },
                 ),

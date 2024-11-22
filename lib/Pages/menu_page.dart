@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as httpp;
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:woxsen/Pages/feedback_complaints.dart';
@@ -33,7 +33,7 @@ class _MenuPageState extends State<MenuPage> {
   final TextEditingController _Program = TextEditingController();
   final TextEditingController _academicYear = TextEditingController();
 
-  get http => null;
+  // get http => null;
 
   @override
   void initState() {
@@ -46,59 +46,67 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   void getDetails() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        barrierColor: Colors.black.withOpacity(0.5),
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return SizedBox(
-            height: 100,
-            width: 100,
-            child: Center(
-              child: SpinKitSpinningLines(
-                color: Colors.red.shade800,
-                size: 70.0,
+    try {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          barrierColor: Colors.black.withOpacity(0.5),
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return SizedBox(
+              height: 100,
+              width: 100,
+              child: Center(
+                child: SpinKitSpinningLines(
+                  color: Colors.red.shade800,
+                  size: 70.0,
+                ),
               ),
-            ),
-          );
-        },
-      );
-    });
-    ListStore store = ListStore();
-    var userPreferences = UserPreferences();
-    var email = await userPreferences.getEmail();
-    print(email);
-    String apiUrl =
-        '${store.woxUrl}/api/fetch_profile'; // Replace with your API URL
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'required': 'profile_details',
-        'email': email,
-      }),
-    );
-    print(response.body);
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      var name = data['name'];
-      var studentId = data['id'];
-      var program = data['course'];
-      var academicYear = data['specialization'];
-
-      setState(() {
-        _nameController.text = name;
-        _studentId.text = studentId.toString();
-        _Program.text = program;
-        _academicYear.text = academicYear;
-        Navigator.pop(context);
+            );
+          },
+        );
       });
-    } else {
-      print('Request failed with status: ${response.statusCode}');
+      ListStore store = ListStore();
+      var userPreferences = UserPreferences();
+      var email = await userPreferences.getEmail();
+      String apiUrl =
+          '${store.woxUrl}/api/fetch_profile'; // Replace with your API URL
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'required': 'profile_details',
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var name = data['name'];
+        var studentId = data['id'];
+        var program = data['course'];
+        var academicYear = data['specialization'];
+
+        setState(() {
+          _nameController.text = name;
+          _studentId.text = studentId.toString();
+          _Program.text = program;
+          _academicYear.text = academicYear;
+          Navigator.pop(context);
+        });
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Something went wrong. Please try again later.')),
+      );
     }
   }
 
@@ -188,7 +196,7 @@ class _MenuPageState extends State<MenuPage> {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('LOGOUT',
+                child: Text('Logout',
                     style: TextStyle(
                       color: Colors.red.shade900,
                       fontSize: 22,

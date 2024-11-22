@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:woxsen/Values/app_routes.dart';
@@ -219,7 +218,7 @@ class _profilePageState extends State<profilePage> {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('LOGOUT',
+                child: Text('Logout',
                     style: TextStyle(
                       color: Colors.red.shade900,
                       fontSize: 22,

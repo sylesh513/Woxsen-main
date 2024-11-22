@@ -25,6 +25,9 @@ class _StudentLeaveApplicationFormState
   String? supportingVideo;
   String? otherReason;
 
+  static const int MAX_DOCUMENT_SIZE = 5 * 1024 * 1024;
+  static const int MAX_VIDEO_SIZE = 15 * 1024 * 1024;
+
   final Map<String, List<Map<String, String>>> reasonData = {
     'Regular': [
       {'reason': 'Home Outing', 'type': 'REGULAR'},
@@ -44,6 +47,193 @@ class _StudentLeaveApplicationFormState
       {'reason': 'Other reasons', 'type': 'OTHERS'},
     ],
   };
+
+  bool _isLoading = false;
+
+  void _submitForm() async {
+    UserPreferences userPreferences = UserPreferences();
+    String email = await userPreferences.getEmail();
+
+    Map<String, dynamic> user = await userPreferences.getProfile(email);
+    int totalLeaveDays;
+
+    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
+
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      if (_showFileUploadFields()) {
+        try {
+          if (supportingDocument != null) {
+            File documentFile = File(supportingDocument!);
+            int documentSize = await documentFile.length();
+            if (documentSize > MAX_DOCUMENT_SIZE) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Document size must be less than 5MB')),
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              return;
+            }
+          }
+
+          if (supportingVideo != null) {
+            File videoFile = File(supportingVideo!);
+            int videoSize = await videoFile.length();
+            if (videoSize > MAX_VIDEO_SIZE) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Video size must be less than 15MB')),
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              return;
+            }
+          }
+        } catch (e) {
+          print('Error reading files: $e');
+        }
+
+        if (_isEmergencyOrOthers() && supportingVideo == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please upload a supporting video')),
+          );
+          return;
+        }
+      }
+
+      // Check for valid date range
+      if (startDate == null || endDate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Please select both start and end dates')),
+        );
+        return;
+      }
+
+      if (endDate!.isBefore(startDate!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('End date cannot be before start date')),
+        );
+        return;
+      }
+
+      final difference = endDate!.difference(startDate!).inDays + 1;
+
+      if (difference > 3) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Leave cannot exceed 3 days')),
+        );
+        return;
+      }
+
+      if (startDate != null && endDate != null) {
+        DateTime start = DateTime.parse(startDate.toString());
+        DateTime end = DateTime.parse(endDate.toString());
+        totalLeaveDays = end.difference(start).inDays + 1;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Please provide both start and end dates.')),
+        );
+        return;
+      }
+
+      // video and document url
+
+      var matchingReason = reasonData[leaveCategory]?.firstWhere(
+        (reason) => reason['reason'] == leaveReason,
+        orElse: () => {},
+      );
+
+      if (startDate == null ||
+          endDate == null ||
+          leaveReason == null ||
+          matchingReason == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please fill in all required fields.'),
+          ),
+        );
+        return;
+      }
+
+      var bodyContent = <String, String>{
+        "start_date": dateFormatter.format(startDate!),
+        "end_date": dateFormatter.format(endDate!),
+        "reason": otherReason == null
+            ? leaveReason.toString()
+            : otherReason.toString(),
+        "type": matchingReason['type'].toString(),
+        "total_leaves": totalLeaveDays.toString(),
+        "course": user['course'].toString(),
+        "email": user['email'].toString(),
+        "name": user['name'].toString(),
+      };
+
+      try {
+        var uri = Uri.parse('${ListStore().woxUrl}/api/apply');
+        var request = http.MultipartRequest('POST', uri);
+        request.fields.addAll(bodyContent);
+
+        if (supportingDocument != null) {
+          request.files.add(await http.MultipartFile.fromPath(
+            'document_url',
+            supportingDocument!,
+          ));
+        }
+
+        if (supportingVideo != null) {
+          request.files.add(await http.MultipartFile.fromPath(
+            'video_url',
+            supportingVideo!,
+          ));
+        }
+
+        var userResponse = await request.send();
+
+        if (userResponse.statusCode == 200) {
+          var data = userResponse;
+          print('DATA $data');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Application applied successfully.')),
+          );
+
+          setState(() {
+            startDate = null;
+            endDate = null;
+            leaveCategory = null;
+            leaveReason = null;
+            supportingDocument = null;
+            supportingVideo = null;
+            otherReason = null;
+          });
+
+          return;
+        } else {
+          print('Request failed with status: ${userResponse.statusCode}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Something went wrong.')),
+          );
+          return;
+        }
+      } catch (e) {
+        print('Error in student_leave_application_form.dart: ${e}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong.')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,14 +321,14 @@ class _StudentLeaveApplicationFormState
                       if (_showFileUploadFields()) ...[
                         const SizedBox(height: 16),
                         _buildFileUpload(
-                            'Supporting Document (PDF)',
+                            'Supporting Document (PDF) [Maximum 5MB]',
                             supportingDocument,
                             (file) => setState(() => supportingDocument = file),
                             ['pdf']),
                         if (_isEmergencyOrOthers()) ...[
                           const SizedBox(height: 16),
                           _buildFileUpload(
-                              'Supporting video from your parents',
+                              'Supporting video from your parents [Maximum 15MB]',
                               supportingVideo,
                               (file) => setState(() => supportingVideo = file),
                               ['mp4']),
@@ -148,9 +338,23 @@ class _StudentLeaveApplicationFormState
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          child: const Text('Apply for Leave',
-                              style: TextStyle(fontSize: 20)),
-                          onPressed: _submitForm,
+                          child: _isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Applying...',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ],
+                                )
+                              : const Text('Apply for Leave',
+                                  style: TextStyle(fontSize: 20)),
+                          onPressed: _isLoading ? null : _submitForm,
                           style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: const Color(0xFFFF7F7F),
@@ -308,151 +512,5 @@ class _StudentLeaveApplicationFormState
         .firstWhere((r) => r['reason'] == leaveReason);
     return selectedReason['type'] == 'EMERGENCY' ||
         selectedReason['type'] == 'OTHERS';
-  }
-
-  void _submitForm() async {
-    UserPreferences userPreferences = UserPreferences();
-    String email = await userPreferences.getEmail();
-
-    Map<String, dynamic> user = await userPreferences.getProfile(email);
-    int totalLeaveDays;
-
-    final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
-
-    if (_formKey.currentState!.validate()) {
-      if (_showFileUploadFields()) {
-        try {
-          if (supportingDocument != null) {
-            File documentFile = File(supportingDocument!);
-            if (!await documentFile.exists()) {
-              return;
-            }
-          }
-
-          if (supportingVideo != null) {
-            File videoFile = File(supportingVideo!);
-            if (!await videoFile.exists()) {
-              return;
-            }
-          }
-        } catch (e) {
-          print('Error reading files: $e');
-        }
-
-        if (_isEmergencyOrOthers() && supportingVideo == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please upload a supporting video')),
-          );
-          return;
-        }
-      }
-
-      // Check for valid date range
-      if (startDate == null || endDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please select both start and end dates')),
-        );
-        return;
-      }
-
-      if (endDate!.isBefore(startDate!)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('End date cannot be before start date')),
-        );
-        return;
-      }
-
-      final difference = endDate!.difference(startDate!).inDays + 1;
-
-      if (difference > 3) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Leave cannot exceed 3 days')),
-        );
-        return;
-      }
-
-      if (startDate != null && endDate != null) {
-        DateTime start = DateTime.parse(startDate.toString());
-        DateTime end = DateTime.parse(endDate.toString());
-        totalLeaveDays = end.difference(start).inDays + 1;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please provide both start and end dates.')),
-        );
-        return;
-      }
-
-      // video and document url
-
-      var matchingReason = reasonData[leaveCategory]?.firstWhere(
-        (reason) => reason['reason'] == leaveReason,
-        orElse: () => {},
-      );
-
-      if (startDate == null ||
-          endDate == null ||
-          leaveReason == null ||
-          matchingReason == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please fill in all required fields.'),
-          ),
-        );
-        return;
-      }
-
-      print('Other reason: $otherReason');
-      print('Leave reason: $leaveReason');
-
-      var bodyContent = <String, String>{
-        "start_date": dateFormatter.format(startDate!),
-        "end_date": dateFormatter.format(endDate!),
-        "reason": otherReason == null
-            ? leaveReason.toString()
-            : otherReason.toString(),
-        "type": matchingReason['type'].toString(),
-        "total_leaves": totalLeaveDays.toString(),
-        "course": user['course'].toString(),
-        "email": user['email'].toString(),
-        "name": user['name'].toString(),
-      };
-
-      var uri = Uri.parse('${ListStore().woxUrl}/api/apply');
-      var request = http.MultipartRequest('POST', uri);
-      request.fields.addAll(bodyContent);
-
-      if (supportingDocument != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'document_url',
-          supportingDocument!,
-        ));
-      }
-
-      if (supportingVideo != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'video_url',
-          supportingVideo!,
-        ));
-      }
-
-      var userResponse = await request.send();
-
-      if (userResponse.statusCode == 200) {
-        var data = userResponse;
-        print('DATA $data');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Application applied successfully.')),
-        );
-        return;
-      } else {
-        print('Request failed with status: ${userResponse.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong.')),
-        );
-        return;
-      }
-    }
   }
 }

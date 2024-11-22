@@ -7,8 +7,29 @@ import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
 import 'dart:convert';
 
-class StudentLeaveApplications extends StatelessWidget {
+class StudentLeaveApplications extends StatefulWidget {
+  const StudentLeaveApplications({Key? key}) : super(key: key);
+  @override
+  _StudentLeaveApplications createState() => _StudentLeaveApplications();
+}
+
+class _StudentLeaveApplications extends State<StudentLeaveApplications> {
   ListStore store = ListStore();
+
+  String role = 'role';
+
+  @override
+  void initState() {
+    super.initState();
+    getRole();
+  }
+
+  void getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
+  }
 
   Future<List<dynamic>> fetchLeaveApplications() async {
     UserPreferences userPreferences = UserPreferences();
@@ -77,6 +98,8 @@ class StudentLeaveApplications extends StatelessWidget {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final application = snapshot.data![index];
+
+                      print('EACH STUDENT APPLICATION : ${application}');
 
                       return LeaveCard(
                         title: application['leave_type'],

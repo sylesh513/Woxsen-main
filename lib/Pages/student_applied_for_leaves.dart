@@ -3,8 +3,10 @@ import 'package:woxsen/Pages/student_applied_for_leave_details.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:woxsen/Values/login_status.dart';
 
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/roles.dart';
 
 class StudentAppliedForLeaves extends StatefulWidget {
   @override
@@ -14,25 +16,79 @@ class StudentAppliedForLeaves extends StatefulWidget {
 
 class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
   ListStore store = ListStore();
+  String role = 'role';
   late Future<List<dynamic>> futureLeaveApplications;
-
-  Future<List<dynamic>> fetchLeaveApplications() async {
-    final response =
-        await http.get(Uri.parse('${store.woxUrl}/api/st_leave_all_appl'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(response.body);
-
-      return jsonResponse.map((data) => data).toList();
-    } else {
-      throw Exception('Failed to load leave applications');
-    }
-  }
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    futureLeaveApplications = fetchLeaveApplications();
+    initialize();
+  }
+
+  void initialize() async {
+    await getRole();
+    setState(() {
+      futureLeaveApplications = fetchLeaveApplications();
+    });
+  }
+
+  Future<void> getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
+  }
+
+  Future<List<dynamic>> fetchLeaveApplications() async {
+    UserPreferences userPreferences = UserPreferences();
+    String email = await userPreferences.getEmail();
+
+    String apiEndpoint = role == ROLE_PD
+        ? '${store.woxUrl}/api/st_leave_all_appl'
+        : role == ROLE_STUDENT
+            ? '${store.woxUrl}/api/st_leaves'
+            : '';
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      final httpRequest = role == ROLE_STUDENT
+          ? await http.post(Uri.parse('${store.woxUrl}/api/st_leaves'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, String>{
+                'email_id': email,
+              }))
+          : role == ROLE_PD
+              ? await http.get(Uri.parse(apiEndpoint))
+              : null;
+
+      final response = httpRequest;
+
+      if (response!.statusCode == 200) {
+        List<dynamic> jsonResponse = json.decode(response.body);
+
+        return jsonResponse.map((data) => data).toList();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to load leave applications'),
+        ));
+        throw Exception('Failed to load leave applications');
+      }
+    } catch (e) {
+      print(' Error fetching leave applications: $e');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Something went wrong'),
+      ));
+      throw Exception('Failed to lsoad leave applications');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -64,35 +120,38 @@ class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<dynamic>>(
-              future: futureLeaveApplications,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                      child: Text('No leave applications found.'));
-                } else {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var application = snapshot.data![index];
-                      return Column(
-                        children: [
-                          LeaveApplicationCard(
-                            application: application,
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      );
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : FutureBuilder<List<dynamic>>(
+                    future: futureLeaveApplications,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('No leave applications found.'));
+                      } else {
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            var application = snapshot.data![index];
+                            return Column(
+                              children: [
+                                LeaveApplicationCard(
+                                  application: application,
+                                  role: role,
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
-                  );
-                }
-              },
-            ),
+                  ),
           ),
         ],
       ),
@@ -115,11 +174,11 @@ Color getStatusColor(String status) {
 
 class LeaveApplicationCard extends StatelessWidget {
   final Map<String, dynamic> application;
+  final role;
 
-  const LeaveApplicationCard({
-    Key? key,
-    required this.application,
-  }) : super(key: key);
+  const LeaveApplicationCard(
+      {Key? key, required this.application, required this.role})
+      : super(key: key);
 
   String capitalize(String s) =>
       s[0].toUpperCase() + s.substring(1).toLowerCase();
@@ -131,8 +190,8 @@ class LeaveApplicationCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  StudentAppliedForLeaveDetails(application: application)),
+              builder: (context) => StudentAppliedForLeaveDetails(
+                  application: application, role: role)),
         );
       },
       child: Card(

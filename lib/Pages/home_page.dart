@@ -621,7 +621,7 @@ class _HomePageState extends State<HomePage> {
                                 SizedBox(
                                     width: 12), // Space between logo and text
                                 Text(
-                                  'Student Leave Manager',
+                                  'Student Leave',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 24,

@@ -38,26 +38,34 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
   ListStore store = ListStore();
 
   Future<void> getDetails() async {
-    final response = await http.post(
-      Uri.parse('${store.woxUrl}/api/st_leave_get_doc'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'doc_is': 'document_url',
-        'user_id': '${widget.userId}',
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('${store.woxUrl}/api/st_leave_get_doc'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'doc_is': 'document_url',
+          'user_id': '${widget.userId}',
+        }),
+      );
 
-    final bytes = response.bodyBytes;
-    final tempDir = await getTemporaryDirectory();
-    final tempDocumentPath = '${tempDir.path}/${widget.filename}';
-    final file = File(tempDocumentPath);
-    await file.writeAsBytes(bytes);
+      final bytes = response.bodyBytes;
+      final tempDir = await getTemporaryDirectory();
+      final tempDocumentPath = '${tempDir.path}/${widget.filename}';
+      final file = File(tempDocumentPath);
+      await file.writeAsBytes(bytes);
 
-    setState(() {
-      _filePath = tempDocumentPath;
-    });
+      setState(() {
+        _filePath = tempDocumentPath;
+      });
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -72,9 +80,9 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
         ),
         title: const Text('Supporting Document'),
       ),
-      body: _isLoading
+      body: _isLoading || _filePath == null
           ? const Center(child: CircularProgressIndicator())
-          : _filePath == null
+          : _filePath == null || _filePath!.isEmpty
               ? const Center(child: Text('Error loading document'))
               : Container(
                   color: Colors.grey[200],

@@ -4,13 +4,16 @@ import 'package:woxsen/Pages/video_player.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/roles.dart';
 
 class StudentAppliedForLeaveDetails extends StatefulWidget {
   final Map<String, dynamic> application;
+  final String role;
 
   const StudentAppliedForLeaveDetails({
     Key? key,
     required this.application,
+    required this.role,
   }) : super(key: key);
 
   @override
@@ -90,6 +93,7 @@ class _StudentAppliedForLeaveDetailsState
             color: const Color(0xFFFF9999),
             child: const Text(
               'Leave Application',
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -99,54 +103,76 @@ class _StudentAppliedForLeaveDetailsState
               child: Column(
                 children: [
                   LeaveDetailsCard(application: widget.application),
-                  const SizedBox(height: 16),
-                  if (status == 'Accepted' || status == 'Rejected') ...[
-                    Text(
-                      'Application ${status == 'Accepted' ? 'Accepted' : 'Rejected'}',
-                      style: TextStyle(
-                        color: status == 'Accepted'
-                            ? Colors.green.shade700
-                            : Colors.red.shade600,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ] else ...[
-                    ElevatedButton(
-                      onPressed: () async {
-                        return await _updateStatus('Accepted', context);
-                      },
-                      child: Text('Accept',
-                          style: TextStyle(
-                            color: Colors.green.shade700,
-                            fontSize: 18,
-                          )),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade100,
-                          minimumSize: Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          )),
-                    ),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () async {
-                        return await _updateStatus('Rejected', context);
-                      },
-                      child: Text(
-                        'Reject',
+                  if (widget.role == ROLE_STUDENT) const SizedBox(height: 16),
+                  if (widget.role == ROLE_STUDENT)
+                    if (status == 'Accepted' || status == 'Rejected') ...[
+                      Text(
+                        'Your leave application is ${status == 'Accepted' ? 'Accepted' : 'Rejected'}',
                         style: TextStyle(
-                          color: Colors.red.shade600,
+                          color: status == 'Accepted'
+                              ? Colors.green.shade700
+                              : Colors.red.shade600,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        'Your application is in Under Review',
+                        style: TextStyle(
+                          color: Colors.yellow.shade900,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  if (widget.role == ROLE_PD) const SizedBox(height: 16),
+                  if (widget.role == ROLE_PD)
+                    if (status == 'Accepted' || status == 'Rejected') ...[
+                      Text(
+                        'Application ${status == 'Accepted' ? 'Accepted' : 'Rejected'}',
+                        style: TextStyle(
+                          color: status == 'Accepted'
+                              ? Colors.green.shade700
+                              : Colors.red.shade600,
                           fontSize: 18,
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade100,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          )),
-                    ),
-                  ],
+                    ] else ...[
+                      ElevatedButton(
+                        onPressed: () async {
+                          return await _updateStatus('Accepted', context);
+                        },
+                        child: Text('Accept',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontSize: 18,
+                            )),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade100,
+                            minimumSize: Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            )),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () async {
+                          return await _updateStatus('Rejected', context);
+                        },
+                        child: Text(
+                          'Reject',
+                          style: TextStyle(
+                            color: Colors.red.shade600,
+                            fontSize: 18,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade100,
+                            minimumSize: const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            )),
+                      ),
+                    ],
                 ],
               ),
             ),

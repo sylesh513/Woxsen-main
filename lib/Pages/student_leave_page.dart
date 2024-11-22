@@ -81,7 +81,7 @@ class _StudentLeavePage extends State<StudentLeavePage> {
           //     ),
           //   ),
           // ),
-          if (role == ROLE_STUDENT) SizedBox(height: 16),
+          if (role == ROLE_STUDENT) const SizedBox(height: 16),
           if (role == ROLE_STUDENT)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -105,34 +105,10 @@ class _StudentLeavePage extends State<StudentLeavePage> {
               ),
             ),
 
-          // TODO : ONLY FOR STUDENTS
-          if (role == ROLE_STUDENT) const SizedBox(height: 16),
-          if (role == ROLE_STUDENT)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => StudentLeaveApplications()));
-                },
-                child: Text('Applications'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-
-          // TODO : ONLY FOR FACULTIES
-          if (role == ROLE_PD) const SizedBox(height: 16),
-          if (role == ROLE_PD)
+          // TODO : FOR FACULTY AND STUDNETS
+          if (role == ROLE_PD || role == ROLE_STUDENT)
+            const SizedBox(height: 16),
+          if (role == ROLE_PD || role == ROLE_STUDENT)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ElevatedButton(
@@ -142,7 +118,8 @@ class _StudentLeavePage extends State<StudentLeavePage> {
                       MaterialPageRoute(
                           builder: (context) => StudentAppliedForLeaves()));
                 },
-                child: const Text('Leave Applications'),
+                child: Text(
+                    role == ROLE_STUDENT ? 'My Leaves' : 'Leave Applications'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.white,
