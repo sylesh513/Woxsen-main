@@ -5,6 +5,8 @@ import 'package:woxsen/Pages/academics_page.dart';
 import 'package:woxsen/Pages/campus_jobs.dart';
 import 'package:woxsen/Pages/campus_jobs_admin.dart';
 import 'package:woxsen/Pages/feedback_complaints.dart';
+import 'package:woxsen/Pages/lab_booking.dart';
+import 'package:woxsen/Pages/leave_approval.dart';
 import 'package:woxsen/Pages/leave_page.dart';
 import 'package:woxsen/Pages/services_page.dart';
 import 'package:woxsen/Pages/student_leave_page.dart';
@@ -12,6 +14,7 @@ import 'package:woxsen/Pages/upload_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/utils/responsive.dart';
 import 'package:woxsen/utils/roles.dart';
 
 class HomePage extends StatefulWidget {
@@ -64,8 +67,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.08,
+        width: Responsive.getWidth(context),
+        height: Responsive.getHeight(context),
+        // height: MediaQuery.of(context).size.height * 0.08,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(40)),
         ),
@@ -145,8 +149,8 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width * 0.80,
+                        height: Responsive.getHeight(context),
+                        width: Responsive.getWidth(context),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black,
@@ -213,8 +217,8 @@ class _HomePageState extends State<HomePage> {
                       if (role == ROLE_VP) const SizedBox(height: 20),
                       if (role == ROLE_VP)
                         Container(
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.width * 0.80,
+                          height: Responsive.getHeight(context),
+                          width: Responsive.getWidth(context),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,
@@ -287,8 +291,8 @@ class _HomePageState extends State<HomePage> {
                           role == ROLE_DEAN ||
                           role == ROLE_STUDENT)
                         Container(
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.width * 0.80,
+                          height: Responsive.getHeight(context),
+                          width: Responsive.getWidth(context),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,
@@ -375,8 +379,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       const SizedBox(height: 20),
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width * 0.80,
+                        height: Responsive.getHeight(context),
+                        width: Responsive.getWidth(context),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black,
@@ -435,8 +439,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 20),
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width * 0.80,
+                        height: Responsive.getHeight(context),
+                        width: Responsive.getWidth(context),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Colors.black,
@@ -507,8 +511,8 @@ class _HomePageState extends State<HomePage> {
                           role == ROLE_DEAN ||
                           role == ROLE_PD)
                         Container(
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.width * 0.80,
+                          height: Responsive.getHeight(context),
+                          width: Responsive.getWidth(context),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,
@@ -571,8 +575,8 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(height: 20),
                       if (role == ROLE_STUDENT || role == ROLE_PD)
                         Container(
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.width * 0.80,
+                          height: Responsive.getHeight(context),
+                          width: Responsive.getWidth(context),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,
@@ -632,6 +636,75 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
+                      // if (role == ROLE_STUDENT || role == ROLE_FACULTY)
+                      //   const SizedBox(height: 20),
+                      // if (role == ROLE_STUDENT || role == ROLE_FACULTY)
+                      //   Container(
+                      //     height: Responsive.getHeight(context),
+                      //     width: Responsive.getWidth(context),
+                      //     decoration: BoxDecoration(
+                      //       border: Border.all(
+                      //         color: Colors.black,
+                      //         width: 2.0,
+                      //       ),
+                      //       borderRadius: BorderRadius.circular(18),
+                      //     ),
+                      //     child: ElevatedButton(
+                      //       onPressed: () {
+                      //         Navigator.push(
+                      //           context,
+                      //           PageRouteBuilder(
+                      //             pageBuilder: (context, animation,
+                      //                     secondaryAnimation) =>
+                      //                 const LabBooking(), // Assuming HomePage is the page you want to navigate to
+                      //             transitionsBuilder: (context, animation,
+                      //                 secondaryAnimation, child) {
+                      //               return FadeTransition(
+                      //                 opacity: animation,
+                      //                 child: child,
+                      //               );
+                      //             },
+                      //             transitionDuration: const Duration(
+                      //                 milliseconds: 200), // Customize duration
+                      //           ),
+                      //         );
+                      //       },
+                      //       style: ElevatedButton.styleFrom(
+                      //         shadowColor: Colors.black,
+                      //         backgroundColor: const Color(
+                      //             0xffF2C9CD), // Change background color to white
+                      //         padding: const EdgeInsets.symmetric(
+                      //             horizontal: 16), // Adjust padding if needed
+                      //         shape: RoundedRectangleBorder(
+                      //           borderRadius: BorderRadius.circular(18),
+                      //         ), // Adjust border radius if
+                      //       ),
+                      //       child: const Row(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         // mainAxisSize: MainAxisSize
+                      //         //     .min,
+
+                      //         // Use min to wrap content inside the button
+                      //         children: <Widget>[
+                      //           Icon(
+                      //             Icons.science,
+                      //             color: Colors.black,
+                      //             size: 30,
+                      //           ),
+                      //           SizedBox(
+                      //               width: 12), // Space between logo and text
+                      //           Text(
+                      //             'Lab Booking',
+                      //             style: TextStyle(
+                      //               color: Colors.black,
+                      //               fontSize: 24,
+                      //               fontWeight: FontWeight.w400,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ],

@@ -47,9 +47,7 @@ class _FacultiesListPageState extends State<FacultiesListPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Handle back button press
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title:
             const Text('Faculties List', style: TextStyle(color: Colors.black)),

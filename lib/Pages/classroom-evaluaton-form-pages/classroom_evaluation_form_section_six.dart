@@ -6,6 +6,8 @@ import 'package:woxsen/providers/feedback_from_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:woxsen/utils/utils.dart';
+
 class ClassroomEvaluationFormSectionSix extends StatefulWidget {
   const ClassroomEvaluationFormSectionSix({Key? key}) : super(key: key);
 
@@ -21,6 +23,7 @@ class _EvaluationFormSection6State
   late TextEditingController _commentsController;
   String? _satisfactionResponse;
   ListStore store = ListStore();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -44,36 +47,53 @@ class _EvaluationFormSection6State
   }
 
   Future submitFeedback() async {
-    UserPreferences userPreferences = UserPreferences();
-    String? email = await userPreferences.getEmail();
-    Map<String, dynamic> user = await userPreferences.getProfile(email);
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      UserPreferences userPreferences = UserPreferences();
+      String? email = await userPreferences.getEmail();
+      Map<String, dynamic> user = await userPreferences.getProfile(email);
 
-    final provider = Provider.of<FeedbackFormProvider>(context, listen: false);
+      final provider =
+          Provider.of<FeedbackFormProvider>(context, listen: false);
 
-    print('Feeback data is ${provider.sections}');
+      String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
+      // String apiUrl = '${store.woxUrl}/api/faculty_feedback';
 
-    final userResponse = await http.post(
-      Uri.parse(
-          '${store.woxUrl}/api/faculty_feedback'), // Change the api endpoint
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'school': provider.selectedDegree!,
-        'semester': provider.selectedSemester!,
-        'subject': provider.selectedCourse!,
-        'user_email': user['email'],
-        'faculty_name': provider.selectedFaculty!,
-        'answer': provider.sections.toString(),
-      }),
-    );
-    debugPrint(userResponse.body);
+      var updatedFeedbackData = convertFeedbackToNumerical(provider.sections);
 
-    if (userResponse.statusCode == 200) {
-      var data = jsonDecode(userResponse.body);
-      debugPrint('Response data: $data');
-    } else {
-      debugPrint('Request failed with status: ${userResponse.statusCode}');
+      final userResponse = await http.post(
+        Uri.parse(apiUrl), // Change the api endpoint
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+
+        body: jsonEncode({
+          'school': provider.selectedDegree!,
+          'semester': provider.selectedSemester!,
+          'subject': provider.selectedCourse!,
+          'user_email': user['email'],
+          'faculty_name': provider.selectedFaculty!,
+          'answer': updatedFeedbackData,
+        }),
+      );
+
+      if (userResponse.statusCode == 200) {
+        var data = jsonDecode(userResponse.body);
+        debugPrint('Response data: $data');
+      } else {
+        debugPrint('Request failed with status: ${userResponse.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -182,8 +202,9 @@ class _EvaluationFormSection6State
                           //         builder: (context) =>
                           //             const ClassroomEvaluationFormSectionTwo()));
                           debugPrint('feedback data :  ${provider.sections}');
+
                           // provider.clearData();po=po=po=o==
-                          await submitFeedback();
+                          _isLoading ? null : await submitFeedback();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -194,17 +215,20 @@ class _EvaluationFormSection6State
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF8B98),
+                        backgroundColor: _isLoading
+                            ? const Color.fromARGB(108, 255, 139, 153)
+                            : const Color(0xFFFF8B98),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
-                        'Submit Feedback',
+                      child: Text(
+                        _isLoading ? 'Submitting...' : 'Submit Feedback',
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black,
+                          color:
+                              _isLoading ? Colors.grey.shade800 : Colors.black,
                         ),
                       ),
                     ),

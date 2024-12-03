@@ -12,4 +12,5 @@ class AppRoutes {
   static const String feedback = '/feedback';
   static const String notificationsPage = '/NotificationsPage';
   static const String leavePage = '/LeavePage';
+  static const String labBookingPage = '/LabBooking';
 }

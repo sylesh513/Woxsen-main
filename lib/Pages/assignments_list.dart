@@ -381,10 +381,11 @@ class _UploadAssignmentPageState extends State<UploadAssignmentPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Upload Assignment', style: TextStyle(color: Colors.black)),
+        title: const Text('Upload Assignment',
+            style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -393,11 +394,11 @@ class _UploadAssignmentPageState extends State<UploadAssignmentPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            const Text(
               'Upload Assignment',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             GestureDetector(
               onTap: _pickFile,
               child: Container(

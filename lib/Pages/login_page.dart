@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:woxsen/Pages/forget_password_page.dart';
 import 'package:woxsen/Pages/signup_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/responsive.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,247 +36,269 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.white, // Start color
-                Color(0xFFF36776), // End color
-              ],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/top.png',
-                height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white, // Start color
+                  Color(0xFFF36776), // End color
+                ],
               ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) => Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/top.png',
+                    height: MediaQuery.of(context).size.height * 0.2,
+                  ),
 
-              const SizedBox(height: 20),
-              buildLoginRow(context, 'Email', _emailController),
-              const SizedBox(height: 30),
-              buildLoginRow(context, 'Password', _passwordController),
-              // Container(
-              //   width: MediaQuery.of(context).size.width * 0.83,
-              //   decoration: BoxDecoration(
-              //     boxShadow: [
-              //       BoxShadow(
-              //         color: Colors.black.withOpacity(0.5),
-              //         spreadRadius: 1,
-              //         blurRadius: 9,
-              //         offset: const Offset(4, 7), // changes position of shadow
-              //       ),
-              //     ],
-              //   ),
-              //   child: TextField(
-              //     controller: _passwordController,
-              //     keyboardType: TextInputType.visiblePassword,
-              //     decoration: const InputDecoration(
-              //       fillColor: Colors.white,
-              //       filled: true,
-              //       hintText: '  Password',
-              //       hintStyle: TextStyle(
-              //         color: Colors.black,
-              //         fontSize: 16,
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //       border: OutlineInputBorder(
-              //         borderSide: BorderSide.none,
-              //         borderRadius: BorderRadius.all(
-              //           Radius.circular(16),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              const SizedBox(height: 30),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.83,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.5),
-                      spreadRadius: 1,
-                      blurRadius: 9,
-                      offset: const Offset(4, 7), // changes position of shadow
+                  const SizedBox(height: 20),
+                  buildLoginRow(context, 'Email', _emailController),
+                  const SizedBox(height: 20),
+                  buildLoginRow(context, 'Password', _passwordController),
+                  // Container(
+                  //   width: MediaQuery.of(context).size.width * 0.83,
+                  //   decoration: BoxDecoration(
+                  //     boxShadow: [
+                  //       BoxShadow(
+                  //         color: Colors.black.withOpacity(0.5),
+                  //         spreadRadius: 1,
+                  //         blurRadius: 9,
+                  //         offset: const Offset(4, 7), // changes position of shadow
+                  //       ),
+                  //     ],
+                  //   ),
+                  //   child: TextField(
+                  //     controller: _passwordController,
+                  //     keyboardType: TextInputType.visiblePassword,
+                  //     decoration: const InputDecoration(
+                  //       fillColor: Colors.white,
+                  //       filled: true,
+                  //       hintText: '  Password',
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.black,
+                  //         fontSize: 16,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //       border: OutlineInputBorder(
+                  //         borderSide: BorderSide.none,
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(16),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: Responsive.getWidth(context),
+                    height: Responsive.getHeight(context),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 9,
+                          offset:
+                              const Offset(4, 7), // changes position of shadow
+                        ),
+                      ],
+                      borderRadius:
+                          BorderRadius.circular(10), // Add border radius
                     ),
-                  ],
-                  borderRadius: BorderRadius.circular(16), // Add border radius
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      dropdownColor: Colors.white,
-                      value: selectedCourse,
-                      hint: const Text('Select Course'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedCourse = newValue;
-                        });
-                      },
-                      items:
-                          courses.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          dropdownColor: Colors.white,
+                          value: selectedCourse,
+                          hint: const Text('Select Course'),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedCourse = newValue;
+                            });
+                          },
+                          items: courses
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text("Forgot Password?",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  )),
-              const SizedBox(height: 70),
-              ElevatedButton(
-                onPressed: () {
-                  if (selectedCourse == null) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Please select a course"),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else if (_emailController.text.isEmpty ||
-                      _passwordController.text.isEmpty) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Please fill all the fields"),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else if (!RegExp(r'^[a-zA-Z0-9._]+@woxsen\.edu\.in$')
-                      .hasMatch(_emailController.text)) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title:
-                              const Text("Please enter your Woxsen email id."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    // if (_emailController.text == "student@woxsen.edu.in") {
-                    //   UserPreferences.saveRole('student');
-                    // } else if (_emailController.text == "admin@woxsen.edu.in") {
-                    //   UserPreferences.saveRole('faculty');
-                    // }
+                  const SizedBox(height: 24),
+                  // const Text("Forgot Password?",
+                  //     style: TextStyle(
+                  //       color: Colors.black,
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.w600,
+                  //     )),
+                  TextButton(
+                    child: const Text("Forgot Password?",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        )),
+                    onPressed: () {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) {
+                        return ResetPasswordScreen();
+                      }));
+                    },
+                  ),
 
-                    // loginUser(_emailController.text, _passwordController.text)
-                    //     .then((response) {
-                    //   final responseBody = jsonDecode(response.body);
-                    //   print(responseBody['role']);
-                    //   if (responseBody['role'] == 'student' ||
-                    //       responseBody['role'] == 'faculty' ||
-                    //       responseBody['role'] == 'admin') {
-                    //     UserPreferences.saveCourse(selectedCourse!);
-                    //     UserPreferences.saveRole(responseBody['role']);
-                    //     UserPreferences.saveLoginStatus(true);
-                    //     Navigator.pushNamed(context, AppRoutes.homePage);
-                    //   } else if (responseBody['role'] == 'none') {
-                    //     showDialog(
-                    //       context: context,
-                    //       builder: (BuildContext context) {
-                    //         return AlertDialog(
-                    //           title: const Text("Invalid Credentials"),
-                    //           actions: [
-                    //             TextButton(
-                    //               onPressed: () {
-                    //                 Navigator.of(context).pop();
-                    //               },
-                    //               child: const Text("OK"),
-                    //             ),
-                    //           ],
-                    //         );
-                    //       },
-                    //     );
-                    //   }
-                    // }).catchError((error) {
-                    //   print('Error: $error');
-                    // });
-                    // UserPreferences.saveCourse(selectedCourse!);
-                    // UserPreferences.saveLoginStatus(true);
-                    // Navigator.pushNamed(context, AppRoutes.homePage);
-                    loadingOnScreen(context);
-                    loginUser(_emailController.text, _passwordController.text);
-                    var userPrefa = UserPreferences();
-                    userPrefa.setEmail(_emailController.text);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                      0xFFEA485D), // Change background color to white
-                  minimumSize:
-                      const Size(250, 60), // Change dimensions of the button
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16), // Adjust padding if needed
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ), // Adjust border radius if
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
+                  const SizedBox(height: 70),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (selectedCourse == null) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Please select a course"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Please fill all the fields"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (!RegExp(r'^[a-zA-Z0-9._]+@woxsen\.edu\.in$')
+                          .hasMatch(_emailController.text)) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text(
+                                  "Please enter your Woxsen email id."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // if (_emailController.text == "student@woxsen.edu.in") {
+                        //   UserPreferences.saveRole('student');
+                        // } else if (_emailController.text == "admin@woxsen.edu.in") {
+                        //   UserPreferences.saveRole('faculty');
+                        // }
+
+                        // loginUser(_emailController.text, _passwordController.text)
+                        //     .then((response) {
+                        //   final responseBody = jsonDecode(response.body);
+                        //   print(responseBody['role']);
+                        //   if (responseBody['role'] == 'student' ||
+                        //       responseBody['role'] == 'faculty' ||
+                        //       responseBody['role'] == 'admin') {
+                        //     UserPreferences.saveCourse(selectedCourse!);
+                        //     UserPreferences.saveRole(responseBody['role']);
+                        //     UserPreferences.saveLoginStatus(true);
+                        //     Navigator.pushNamed(context, AppRoutes.homePage);
+                        //   } else if (responseBody['role'] == 'none') {
+                        //     showDialog(
+                        //       context: context,
+                        //       builder: (BuildContext context) {
+                        //         return AlertDialog(
+                        //           title: const Text("Invalid Credentials"),
+                        //           actions: [
+                        //             TextButton(
+                        //               onPressed: () {
+                        //                 Navigator.of(context).pop();
+                        //               },
+                        //               child: const Text("OK"),
+                        //             ),
+                        //           ],
+                        //         );
+                        //       },
+                        //     );
+                        //   }
+                        // }).catchError((error) {
+                        //   print('Error: $error');
+                        // });
+                        // UserPreferences.saveCourse(selectedCourse!);
+                        // UserPreferences.saveLoginStatus(true);
+                        // Navigator.pushNamed(context, AppRoutes.homePage);
+                        loadingOnScreen(context);
+                        loginUser(
+                            _emailController.text, _passwordController.text);
+                        var userPrefa = UserPreferences();
+                        userPrefa.setEmail(_emailController.text);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(
+                          0xFFEA485D), // Change background color to white
+                      minimumSize: const Size(
+                          250, 60), // Change dimensions of the button
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16), // Adjust padding if needed
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ), // Adjust border radius if
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(color: Colors.white, fontSize: 24),
+                    ),
+                  ),
+                  TextButton(
+                    child: const Text("Don't have an account? Sign Up",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        )),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const SignUpPage();
+                      }));
+                    },
+                  ),
+                ],
               ),
-              TextButton(
-                child: const Text("Don't have an account? Sign Up",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    )),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const SignUpPage();
-                  }));
-                },
-              ),
-            ],
-          ),
-          // Add your login page content here
-        ),
+            )
+            // Add your login page content here
+            ),
       ),
     );
   }
@@ -282,13 +306,15 @@ class _LoginPageState extends State<LoginPage> {
   Container buildLoginRow(
       BuildContext context, String hintText, TextEditingController controller) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.83,
+      // width: MediaQuery.of(context).size.width * 0.83,
+      width: Responsive.getWidth(context),
+      height: Responsive.getHeight(context),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
             spreadRadius: 1,
-            blurRadius: 9,
+            blurRadius: 4,
             offset: const Offset(4, 7), // changes position of shadow
           ),
         ],
@@ -308,7 +334,7 @@ class _LoginPageState extends State<LoginPage> {
           border: const OutlineInputBorder(
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.all(
-              Radius.circular(16),
+              Radius.circular(4),
             ),
           ),
         ),

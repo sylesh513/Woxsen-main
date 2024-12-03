@@ -4,10 +4,12 @@ import 'package:woxsen/Pages/faculty_leave_application_form.dart';
 import 'package:woxsen/Pages/faculty_leave_status.dart';
 import 'package:woxsen/Pages/leave_applications.dart';
 import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/utils/colors.dart';
+import 'package:woxsen/utils/responsive.dart';
 import 'package:woxsen/utils/roles.dart';
 
 class FacultyLeavePage extends StatefulWidget {
-  const FacultyLeavePage({super.key});
+  const FacultyLeavePage({Key? key}) : super(key: key);
 
   @override
   _FacultyLeavePage createState() => _FacultyLeavePage();
@@ -29,6 +31,41 @@ class _FacultyLeavePage extends State<FacultyLeavePage> {
     });
   }
 
+  Widget _buildButton({
+    required String text,
+    required VoidCallback onPressed,
+    required BuildContext context,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+        vertical: 8,
+      ),
+      child: SizedBox(
+        width: Responsive.getWidth(context),
+        height: Responsive.getHeight(context),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            backgroundColor: Colors.white,
+            textStyle: const TextStyle(
+              fontSize: 18,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 3,
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.black),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,118 +80,65 @@ class _FacultyLeavePage extends State<FacultyLeavePage> {
         title:
             const Text('Leave Manager', style: TextStyle(color: Colors.black)),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            color: Color(0xffFA6978),
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              'Faculty Leave Manager',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // TODO : ONLY FOR FACULTY
-          // SizedBox(height: 20),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       Navigator.push(
-          //           context,
-          //           MaterialPageRoute(
-          //               builder: (context) => FacultyLeaveStatus()));
-          //     },
-          //     child: Text('See Status'),
-          //     style: ElevatedButton.styleFrom(
-          //       foregroundColor: Colors.black,
-          //       backgroundColor: Colors.white,
-          //       padding: EdgeInsets.symmetric(vertical: 16),
-          //       textStyle: TextStyle(fontSize: 18),
-          //       shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(8),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // TODO : ONLY FOR FACULTY
-          if (role == ROLE_FACULTY || role == ROLE_PD) SizedBox(height: 16),
-          if (role == ROLE_FACULTY || role == ROLE_PD)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FacultyLeaveApplicationForm()));
-                },
-                child: Text('Apply For Leave'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: Responsive.getWidth(context),
+              color: const Color(0xffFA6978),
+              padding: const EdgeInsets.all(20),
+              child: const Text(
+                'Faculty Leave Manager',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          // TODO : ONLY FOR PROGRAMME DIRECTORS
-          const SizedBox(height: 16),
-          if (role == ROLE_FACULTY || role == ROLE_DEAN || role == ROLE_PD)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
+            const SizedBox(height: 20),
+            if (role == ROLE_FACULTY || role == ROLE_PD)
+              _buildButton(
+                text: 'Apply For Leave',
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LeaveApplications()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FacultyLeaveApplicationForm()),
+                  );
                 },
-                child: const Text('Applications'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                context: context,
               ),
-            ),
-          // TODO : ONLY FOR Programme Directors
-          if (role == ROLE_PD || role == ROLE_DEAN) const SizedBox(height: 16),
-          if (role == ROLE_PD || role == ROLE_DEAN)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
+            const SizedBox(height: 20),
+            if (role == ROLE_FACULTY || role == ROLE_DEAN || role == ROLE_PD)
+              _buildButton(
+                text: 'Applications',
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FacultiesListPage()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LeaveApplications()),
+                  );
                 },
-                child: Text('Faculties Leaves Availability'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                context: context,
               ),
-            ),
-        ],
+            const SizedBox(height: 20),
+            if (role == ROLE_PD || role == ROLE_DEAN)
+              _buildButton(
+                text: 'Faculties Leaves Availability',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FacultiesListPage()),
+                  );
+                },
+                context: context,
+              ),
+          ],
+        ),
       ),
     );
   }

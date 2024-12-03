@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:woxsen/Pages/classroom-evaluaton-form-pages/classroom_evaluation_form_section_one.dart';
+import 'package:woxsen/Pages/faculty_feedback_form_page.dart';
 import 'package:woxsen/providers/feedback_from_provider.dart';
 
 class FacultyFeedback extends StatelessWidget {
@@ -56,14 +57,14 @@ class FacultyFeedback extends StatelessWidget {
                   _buildDropdown(
                     hint: 'Select Semester',
                     items: [
-                      '1st',
-                      '2nd',
-                      '3rd',
-                      '4th',
-                      '5th',
-                      '6th',
-                      '7th',
-                      '8th'
+                      'Semester 1',
+                      'Semester 2',
+                      'Semester 3',
+                      'Semester 4',
+                      'Semester 5',
+                      'Semester 6',
+                      'Semester 7',
+                      'Semester 8',
                     ],
                     onChanged: (value) => context
                         .read<FeedbackFormProvider>()
@@ -100,7 +101,7 @@ class FacultyFeedback extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const ClassroomEvaluationFormSectionOne()));
+                                      const FacultyFeedbackForm()));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

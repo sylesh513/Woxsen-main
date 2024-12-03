@@ -6,6 +6,19 @@ class FeedbackFormProvider with ChangeNotifier {
   String? selectedCourse;
   String? selectedFaculty;
 
+  Map<String, int> objectiveAnswers = {};
+  Map<String, String> subjectiveAnswers = {};
+
+  void updateObjectiveAnswer(String questionId, int value) {
+    objectiveAnswers[questionId] = value;
+    notifyListeners();
+  }
+
+  void updateSubjectiveAnswer(String questionId, String value) {
+    subjectiveAnswers[questionId] = value;
+    notifyListeners();
+  }
+
   Map<String, Map<String, String>> sections = {
     'section1': {'q1': '', 'q2': ''},
     'section2': {'q1': '', 'q2': ''},
@@ -13,6 +26,11 @@ class FeedbackFormProvider with ChangeNotifier {
     'section4': {'q1': '', 'q2': '', 'q3': ''},
     'section5': {'q1': '', 'q2': ''},
     'section6': {'q1': '', 'q2': '', 'q3': '', 'q4': ''},
+  };
+
+  Map<String, Map<String, dynamic>> answers = {
+    'subjective_answers': {},
+    'objective_answers': {}
   };
 
   void updateDegree(String? value) {
@@ -40,6 +58,11 @@ class FeedbackFormProvider with ChangeNotifier {
       sections[section]![question] = answer;
       notifyListeners();
     }
+  }
+
+  String updateAnswers(String id, String answer) {
+    return answers['objective_answers']![id] = answer.toString();
+    // notifyListeners();
   }
 
   String getSectionValue(String section, String question) {

@@ -7,6 +7,7 @@ import 'package:woxsen/Pages/assignments_list.dart';
 import 'package:woxsen/Pages/attendance_page.dart';
 import 'package:woxsen/Pages/faculty_attendance_page.dart';
 import 'package:woxsen/Pages/faculty_feedback.dart';
+import 'package:woxsen/Pages/faculty_feedback_form_page.dart';
 import 'package:woxsen/Pages/home_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
@@ -758,21 +759,229 @@ class _AcademicsState extends State<Academics> {
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),
+
+              // Faculty Feedback
+              // const SizedBox(height: 20),
+              // if (!store.isFaculty)
+              //   ElevatedButton(
+              //     onPressed: () {
+              //       // ScaffoldMessenger.of(context).showSnackBar(
+              //       //   const SnackBar(
+              //       //       content: Text(
+              //       //           'You are not allowed to give feedback right now.')),
+              //       // );
+              //       // return;
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (context) => FacultyFeedback()),
+              //       );
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: const Color(
+              //           0xffE7E7E7), // Change background color to white
+              //       minimumSize:
+              //           const Size(270, 63), // Change dimensions of the button
+              //       padding: const EdgeInsets.symmetric(
+              //           horizontal: 16), // Adjust padding if needed
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(18),
+              //       ), // Adjust border radius if
+              //     ),
+              //     child: const Text(
+              //       'Feedback',
+              //       style: TextStyle(color: Colors.black, fontSize: 24),
+              //     ),
+              //   ),
+
               const SizedBox(height: 20),
               if (!store.isFaculty)
                 ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(
-                              'You are not allowed to give feedback right now.')),
-                    );
-                    return;
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => FacultyFeedback()),
-                    // );
+                  onPressed: () async {
+                    if (dropdownValue == null) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Please select a semester'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else if (dropdownValue != null) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return AlertDialog(
+                                title: const Text('Select Options'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    DropdownButton<String>(
+                                      value: selectedSpecialization,
+                                      hint: const Text('Select Specialization'),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          // Subjects.clear();
+                                          selectedSection = null;
+                                          selectedSubject = null;
+
+                                          selectedSpecialization = newValue;
+                                          debugPrint(
+                                              'Selected Specializatin : $selectedSpecialization');
+
+                                          // if (selectedSpecialization ==
+                                          //     'MBA GEN') {
+                                          //   if (dropdownValue == 'Semester 1') {
+                                          //     store.subjectsList =
+                                          //         store.mbaGenSem1;
+                                          //   } else if (dropdownValue ==
+                                          //       'Semester 4') {
+                                          //     store.subjectsList =
+                                          //         store.mbaGenSem4;
+                                          //   }
+
+                                          //   showSection = true;
+                                          // } else if (selectedSpecialization !=
+                                          //     'MBA GEN') {
+                                          //   selectedSection = null;
+                                          //   showSection = false;
+                                          // }
+                                          // if (selectedSpecialization ==
+                                          //     'MBA BA') {
+                                          //   if (dropdownValue == 'Semester 1') {
+                                          //     store.subjectsList =
+                                          //         store.mbaBaSem1;
+                                          //   } else if (dropdownValue ==
+                                          //       'Semester 4') {
+                                          //     store.subjectsList =
+                                          //         store.mbaBaSem4;
+                                          //   }
+                                          // } else if (selectedSpecialization ==
+                                          //     'MBA FS') {
+                                          //   if (dropdownValue == 'Semester 1') {
+                                          //     store.subjectsList =
+                                          //         store.mbaFsSem1;
+                                          //   } else if (dropdownValue ==
+                                          //       'Semester 4') {
+                                          //     store.subjectsList =
+                                          //         store.mbaFsSem4;
+                                          //   }
+                                          // }
+                                        });
+                                        updateLists();
+                                      },
+                                      items: store.specList
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: SizedBox(
+                                              width: 250, child: Text(value)),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    if (showSection)
+                                      DropdownButton<String>(
+                                        value: selectedSection,
+                                        hint: const Text('Select Section'),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedSection = newValue;
+                                          });
+                                          updateLists();
+                                        },
+                                        items: store.sectionsList
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: SizedBox(
+                                                width: 250, child: Text(value)),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    DropdownButton<String>(
+                                      value: selectedSubject,
+                                      hint: const Text('Select Subject'),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          selectedSubject = newValue;
+                                        });
+                                        updateLists();
+                                      },
+                                      items: store.subjectsList
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: SizedBox(
+                                              width: 250, child: Text(value)),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text('Select Faculty Name Here')
+                                  ],
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      if (selectedSection == null &&
+                                          selectedSubject == null) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  'Please select a section and subject'),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text('OK'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const FacultyFeedbackForm(),
+                                          ),
+                                        );
+                                      }
+                                      // Handle OK action
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      // Handle Cancel action
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(
@@ -790,6 +999,7 @@ class _AcademicsState extends State<Academics> {
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),
+
               const SizedBox(height: 20),
               if (store.isFaculty)
                 ElevatedButton(
@@ -889,8 +1099,6 @@ class _AcademicsState extends State<Academics> {
   }
 
   void updateLists() {
-    print(store.course);
-    print(store.specList);
     return setState(() {
       print(selectedSpecialization);
       if (store.course == 'B.Tech') {

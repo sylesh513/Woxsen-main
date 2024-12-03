@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/colors.dart';
 
 class FacultyLeaveApplicationForm extends StatefulWidget {
   @override
@@ -51,7 +52,8 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
     'Sick Leave',
     'Earned Leave',
     'Leave Without Pay',
-    'Compensation Leave'
+    'Compensation Leave',
+    'On Duty Leave',
   ];
 
   int calculateTotalDays() {
@@ -83,7 +85,7 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime currentDate = DateTime.now();
     final DateTime firstAllowedDate = tabControllerIndex == 1
-        ? currentDate
+        ? currentDate.subtract(const Duration(days: 7))
         : currentDate.add(const Duration(days: 5));
 
     final DateTime? picked = await showDatePicker(
@@ -92,7 +94,7 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
           ? (_startDate ?? firstAllowedDate)
           : (_endDate ?? (_startDate ?? firstAllowedDate)),
       firstDate: firstAllowedDate,
-      lastDate: DateTime(currentDate.year + 2),
+      lastDate: DateTime(currentDate.year + 1),
     );
 
     if (picked != null) {
@@ -220,7 +222,8 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
                         unselectedLabelColor: Colors.black,
                         indicatorSize: TabBarIndicatorSize.tab,
                         labelStyle: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                         tabs: const [
                           Tab(text: 'General Leave'),
@@ -249,6 +252,7 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
                               }
                               final minAllowedDate = tabControllerIndex == 1
                                   ? DateTime.now()
+                                      .subtract(const Duration(days: 7))
                                   : DateTime.now().add(const Duration(days: 4));
 
                               if (tabControllerIndex == 0 &&
@@ -334,31 +338,41 @@ class _LeaveApplicationFormState extends State<FacultyLeaveApplicationForm>
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        child: _isLoading
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Applying...',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              )
-                            : Text(
-                                'Apply Leave',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFFF7F7F),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 30),
-                        ),
-                        onPressed: _isLoading ? null : _submitLeaveApplication,
-                      ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 30),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed:
+                              _isLoading ? null : _submitLeaveApplication,
+                          child: _isLoading
+                              ? const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Applying...',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ],
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Apply Leave',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ],
+                                )),
                     ],
                   )),
             ],

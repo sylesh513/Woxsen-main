@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:woxsen/Pages/lab_booking.dart';
 import 'package:woxsen/Pages/menu_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -229,6 +230,35 @@ class _ServicesState extends State<Services> {
                   ),
                   child: const Text(
                     'Oval',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LabBooking()),
+                    );
+// Navigator.pushNamed(context, AppRoutes.loginPage);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shadowColor: Colors.black,
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 70), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'Lab Booking',
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),

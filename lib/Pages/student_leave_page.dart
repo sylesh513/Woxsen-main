@@ -4,6 +4,7 @@ import 'package:woxsen/Pages/student_leave_application_form.dart';
 import 'package:woxsen/Pages/student_leave_applications.dart';
 import 'package:woxsen/Pages/student_leave_status.dart';
 import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/utils/responsive.dart';
 import 'package:woxsen/utils/roles.dart';
 
 class StudentLeavePage extends StatefulWidget {
@@ -84,26 +85,30 @@ class _StudentLeavePage extends State<StudentLeavePage> {
           if (role == ROLE_STUDENT) const SizedBox(height: 16),
           if (role == ROLE_STUDENT)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => StudentLeaveApplicationForm()));
-                },
-                child: Text('Apply For Leave'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  textStyle: TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                child: Container(
+                  width: Responsive.getWidth(context),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  StudentLeaveApplicationForm()));
+                    },
+                    child: Text('Apply For Leave'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      textStyle: TextStyle(fontSize: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
+                )),
 
           // TODO : FOR FACULTY AND STUDNETS
           if (role == ROLE_PD || role == ROLE_STUDENT)

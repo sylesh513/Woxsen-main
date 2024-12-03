@@ -12,9 +12,6 @@ class ClassroomEvaluationFormSectionFive extends StatefulWidget {
 }
 
 class _EvaluationFormState extends State<ClassroomEvaluationFormSectionFive> {
-  String? _question1Response;
-  String? _question2Response;
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FeedbackFormProvider>(context);

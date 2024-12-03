@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:woxsen/Pages/forget_password_page.dart';
 import 'package:woxsen/Pages/login_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:http/http.dart' as httpp;
 import 'package:woxsen/Values/login_status.dart';
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/responsive.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -78,7 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 // buildLoginRow(
                 //     context, 'Specialization', _specializationController),
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.83,
+                  width: Responsive.getWidth(context),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
@@ -174,12 +176,27 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 const SizedBox(height: 20),
-                const Text("Forgot Password?",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    )),
+                // const Text("Forgot Password?",
+                //     style: TextStyle(
+                //       color: Colors.black,
+                //       fontSize: 16,
+                //       fontWeight: FontWeight.w600,
+                //     )),
+                TextButton(
+                  child: const Text("Forgot Password?",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ResetPasswordScreen();
+                    }));
+                  },
+                ),
+
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
@@ -364,8 +381,8 @@ class _SignUpPageState extends State<SignUpPage> {
               ],
             ),
           ),
-          // Add your login page content here
         ),
+        // Add your login page content here
       ),
     );
   }
@@ -373,7 +390,8 @@ class _SignUpPageState extends State<SignUpPage> {
   Container buildLoginRow(
       BuildContext context, String hintText, TextEditingController controller) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.83,
+      width: Responsive.getWidth(context),
+      height: Responsive.getHeight(context),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(

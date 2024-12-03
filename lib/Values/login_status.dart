@@ -77,9 +77,6 @@ class UserPreferences {
   }
 
   Future<Map<String, dynamic>> getProfile(String email) async {
-    print('FETCH PROFILE API URL ' + '${store.woxUrl}/api/fetch_profile');
-    print('EMAIL RECEIVED ' + email);
-
     try {
       String apiUrl = '${store.woxUrl}/api/fetch_profile';
 
