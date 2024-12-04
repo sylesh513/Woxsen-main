@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 
 Future<dynamic> loadingOnScreen(BuildContext context) {
   return showDialog(
@@ -68,4 +69,22 @@ Map<String, dynamic> convertFeedbackToNumerical(
   });
 
   return convertedData;
+}
+
+String formatDate(String dateStr) {
+  DateTime dateTime = DateTime.parse(dateStr);
+  DateFormat formatter = DateFormat('d MMM yyyy');
+  String formattedDate = formatter.format(dateTime);
+
+  String day = DateFormat('d').format(dateTime);
+  String suffix = 'th';
+  if (day.endsWith('1') && !day.endsWith('11')) {
+    suffix = 'st';
+  } else if (day.endsWith('2') && !day.endsWith('12')) {
+    suffix = 'nd';
+  } else if (day.endsWith('3') && !day.endsWith('13')) {
+    suffix = 'rd';
+  }
+
+  return day + suffix + formattedDate.substring(day.length);
 }

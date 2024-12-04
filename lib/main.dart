@@ -21,8 +21,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // runApp(const MainApp());
-  runApp(ChangeNotifierProvider(
-    create: (context) => FeedbackFormProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => FeedbackFormProvider()),
+    ],
     child: const MainApp(),
   ));
 }

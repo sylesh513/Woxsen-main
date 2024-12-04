@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:woxsen/Pages/lab_booking.dart';
+import 'package:woxsen/Pages/lab_booking_page.dart';
 import 'package:woxsen/Pages/menu_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -241,7 +242,7 @@ class _ServicesState extends State<Services> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LabBooking()),
+                          builder: (context) => const LabBookingScreen()),
                     );
 // Navigator.pushNamed(context, AppRoutes.loginPage);
                   },
