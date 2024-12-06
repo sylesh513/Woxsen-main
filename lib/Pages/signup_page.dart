@@ -38,7 +38,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String? selectedCourse;
   String? selectedSpecialization;
-  final List<String> courses = ListStore().courses;
+  final List<String> schools = ListStore().schools;
+  // final List<String> courses = ListStore().courses;
   final List<String> specializations = ['MBA Gen', 'MBA BA', 'MBA FS'];
   @override
   Widget build(BuildContext context) {
@@ -102,7 +103,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: DropdownButton<String>(
                         dropdownColor: Colors.white,
                         value: selectedCourse,
-                        hint: const Text('Select Course'),
+                        hint: const Text('Select School'),
+                        // hint: const Text('Select Course'),
                         onChanged: (String? newValue) {
                           setState(() {
                             selectedCourse = newValue;
@@ -122,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           }
                           selectedSpecialization = null;
                         },
-                        items: courses
+                        items: schools
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,

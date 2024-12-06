@@ -44,6 +44,8 @@ class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
     UserPreferences userPreferences = UserPreferences();
     String email = await userPreferences.getEmail();
 
+    Map<String, dynamic> user = await userPreferences.getProfile(email);
+
     String apiEndpoint = role == ROLE_PD
         ? '${store.woxUrl}/api/st_leave_all_appl'
         : role == ROLE_STUDENT
@@ -141,9 +143,7 @@ class _StudentAppliedForLeavesState extends State<StudentAppliedForLeaves> {
                             return Column(
                               children: [
                                 LeaveApplicationCard(
-                                  application: application,
-                                  role: role,
-                                ),
+                                    application: application, role: role),
                                 const SizedBox(height: 16),
                               ],
                             );
@@ -175,9 +175,10 @@ Color getStatusColor(String status) {
 class LeaveApplicationCard extends StatelessWidget {
   final Map<String, dynamic> application;
   final role;
+  final userId;
 
   const LeaveApplicationCard(
-      {Key? key, required this.application, required this.role})
+      {Key? key, required this.application, required this.role, this.userId})
       : super(key: key);
 
   String capitalize(String s) =>

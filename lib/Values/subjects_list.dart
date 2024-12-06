@@ -451,9 +451,10 @@ class ListStore {
     'School of Technology',
     'School of Architecture and Planning',
     'School of Business',
-    'School of SOL',
+    'School of Law',
     'School of Sciences',
-    'School of Arts and Design'
+    'School of Arts and Design',
+    'School of Liberal Arts and Humanities'
   ];
   final List<String> SOLSem1 = [
     'Business English and Communication',

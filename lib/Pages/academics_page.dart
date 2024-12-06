@@ -8,6 +8,7 @@ import 'package:woxsen/Pages/attendance_page.dart';
 import 'package:woxsen/Pages/faculty_attendance_page.dart';
 import 'package:woxsen/Pages/faculty_feedback.dart';
 import 'package:woxsen/Pages/faculty_feedback_form_page.dart';
+import 'package:woxsen/Pages/faculty_ratings_page.dart';
 import 'package:woxsen/Pages/home_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:woxsen/Values/login_status.dart';
@@ -929,8 +930,6 @@ class _AcademicsState extends State<Academics> {
                                         );
                                       }).toList(),
                                     ),
-                                    const SizedBox(height: 16),
-                                    const Text('Select Faculty Name Here')
                                   ],
                                 ),
                                 actions: <Widget>[
@@ -960,7 +959,7 @@ class _AcademicsState extends State<Academics> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const FacultyFeedbackForm(),
+                                                FacultyFeedbackForm(),
                                           ),
                                         );
                                       }
@@ -995,10 +994,36 @@ class _AcademicsState extends State<Academics> {
                     ), // Adjust border radius if
                   ),
                   child: const Text(
-                    'Feedback',
+                    'Give Feedback',
                     style: TextStyle(color: Colors.black, fontSize: 24),
                   ),
                 ),
+
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FacultyRatingScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(
+                      0xffE7E7E7), // Change background color to white
+                  minimumSize:
+                      const Size(270, 63), // Change dimensions of the button
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16), // Adjust padding if needed
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ), // Adjust border radius if
+                ),
+                child: const Text(
+                  'See Feedback',
+                  style: TextStyle(color: Colors.black, fontSize: 24),
+                ),
+              ),
 
               const SizedBox(height: 20),
               if (store.isFaculty)

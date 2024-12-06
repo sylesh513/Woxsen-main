@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary brand colors
   static const Color primary = Color(0xffFA6978); // Woxsen Blue
+  static const Color border = Color.fromARGB(40, 250, 105, 119); // Woxsen Blue
   static const Color secondary = Color(0xFFE31837); // Woxsen Red
 
   // Common UI colors

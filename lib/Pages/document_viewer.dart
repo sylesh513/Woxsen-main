@@ -89,13 +89,43 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
                   child: Card(
                     margin: const EdgeInsets.all(8.0),
                     child: _isPDF
-                        ? PDFView(
-                            filePath: _filePath,
-                            enableSwipe: true,
-                            swipeHorizontal: true,
-                            autoSpacing: false,
-                            pageFling: false,
-                          )
+                        // ? PDFView(
+                        //     filePath: _filePath!,
+                        //     enableSwipe: true,
+                        //     swipeHorizontal: false,
+                        //     autoSpacing: true,
+                        //     pageFling: true,
+                        //     pageSnap: true,
+                        //     onRender: (pages) {
+                        //       print(pages);
+                        //     },
+                        //     onError: (error) {
+                        //       print(error.toString());
+                        //     },
+                        //     onPageError: (page, error) {
+                        //       print('$page: ${error.toString()}');
+                        //     },
+                        //   )
+                        // : Image.file(
+                        //     File(_filePath!),
+                        //     fit: BoxFit.contain,
+                        //   ),
+                        ? (Platform.isWindows
+                            ? ElevatedButton(
+                                onPressed: () {
+                                  // Open PDF with the default application
+                                  Process.run(
+                                      'cmd', ['/c', 'start', '', _filePath!],
+                                      runInShell: true);
+                                },
+                                child: const Text('Open PDF'))
+                            : PDFView(
+                                filePath: _filePath,
+                                enableSwipe: true,
+                                swipeHorizontal: true,
+                                autoSpacing: false,
+                                pageFling: false,
+                              ))
                         : Image.file(
                             File(_filePath!),
                             fit: BoxFit.contain,

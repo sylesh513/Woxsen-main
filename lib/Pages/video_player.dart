@@ -5,6 +5,8 @@ import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 class VideoPlayerScreen extends StatefulWidget {
   final String? url;
@@ -52,14 +54,50 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         final bytes = response.bodyBytes;
         final tempDir = await getTemporaryDirectory();
         final tempVideoPath = '${tempDir.path}/${widget.filename}';
+
+        debugPrint('Temp Video Path: $tempVideoPath');
+
         final file = File(tempVideoPath);
         await file.writeAsBytes(bytes);
 
+        debugPrint('TEMP VIDEO PATH: $tempVideoPath');
+        debugPrint('DEFAULT TARGET PLATFORM: $defaultTargetPlatform');
+        debugPrint('DEFAULT TARGET  FILE: $file');
+
+        // setState(() {
+        //   _videoUrl = tempVideoPath;
+        //   _controller =
+        //       VideoPlayerController.networkUrl(Uri.parse('_videoUrl!'));
+        //   _initializeVideoPlayerFuture = _controller.initialize();
+        //   _isLoading = false;
+        // });
+
         setState(() {
           _videoUrl = tempVideoPath;
-          _controller = VideoPlayerController.networkUrl(Uri.parse(_videoUrl!));
-          _initializeVideoPlayerFuture = _controller.initialize();
-          _isLoading = false;
+
+          if (!kIsWeb &&
+              (defaultTargetPlatform == TargetPlatform.windows ||
+                  defaultTargetPlatform == TargetPlatform.linux ||
+                  defaultTargetPlatform == TargetPlatform.macOS)) {
+            // Use File controller for desktop
+            _controller = VideoPlayerController.file(file);
+          } else {
+            // Use Network controller for mobile/web
+            _controller =
+                VideoPlayerController.networkUrl(Uri.parse(_videoUrl!));
+          }
+
+          _initializeVideoPlayerFuture = _controller.initialize().then((_) {
+            setState(() {
+              _isLoading = false;
+            });
+            _controller.play();
+          }).catchError((error) {
+            setState(() {
+              _isLoading = false;
+            });
+            print('Error initializing video player: $error');
+          });
         });
       } else {
         throw Exception('Failed to load video URL');
@@ -82,6 +120,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Widget Video URL: $_videoUrl');
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

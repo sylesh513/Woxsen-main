@@ -29,10 +29,16 @@ class _LoginPageState extends State<LoginPage> {
 
   RegExp emailPattern = RegExp(r'_[0-9]{4}');
 
-  String? selectedCourse = 'B.Tech';
+  String? selectedCourse = 'School of Technology';
+  // String? selectedCourse = 'B.Tech';
+  final List<String> schools = ListStore().schools;
   final List<String> courses = ListStore().courses;
+
   @override
   Widget build(BuildContext context) {
+    debugPrint("login page");
+    debugPrint("$schools");
+    debugPrint("$courses");
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -125,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                               selectedCourse = newValue;
                             });
                           },
-                          items: courses
+                          items: schools
                               .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,

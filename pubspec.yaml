@@ -34,6 +34,7 @@ dependencies:
   flutter_animate: ^4.5.0
   video_player: ^2.9.2
   provider: ^6.1.2
+  chewie: ^1.8.5
 
 
 

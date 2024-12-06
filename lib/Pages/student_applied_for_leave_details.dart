@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:woxsen/Pages/document_viewer.dart';
 import 'package:woxsen/Pages/video_player.dart';
 import 'package:http/http.dart' as http;
+import 'package:woxsen/Values/login_status.dart';
 import 'dart:convert';
 import 'package:woxsen/Values/subjects_list.dart';
 import 'package:woxsen/utils/roles.dart';
@@ -24,11 +25,24 @@ class StudentAppliedForLeaveDetails extends StatefulWidget {
 class _StudentAppliedForLeaveDetailsState
     extends State<StudentAppliedForLeaveDetails> {
   String? status;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
     status = widget.application['status'];
+    getUserId();
+  }
+
+  Future<void> getUserId() async {
+    UserPreferences userPreferences = UserPreferences();
+    String? email = await userPreferences.getEmail();
+    Map<String, dynamic> user = await userPreferences
+        .getProfile(widget.application['email_id'].toString());
+    debugPrint('USER $user');
+    setState(() {
+      userId = user['id'];
+    });
   }
 
   Future<void> _updateStatus(String newStatus, BuildContext context) async {
@@ -102,7 +116,8 @@ class _StudentAppliedForLeaveDetailsState
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  LeaveDetailsCard(application: widget.application),
+                  LeaveDetailsCard(
+                      application: widget.application, userId: userId ?? ''),
                   if (widget.role == ROLE_STUDENT) const SizedBox(height: 16),
                   if (widget.role == ROLE_STUDENT)
                     if (status == 'Accepted' || status == 'Rejected') ...[
@@ -185,24 +200,17 @@ class _StudentAppliedForLeaveDetailsState
 
 class LeaveDetailsCard extends StatelessWidget {
   final Map<String, dynamic> application;
+  final String userId;
 
   const LeaveDetailsCard({
     Key? key,
     required this.application,
+    required this.userId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        'application Leave Details Card:: ${application['document_url']}');
-    debugPrint(
-        'application Leave Details Card:: ${application['video_url'].runtimeType}');
-
-    if (application['video_url'].isNotEmpty) {
-      debugPrint('video_url is not empty');
-    } else {
-      debugPrint('video_url is empty');
-    }
+    debugPrint('video url ${application['video_url']}');
 
     return Card(
       child: Padding(
@@ -220,6 +228,8 @@ class LeaveDetailsCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
+            _buildDetailRow('ID', userId ?? ''),
+            // _buildDetailRow('ID', userId ?? 'test'),
             _buildDetailRow('Name', application['name']),
             _buildDetailRow('Email', application['email_id']),
             _buildDetailRow('Start Date', application['start_date']),
