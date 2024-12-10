@@ -15,6 +15,7 @@ import 'package:woxsen/Values/login_status.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:http/http.dart' as http;
 import 'package:woxsen/Values/subjects_list.dart';
+import 'package:woxsen/utils/colors.dart';
 
 class Academics extends StatefulWidget {
   const Academics({super.key});
@@ -30,6 +31,14 @@ class _AcademicsState extends State<Academics> {
   bool showSection = false;
   String? selectedSection;
   String? selectedSubject;
+  String? selectedFaculty;
+
+  String? userEmail;
+
+  String? selectedSubjectFb;
+
+  bool fetchingFaculties = false;
+
   List<File> _pdfs = [];
 
   String? selectedSpecialization;
@@ -37,10 +46,22 @@ class _AcademicsState extends State<Academics> {
   void initState() {
     super.initState();
     store.getCourse();
+    updateSubjectsList();
+    _loadUserEmail();
+  }
+
+  Future<void> _loadUserEmail() async {
+    UserPreferences userPreferences = UserPreferences();
+    String? email = await userPreferences.getEmail();
+    setState(() {
+      userEmail = email;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Fectching Faculties State: $fetchingFaculties');
+    debugPrint('Building UI with facultiesList: ${store.facultiesList}');
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
@@ -216,6 +237,8 @@ class _AcademicsState extends State<Academics> {
                                       onChanged: (String? newValue) {
                                         setState(() {
                                           selectedSpecialization = newValue;
+                                          debugPrint(
+                                              'Selected Spec $selectedSpecialization');
                                           if (selectedSpecialization ==
                                               'MBA GEN') {
                                             showSection = true;
@@ -434,11 +457,11 @@ class _AcademicsState extends State<Academics> {
                                     DropdownButton<String>(
                                       value: selectedSubject,
                                       hint: const Text('Select Subject'),
-                                      onChanged: (String? newValue) {
+                                      onChanged: (String? newValue) async {
                                         setState(() {
                                           selectedSubject = newValue;
                                         });
-                                        updateLists();
+                                        // await fetchFaculties();
                                       },
                                       items: store.subjectsList
                                           .map<DropdownMenuItem<String>>(
@@ -761,243 +784,151 @@ class _AcademicsState extends State<Academics> {
                   ),
                 ),
 
-              // Faculty Feedback
-              // const SizedBox(height: 20),
-              // if (!store.isFaculty)
-              //   ElevatedButton(
-              //     onPressed: () {
-              //       // ScaffoldMessenger.of(context).showSnackBar(
-              //       //   const SnackBar(
-              //       //       content: Text(
-              //       //           'You are not allowed to give feedback right now.')),
-              //       // );
-              //       // return;
-              //       Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //             builder: (context) => FacultyFeedback()),
-              //       );
-              //     },
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: const Color(
-              //           0xffE7E7E7), // Change background color to white
-              //       minimumSize:
-              //           const Size(270, 63), // Change dimensions of the button
-              //       padding: const EdgeInsets.symmetric(
-              //           horizontal: 16), // Adjust padding if needed
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(18),
-              //       ), // Adjust border radius if
-              //     ),
-              //     child: const Text(
-              //       'Feedback',
-              //       style: TextStyle(color: Colors.black, fontSize: 24),
-              //     ),
-              //   ),
-
+              // FACULTY RATING
               const SizedBox(height: 20),
-              if (!store.isFaculty)
-                ElevatedButton(
-                  onPressed: () async {
-                    if (dropdownValue == null) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Please select a semester'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    } else if (dropdownValue != null) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return AlertDialog(
-                                title: const Text('Select Options'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
+              // if (!store.isFaculty)
+              ElevatedButton(
+                onPressed: () async {
+                  if (dropdownValue == null) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Please select a semester'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else if (dropdownValue != null) {
+                    return showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        debugPrint(
+                            'Selected Subject Here 👍:  $selectedSubject');
+                        debugPrint(
+                            'Drop down value aka Semester 👍:  $dropdownValue');
+                        return StatefulBuilder(
+                          builder: (BuildContext context,
+                              StateSetter setDialogState) {
+                            return AlertDialog(
+                              title: const Text('Select Options '),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  DropdownButton<String>(
+                                    value: selectedSubjectFb,
+                                    hint: const Text('Select Subject'),
+                                    onChanged: (String? newValue) {
+                                      setDialogState(() {
+                                        selectedSubjectFb = newValue;
+                                        selectedFaculty = null;
+                                      });
+                                      fetchFaculties().then((_) {
+                                        setDialogState(() {});
+                                      });
+                                    },
+                                    items: store.subjectsList
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  // store.facultiesList.isNotEmpty
+                                  if (fetchingFaculties)
+                                    const CircularProgressIndicator(),
+                                  if (!fetchingFaculties &&
+                                      store.facultiesList.isNotEmpty)
                                     DropdownButton<String>(
-                                      value: selectedSpecialization,
-                                      hint: const Text('Select Specialization'),
+                                      value: selectedFaculty,
+                                      hint: const Text('Select Faculty'),
                                       onChanged: (String? newValue) {
-                                        setState(() {
-                                          // Subjects.clear();
-                                          selectedSection = null;
-                                          selectedSubject = null;
-
-                                          selectedSpecialization = newValue;
-                                          debugPrint(
-                                              'Selected Specializatin : $selectedSpecialization');
-
-                                          // if (selectedSpecialization ==
-                                          //     'MBA GEN') {
-                                          //   if (dropdownValue == 'Semester 1') {
-                                          //     store.subjectsList =
-                                          //         store.mbaGenSem1;
-                                          //   } else if (dropdownValue ==
-                                          //       'Semester 4') {
-                                          //     store.subjectsList =
-                                          //         store.mbaGenSem4;
-                                          //   }
-
-                                          //   showSection = true;
-                                          // } else if (selectedSpecialization !=
-                                          //     'MBA GEN') {
-                                          //   selectedSection = null;
-                                          //   showSection = false;
-                                          // }
-                                          // if (selectedSpecialization ==
-                                          //     'MBA BA') {
-                                          //   if (dropdownValue == 'Semester 1') {
-                                          //     store.subjectsList =
-                                          //         store.mbaBaSem1;
-                                          //   } else if (dropdownValue ==
-                                          //       'Semester 4') {
-                                          //     store.subjectsList =
-                                          //         store.mbaBaSem4;
-                                          //   }
-                                          // } else if (selectedSpecialization ==
-                                          //     'MBA FS') {
-                                          //   if (dropdownValue == 'Semester 1') {
-                                          //     store.subjectsList =
-                                          //         store.mbaFsSem1;
-                                          //   } else if (dropdownValue ==
-                                          //       'Semester 4') {
-                                          //     store.subjectsList =
-                                          //         store.mbaFsSem4;
-                                          //   }
-                                          // }
+                                        setDialogState(() {
+                                          selectedFaculty = newValue;
                                         });
-                                        updateLists();
                                       },
-                                      items: store.specList
+                                      items: store.facultiesList
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
-                                          child: SizedBox(
-                                              width: 250, child: Text(value)),
+                                          child: Text(value),
                                         );
                                       }).toList(),
                                     ),
-                                    if (showSection)
-                                      DropdownButton<String>(
-                                        value: selectedSection,
-                                        hint: const Text('Select Section'),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedSection = newValue;
-                                          });
-                                          updateLists();
-                                        },
-                                        items: store.sectionsList
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: SizedBox(
-                                                width: 250, child: Text(value)),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    DropdownButton<String>(
-                                      value: selectedSubject,
-                                      hint: const Text('Select Subject'),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          selectedSubject = newValue;
-                                        });
-                                        updateLists();
-                                      },
-                                      items: store.subjectsList
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: SizedBox(
-                                              width: 250, child: Text(value)),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ],
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      if (selectedSection == null &&
-                                          selectedSubject == null) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Please select a section and subject'),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('OK'),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      } else {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                FacultyFeedbackForm(),
-                                          ),
-                                        );
-                                      }
-                                      // Handle OK action
-                                    },
-                                    child: const Text('OK'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // Handle Cancel action
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
                                 ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                        0xffE7E7E7), // Change background color to white
-                    minimumSize:
-                        const Size(270, 63), // Change dimensions of the button
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16), // Adjust padding if needed
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ), // Adjust border radius if
-                  ),
-                  child: const Text(
-                    'Give Feedback',
-                    style: TextStyle(color: Colors.black, fontSize: 24),
-                  ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: !store.facultiesList
+                                          .contains(selectedFaculty)
+                                      ? null
+                                      : () {
+                                          // need to pass specialization, subject, faculty data
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  FacultyFeedbackForm(
+                                                      faculty_name:
+                                                          selectedFaculty!,
+                                                      subject:
+                                                          selectedSubjectFb!,
+                                                      semester: dropdownValue!,
+                                                      course:
+                                                          selectedSpecialization!,
+                                                      email: userEmail!),
+                                            ),
+                                          );
+
+                                          // Handle OK action
+                                        },
+                                  child: !store.facultiesList
+                                              .contains(selectedFaculty) &&
+                                          !fetchingFaculties
+                                      ? const Text('OK')
+                                      : const Text('Continue'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Handle Cancel action
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(
+                      0xffE7E7E7), // Change background color to white
+                  minimumSize:
+                      const Size(270, 63), // Change dimensions of the button
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16), // Adjust padding if needed
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ), // Adjust border radius if
                 ),
+                child: const Text(
+                  'Give Feedback',
+                  style: TextStyle(color: Colors.black, fontSize: 24),
+                ),
+              ),
 
               const SizedBox(height: 20),
               ElevatedButton(
@@ -1061,7 +992,7 @@ class _AcademicsState extends State<Academics> {
   Future<void> getPdf(String what, String? specialization, String? section,
       [String? subject]) async {
     loadingOnScreen(context);
-    ListStore store = ListStore();
+    // ListStore store = ListStore();
     var pdfs;
 
     // final String apiUrl = '${store.woxUrl}/api/view_files';
@@ -1123,19 +1054,50 @@ class _AcademicsState extends State<Academics> {
     }
   }
 
+  void updateSubjectsList() async {
+    UserPreferences userPreferences = UserPreferences();
+    String? email = await userPreferences.getEmail();
+    Map<String, dynamic> user = await userPreferences.getProfile(email);
+
+    String specialization = user['specialization'];
+
+    debugPrint(
+        'updateSubjectsList() : Selected Specialization : $specialization');
+
+    setState(() {
+      store.subjectsList = [];
+      selectedSpecialization = specialization;
+    });
+
+    debugPrint('updateSubjectsList ${store.subjectsList}');
+    updateLists();
+    debugPrint('updateSubjectsList Later ${store.subjectsList}');
+  }
+
   void updateLists() {
+    debugPrint('SELECTED SPECIALIZATION : $selectedSpecialization');
+
     return setState(() {
-      print(selectedSpecialization);
-      if (store.course == 'B.Tech') {
+      // School
+      if (store.course == 'School of Technology') {
         store.specList = store.btechSpecializations;
-      } else if (store.course == 'M.B.A') {
-        store.specList = store.mbaSpecializations;
-      } else if (store.course == 'B.B.A') {
-        store.specList = store.bbaSpecializations;
-      } else if (store.course == "SOL") {
+      } else if (store.course == 'School of Business') {
+        store.specList = store.sobSpecializations;
+      } else if (store.course == 'School of Arts and Design') {
+        store.specList = store.bdesSpecializations;
+      } else if (store.course == 'School of Law') {
         store.specList = store.SOLSpecializations;
+      } else if (store.course == 'School of Sciences') {
+        store.specList = store.sciSpecializations;
+      } else if (store.course == 'School of Liberal Arts and Humanities') {
+        store.specList = store.humanSpecializations;
+      } else if (store.course == 'School of Architecture and Planning') {
+        store.specList = store.SOAPSpecializations;
       }
 
+      // selectedSpecialization = null;
+
+      // Specialization
       if (selectedSpecialization == 'MBA GEN') {
         if (dropdownValue == 'Semester 1') {
           store.subjectsList = store.mbaGenSem1;
@@ -1167,36 +1129,62 @@ class _AcademicsState extends State<Academics> {
           store.subjectsList = store.bbaGenSem5;
         }
       } else if (selectedSpecialization == 'BBA DSAI') {
+        debugPrint('$selectedSpecialization : $dropdownValue');
         showSection = false;
         if (dropdownValue == 'Semester 1') {
           store.subjectsList = store.bbaAiSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          store.subjectsList = store.bbaAiSem2;
         } else if (dropdownValue == 'Semester 3') {
           store.subjectsList = store.bbaAiSem3;
+        } else if (dropdownValue == 'Semester 4') {
+          store.subjectsList = store.bbaAiSem4;
+          debugPrint('Store Subject List : ${store.subjectsList}');
         } else if (dropdownValue == 'Semester 5') {
           store.subjectsList = store.bbaAiSem5;
+        } else if (dropdownValue == 'Semester 6') {
+          store.subjectsList = store.bbaAiSem6;
         }
       } else if (selectedSpecialization == 'BBA FS') {
         if (dropdownValue == 'Semester 1') {
           showSection = false;
           store.subjectsList = store.bbaFsSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          showSection = true;
+          store.subjectsList = store.bbaFsSem2;
         } else if (dropdownValue == 'Semester 3') {
           showSection = true;
           store.subjectsList = store.bbaFsSem3;
+        } else if (dropdownValue == 'Semester 4') {
+          showSection = true;
+          store.subjectsList = store.bbaFsSem4;
         } else if (dropdownValue == 'Semester 5') {
           showSection = true;
-
           store.subjectsList = store.bbaFsSem5;
+        } else if (dropdownValue == 'Semester 6') {
+          showSection = true;
+
+          store.subjectsList = store.bbaFsSem6;
         }
       } else if (selectedSpecialization == 'BBA ECDM') {
         if (dropdownValue == 'Semester 1') {
           showSection = false;
           store.subjectsList = store.bbaDmSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          showSection = true;
+          store.subjectsList = store.bbaDmSem2;
         } else if (dropdownValue == 'Semester 3') {
           showSection = true;
           store.subjectsList = store.bbaDmSem3;
+        } else if (dropdownValue == 'Semester 4') {
+          showSection = true;
+          store.subjectsList = store.bbaDmSem4;
         } else if (dropdownValue == 'Semester 5') {
           showSection = true;
           store.subjectsList = store.bbaDmSem5;
+        } else if (dropdownValue == 'Semester 6') {
+          showSection = true;
+          store.subjectsList = store.bbaDmSem6;
         }
       } else if (selectedSpecialization == 'BBA ED') {
         showSection = false;
@@ -1214,6 +1202,57 @@ class _AcademicsState extends State<Academics> {
         }
       }
     });
+  }
+
+  Future<void> fetchFaculties() async {
+    if (selectedSubjectFb == null) return;
+
+    debugPrint('🏃‍♂️ - -- - - -- - -- - -- - -- -- - ');
+
+    final url = Uri.parse('http://10.7.0.23:4000/api/get_faculties');
+
+    try {
+      setState(() {
+        fetchingFaculties = true;
+      });
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'specialization': selectedSpecialization,
+          'subject': selectedSubjectFb,
+          'semester': dropdownValue,
+        }),
+      );
+
+      debugPrint('fetchFaculties() : ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        List<String> faculties =
+            List<String>.from(data['fac_list'].map((item) => item.toString()));
+
+        debugPrint('fetchFaculties() Faculties List Now: ${faculties}');
+
+        setState(() {
+          store.facultiesList = faculties;
+          // store.facultiesList = faculties.toSet().toList();
+          fetchingFaculties = false;
+        });
+      } else {
+        throw Exception('Failed to load faculties');
+      }
+    } catch (e) {
+      debugPrint('Error fetching faculties: $e');
+      setState(() {
+        store.facultiesList = [];
+        fetchingFaculties = false;
+      });
+    } finally {
+      setState(() {
+        fetchingFaculties = false;
+      });
+    }
   }
 
   Future<dynamic> loadingOnScreen(BuildContext context) {
@@ -1237,6 +1276,7 @@ class _AcademicsState extends State<Academics> {
   }
 }
 
+// pdfView UI
 class pdfView extends StatelessWidget {
   final String pdfPath;
   const pdfView({super.key, required this.pdfPath});

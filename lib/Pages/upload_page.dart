@@ -198,15 +198,33 @@ class _UploadPageState extends State<UploadPage> {
                     });
                     if (dropdownValue != 'Assignment') {
                       setState(() {
-                        if (newValue == 'B.Tech') {
-                          showSpecialization = true;
+                        // if (newValue == 'B.Tech') {
+                        //   showSpecialization = true;
+                        //   store.specList = store.btechSpecializations;
+                        // } else if (newValue == 'M.B.A') {
+                        //   showSpecialization = true;
+                        //   store.specList = store.mbaSpecializations;
+                        //   showSpecialization = true;
+                        // } else if (newValue == 'B.B.A') {
+                        //   store.specList = store.bbaSpecializations;
+                        // }
+
+                        if (newValue == 'School of Technology') {
                           store.specList = store.btechSpecializations;
-                        } else if (newValue == 'M.B.A') {
-                          showSpecialization = true;
-                          store.specList = store.mbaSpecializations;
-                          showSpecialization = true;
-                        } else if (newValue == 'B.B.A') {
-                          store.specList = store.bbaSpecializations;
+                        } else if (newValue == 'School of Business') {
+                          store.specList = store.sobSpecializations;
+                        } else if (newValue == 'School of Arts and Design') {
+                          store.specList = store.bdesSpecializations;
+                        } else if (newValue == 'School of Law') {
+                          store.specList = store.SOLSpecializations;
+                        } else if (newValue == 'School of Sciences') {
+                          store.specList = store.sciSpecializations;
+                        } else if (newValue ==
+                            'School of Liberal Arts and Humanities') {
+                          store.specList = store.humanSpecializations;
+                        } else if (newValue ==
+                            'School of Architecture and Planning') {
+                          store.specList = store.SOAPSpecializations;
                         }
                       });
                     }
@@ -638,10 +656,16 @@ class _UploadPageState extends State<UploadPage> {
           showSection = false;
           if (_selSem == 'Semester 1') {
             store.subjectsList = store.bbaAiSem1;
+          } else if (_selSem == 'Semester 2') {
+            store.subjectsList = store.bbaAiSem2;
           } else if (_selSem == 'Semester 3') {
             store.subjectsList = store.bbaAiSem3;
+          } else if (_selSem == 'Semester 4') {
+            store.subjectsList = store.bbaAiSem4;
           } else if (_selSem == 'Semester 5') {
             store.subjectsList = store.bbaAiSem5;
+          } else if (_selSem == 'Semester 6') {
+            store.subjectsList = store.bbaAiSem6;
           }
         } else if (_selSpec == 'BBA FS') {
           if (_selSem == 'Semester 1') {
@@ -649,17 +673,32 @@ class _UploadPageState extends State<UploadPage> {
                 ? showSection = false
                 : showSection = true;
             store.subjectsList = store.bbaFsSem1;
+          } else if (_selSem == 'Semester 2') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaFsSem2;
           } else if (_selSem == 'Semester 3') {
             dropdownValue == 'Course Outline'
                 ? showSection = false
                 : showSection = true;
             store.subjectsList = store.bbaFsSem3;
+          } else if (_selSem == 'Semester 4') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaFsSem4;
           } else if (_selSem == 'Semester 5') {
             dropdownValue == 'Course Outline'
                 ? showSection = false
                 : showSection = true;
-
             store.subjectsList = store.bbaFsSem5;
+          } else if (_selSem == 'Semester 6') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+
+            store.subjectsList = store.bbaFsSem6;
           }
         } else if (_selSpec == 'BBA ECDM') {
           if (_selSem == 'Semester 1') {
@@ -667,16 +706,31 @@ class _UploadPageState extends State<UploadPage> {
                 ? showSection = false
                 : showSection = true;
             store.subjectsList = store.bbaDmSem1;
+          } else if (_selSem == 'Semester 2') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem2;
           } else if (_selSem == 'Semester 3') {
             dropdownValue == 'Course Outline'
                 ? showSection = false
                 : showSection = true;
             store.subjectsList = store.bbaDmSem3;
+          } else if (_selSem == 'Semester 4') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem4;
           } else if (_selSem == 'Semester 5') {
             dropdownValue == 'Course Outline'
                 ? showSection = false
                 : showSection = true;
             store.subjectsList = store.bbaDmSem5;
+          } else if (_selSem == 'Semester 6') {
+            dropdownValue == 'Course Outline'
+                ? showSection = false
+                : showSection = true;
+            store.subjectsList = store.bbaDmSem6;
           }
         } else if (_selSpec == 'BBA ED') {
           showSection = false;

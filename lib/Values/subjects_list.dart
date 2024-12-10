@@ -16,6 +16,10 @@ class ListStore {
 
   String? jobId;
 
+  // FACULTIES LIST ACCORDING TO SUBJECT
+  List<String> facultiesList = [];
+
+  // MBA SUBJECT LIST
   List<String> mbaBaSem1 = [
     'Introduction to Python',
     'Introduction to Marketing Mgmt',
@@ -102,6 +106,9 @@ class ListStore {
     'AI in Business',
     'Foundation of Machine Learning with AWS',
   ];
+
+  // BBA SUBJECT LIST
+  // BBA AI DS
   List<String> bbaAiSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -111,6 +118,17 @@ class ListStore {
     'Understanding India, Past, Present and Future',
     'Working with MS Office',
   ];
+
+  List<String> bbaAiSem2 = [
+    "Academic and Research Writing",
+    "Design Thinking & Innovation with Capstone Project",
+    "Ethics & Philosophy",
+    "Indian Knowledge System",
+    "Macro Economics",
+    "Networking & Building Responsible Leadership",
+    "Tech tools for Modern business Leaders"
+  ];
+
   List<String> bbaAiSem3 = [
     'Business SOL',
     'Organizational Behavior',
@@ -121,6 +139,19 @@ class ListStore {
     'Foundations on Data Analytics ',
     'Introduction to Decision Support Systems',
   ];
+
+  List<String> bbaAiSem4 = [
+    "Human Resource Management",
+    "Business Research Methodology",
+    "International Business",
+    "AI & Machine Learning in Business",
+    "Bloomberg Certification",
+    "Introduction to Machine Learning for Business Application",
+    "Management Information Systems",
+    "Applied Analytics using Python",
+    "Diversity, Equity and Inclusion Strategies"
+  ];
+
   List<String> bbaAiSem5 = [
     'Business Strategy',
     'Dissertation Dissertation (Planning, Literature Review and Proposal)',
@@ -129,6 +160,53 @@ class ListStore {
     'Applied Analytics using Python',
     'Python Automation',
   ];
+
+  List<String> bbaAiSem6 = [
+    "Global Economic Environment",
+    "Corporate Social Responsibility & Sustainability with Capstone Project",
+    "Dissertation (Dissertation Thesis Submission and Defence)",
+    "International Seminar",
+    "Visual Analytics",
+    "Predictive Analytics using Python (Mandatory)",
+    "Natural Language Processing with Deep Learning",
+    "Prompt Engineering"
+  ];
+
+//BBA FD
+  List<String> bbaFdSem2 = [
+    "Academic and Research Writing",
+    "Design Thinking & Innovation with Capstone Project",
+    "Ethics & Philosophy",
+    "Indian Knowledge System",
+    "Macro Economics",
+    "Networking & Building Responsible Leadership",
+    "Tech tools for Modern business Leaders"
+  ];
+
+  List<String> bbaFdSem4 = [
+    "Human Resource Management",
+    "Business Research Methodology",
+    "International Business",
+    "AI & Machine Learning in Business",
+    "Bloomberg Certification",
+    "Innovation & Technology driven Entrepreneurship",
+    "Entrepreneurial Finance",
+    "Intellectual Property Rights",
+    "Diversity, Equity and Inclusion Strategies"
+  ];
+
+  List<String> bbaFdSem6 = [
+    "Global Economic Environment",
+    "Corporate Social Responsibility & Sustainability with Capstone Project",
+    "Dissertation (Dissertation Thesis Submission and Defence)",
+    "International Seminar",
+    "New Technology Ventures",
+    "Entrepreneurship in Developing Economy",
+    "Business Plan Implementation (Mandatory)",
+    "Scaling Startups: From Idea to Growth"
+  ];
+
+// BBA DM
   List<String> bbaDmSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -139,6 +217,17 @@ class ListStore {
     'Working with MS Office',
     'Case Study Analysis and Writing - I',
   ];
+
+  List<String> bbaDmSem2 = [
+    "Academic and Research Writing",
+    "Design Thinking & Innovation with Capstone Project",
+    "Ethics & Philosophy",
+    "Indian Knowledge System",
+    "Macro Economics",
+    "Networking & Building Responsible Leadership",
+    "Tech tools for Modern business Leaders"
+  ];
+
   List<String> bbaDmSem3 = [
     'Business SOL',
     'Organizational Behavior',
@@ -149,6 +238,20 @@ class ListStore {
     'Introduction to Digital Marketing',
     'Integrated Marketing Communications',
   ];
+
+  List<String> bbaDmSem4 = [
+    "Human Resource Management",
+    "Business Research Methodology",
+    "International Business",
+    "AI & Machine Learning in Business",
+    "Bloomberg Certification",
+    "Social Media Marketing",
+    "Customer Engagement",
+    "Branding",
+    "Rural Marketing",
+    "Diversity, Equity and Inclusion Strategies"
+  ];
+
   List<String> bbaDmSem5 = [
     'Business Strategy',
     'Dissertation Dissertation',
@@ -157,6 +260,20 @@ class ListStore {
     'Introduction to Digital Marketing',
     'Website Development Strategies',
   ];
+
+  List<String> bbaDmSem6 = [
+    "Global Economic Environment",
+    "Corporate Social Responsibility & Sustainability with Capstone Project",
+    "Dissertation (Dissertation Thesis Submission and Defence)",
+    "International Seminar",
+    "Customer Relationship Management",
+    "Social Media Marketing",
+    "Creating Disruptive Online Businesses",
+    "Omni channel Retail Strategies",
+    "Sustainability and Circular Economy in Business"
+  ];
+
+// BBA ED
   List<String> bbaEdSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -183,6 +300,8 @@ class ListStore {
     'Managing Family Businesses',
     'Intellectual Property Rights',
   ];
+
+  // BBA FS
   List<String> bbaFsSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -193,6 +312,17 @@ class ListStore {
     'Working with MS Office',
     'Case Study Analysis and Writing - I',
   ];
+
+  List<String> bbaFsSem2 = [
+    "Academic and Research Writing",
+    "Design Thinking & Innovation with Capstone Project",
+    "Ethics & Philosophy",
+    "Indian Knowledge System",
+    "Macro Economics",
+    "Networking & Building Responsible Leadership",
+    "Tech tools for Modern business Leaders"
+  ];
+
   List<String> bbaFsSem3 = [
     'Business SOL',
     'Organizational Behavior',
@@ -205,6 +335,19 @@ class ListStore {
     'managing Family Businesses',
     'Rural and social entrepreneurship',
   ];
+
+  List<String> bbaFsSem4 = [
+    "Human Resource Management",
+    "Business Research Methodology",
+    "International Business",
+    "AI & Machine Learning in Business",
+    "Bloomberg Certification",
+    "Wealth Management",
+    "Security Analysis and Portfolio Management",
+    "Financial Analytics",
+    "Diversity, Equity and Inclusion Strategies"
+  ];
+
   List<String> bbaFsSem5 = [
     'Business Strategy',
     'Dissertation Dissertation (Planning, Literature Review and Proposal)',
@@ -213,6 +356,20 @@ class ListStore {
     'Security Analysis and Portfolio Management',
     'Entrepreneurial Finance',
   ];
+
+  List<String> bbaFsSem6 = [
+    "Global Economic Environment",
+    "Corporate Social Responsibility & Sustainability with Capstone Project",
+    "Dissertation (Dissertation Thesis Submission and Defence)",
+    "Introduction to Wealth Management",
+    "Investment Banking and Equity Research (Mandatory)",
+    "Fundamentals of Derivatives and Forex Markets",
+    "Fintech and Emerging Technologies",
+    "Series 7 (RR) Distributor certification",
+    "Fintech Revolution: The Future of Finance"
+  ];
+
+  // BBA GEN
   List<String> bbaGenSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -240,6 +397,8 @@ class ListStore {
     'Dissertation Dissertation (Planning, Literature Review and Proposal)',
     'Existential Dialogue',
   ];
+
+  // BBA INT
   List<String> bbaIntSem1 = [
     'EconoSphere: Exploring the Microeconomic Universe',
     'Environmental Education & UN SDGs',
@@ -383,8 +542,20 @@ class ListStore {
     'Time Table',
     'Assignment',
   ];
-  List<String> mbaSpecializations = ['MBA GEN', 'MBA BA', 'MBA FS'];
-  List<String> bbaSpecializations = [
+
+  // List<String> mbaSpecializations = ['MBA GEN', 'MBA BA', 'MBA FS'];
+  // List<String> bbaSpecializations = [
+  //   'BBA DSAI',
+  //   'BBA ECDM',
+  //   'BBA ED',
+  //   'BBA FS',
+  //   'BBA INT',
+  // ];
+
+  List<String> sobSpecializations = [
+    'MBA GEN',
+    'MBA BA',
+    'MBA FS',
     'BBA DSAI',
     'BBA ECDM',
     'BBA ED',
@@ -415,6 +586,11 @@ class ListStore {
   List<String> SOLSpecializations = [
     "N/A",
   ];
+
+  List<String> SOAPSpecializations = [
+    "B. Arch",
+  ];
+
   List<String> sciSpecializations = [
     'Applied Maths',
     'Physics',

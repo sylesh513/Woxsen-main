@@ -1,159 +1,3 @@
-// import 'dart:convert';
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:woxsen/Values/subjects_list.dart';
-// import 'package:woxsen/providers/feedback_from_provider.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:woxsen/widgets/faculty_feedback/objective_questions_widget.dart';
-// import 'package:woxsen/widgets/faculty_feedback/subjective_questions_widget.dart';
-
-// class FacultyFeedbackForm extends StatefulWidget {
-//   const FacultyFeedbackForm({Key? key}) : super(key: key);
-
-//   @override
-//   State<FacultyFeedbackForm> createState() => _FacultyFeedbackForm();
-// }
-
-// class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
-//   ListStore store = ListStore();
-//   bool isLoading = true;
-
-//   Map<String, dynamic> feedbackData = {
-//     'heading': '',
-//     'objective_questions': <Map<String, dynamic>>[],
-//     'subjective_questions': <Map<String, dynamic>>[]
-//   };
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     getFeedbackQuestions();
-//   }
-
-//   void submitFeedback() {
-//     debugPrint('Submit feedback called');
-//     final provider = Provider.of<FeedbackFormProvider>(context, listen: false);
-
-//     debugPrint('Feedback form : ${provider.answers}');
-//     debugPrint('Objective form : ${provider.answers['objective_answers']}');
-//     debugPrint('Subjective form : ${provider.answers['subjective_answers']}');
-
-//     showDialog(
-//       context: context,
-//       builder: (context) => AlertDialog(
-//         title: const Text('Feedback form'),
-//         content: const Text('Thank you for your feedback!'),
-//         actions: [
-//           TextButton(
-//             onPressed: () => Navigator.pop(context),
-//             child: const Text('OK'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Future<void> getFeedbackQuestions() async {
-//     // final String apiUrl = '${store.woxUrl}/api/feedback_questions';
-//     const String apiUrl = 'http://10.7.0.23:4000/api/feedback_questions';
-
-//     try {
-//       final response =
-//           await http.get(Uri.parse(apiUrl), headers: <String, String>{
-//         'Content-Type': 'application/json; charset=UTF-8',
-//       });
-
-//       if (response.statusCode == 200) {
-//         final responseData = json.decode(response.body);
-//         print('Response Data: $responseData');
-//         setState(() {
-//           feedbackData = responseData;
-//           isLoading = false;
-//         });
-//       }
-//     } catch (e) {
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-
-//   List<Widget> buildObjectiveQuestions() {
-//     final objectiveAnswers = Provider.of<FeedbackFormProvider>(context)
-//         .answers['objective_answers'] as Map<String, dynamic>;
-
-//     final feed = (feedbackData['objective_questions'] as List<dynamic>)
-//         .map((question) => ObjectiveQuestionWidget(
-//               question: question,
-//               onAnswer: (answer) {
-//                 final provider =
-//                     Provider.of<FeedbackFormProvider>(context, listen: false);
-
-//                 debugPrint(
-//                     'PROVIDDER DATA ${provider.answers['objective_answers']}');
-
-//                 setState(() {
-//                   provider.updateAnswers(question['id'], answer);
-//                   provider.answers['objective_answers']![question['id']] =
-//                       answer;
-//                 });
-//                 debugPrint('OBJECTIVE ANSWERS DATA ${objectiveAnswers}');
-//               },
-//             ))
-//         .toList();
-
-//     print('Feed Objective : ${feed}');
-
-//     return feed;
-//   }
-
-//   List<Widget> buildSubjectiveQuestions() {
-//     final subjectiveAnswers = Provider.of<FeedbackFormProvider>(context)
-//         .answers['subjective_answers'] as Map<String, dynamic>;
-
-//     return (feedbackData['subjective_questions'] as List<dynamic>)
-//         .map((question) => SubjectiveQuestionWidget(
-//               question: question,
-//               onAnswer: (answer) {
-//                 setState(() {
-//                   subjectiveAnswers[question['id']] = answer;
-//                 });
-//               },
-//             ))
-//         .toList();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Faculty Feedback Here'),
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             const SizedBox(height: 16),
-//             ...buildObjectiveQuestions(),
-//             const SizedBox(height: 16),
-//             ...buildSubjectiveQuestions(),
-//             const SizedBox(height: 32),
-//             Center(
-//               child: ElevatedButton(
-//                 onPressed: submitFeedback,
-//                 child: const Text('Submit Feedback'),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// Updated
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:woxsen/Values/subjects_list.dart';
@@ -163,7 +7,20 @@ import 'package:woxsen/providers/feedback_from_provider.dart';
 import 'package:woxsen/utils/colors.dart';
 
 class FacultyFeedbackForm extends StatefulWidget {
-  const FacultyFeedbackForm({Key? key}) : super(key: key);
+  final String faculty_name;
+  final String subject;
+  final String semester;
+  final String course;
+  final String email;
+
+  const FacultyFeedbackForm({
+    Key? key,
+    required this.faculty_name,
+    required this.subject,
+    required this.semester,
+    required this.course,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<FacultyFeedbackForm> createState() => _FacultyFeedbackForm();
@@ -209,12 +66,55 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
     getFeedbackQuestions();
   }
 
+  Future<void> submitFeedbackForm(FeedbackFormProvider provider) async {
+    debugPrint('SUBMIT FEEDBACK CALLED');
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    const String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'objective_answers': jsonEncode(provider.objectiveAnswers),
+          'subjective_answers': jsonEncode(provider.subjectiveAnswers),
+          'rator_email_id': '${widget.email}',
+          'course': '${widget.course}',
+          'semester': '${widget.semester}',
+          'faculty_name': '${widget.faculty_name}',
+          'subject': '${widget.subject}',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Feedback submitted successfully!')),
+        );
+        Navigator.pop(context); // Return to previous screen
+      } else {
+        throw Exception('Failed to submit feedback');
+      }
+    } catch (e) {
+      debugPrint('ERROR IN FEEDBACK FORM : $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting feedback: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FeedbackFormProvider>(context);
-    debugPrint('Objective Answers : ${provider.objectiveAnswers}');
-    debugPrint('Objective Answers : ${provider.subjectiveAnswers}');
-    debugPrint('FeedbackData : $feedbackData');
+    // final provider = Provider.of<FeedbackFormProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -308,7 +208,7 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
           children: List.generate(5, (index) {
             return _buildRadioOption(
               context,
-              5 - index,
+              1 + index,
               questionId.toString(),
               provider,
             );
@@ -390,34 +290,6 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
     );
   }
 
-  // Widget _buildSubmitButton(
-  //     BuildContext context, FeedbackFormProvider provider) {
-  //   return SizedBox(
-  //     width: double.infinity,
-  //     child: ElevatedButton(
-  //       onPressed: () {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(content: Text('Feedback submitted!')),
-  //         );
-  //       },
-  //       style: ElevatedButton.styleFrom(
-  //         backgroundColor: _isLoading ? AppColors.disabled : AppColors.primary,
-  //         padding: const EdgeInsets.symmetric(vertical: 16),
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(8),
-  //         ),
-  //       ),
-  //       child: Text(
-  //         _isLoading ? 'Submitting...' : 'Submit Feedback',
-  //         style: TextStyle(
-  //           fontSize: 18,
-  //           color: _isLoading ? Colors.grey : Colors.white,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildSubmitButton(
       BuildContext context, FeedbackFormProvider provider) {
     debugPrint('Submitting feedback');
@@ -441,9 +313,15 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
       child: ElevatedButton(
         onPressed: () {
           if (isFormComplete()) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Feedback submitted successfully!')),
-            );
+            // debugPrint('Subjective Answer : ${provider.subjectiveAnswers}');
+            // debugPrint('Objective Answer : ${provider.objectiveAnswers}');
+            debugPrint('CALLED');
+
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   const SnackBar(content: Text('Feedback submitted successfully!')),
+            // );
+
+            submitFeedbackForm(provider);
           } else {
             AlertDialog(
               title: const Text('Please fill all the fields.'),

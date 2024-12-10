@@ -109,18 +109,22 @@ class _SignUpPageState extends State<SignUpPage> {
                           setState(() {
                             selectedCourse = newValue;
                           });
-                          if (newValue == 'B.Tech') {
+                          if (newValue == 'School of Technology') {
                             store.specList = store.btechSpecializations;
-                          } else if (newValue == 'M.B.A') {
-                            store.specList = store.mbaSpecializations;
-                          } else if (newValue == 'B.Des') {
+                          } else if (newValue == 'School of Business') {
+                            store.specList = store.sobSpecializations;
+                          } else if (newValue == 'School of Arts and Design') {
                             store.specList = store.bdesSpecializations;
-                          } else if (newValue == 'B.B.A') {
-                            store.specList = store.bbaSpecializations;
-                          } else if (newValue == 'SOL') {
+                          } else if (newValue == 'School of Law') {
                             store.specList = store.SOLSpecializations;
-                          } else if (newValue == 'Sciences') {
+                          } else if (newValue == 'School of Sciences') {
                             store.specList = store.sciSpecializations;
+                          } else if (newValue ==
+                              'School of Liberal Arts and Humanities') {
+                            store.specList = store.humanSpecializations;
+                          } else if (newValue ==
+                              'School of Architecture and Planning') {
+                            store.specList = store.SOAPSpecializations;
                           }
                           selectedSpecialization = null;
                         },

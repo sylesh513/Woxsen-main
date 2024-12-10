@@ -19,7 +19,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Associate Professor",
       "school": "School of Business",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.7",
+      "rating": "4.3",
       "total_ratings": 72
     },
     {
@@ -29,7 +29,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Professor",
       "school": "School of Arts and Design",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.1",
+      "rating": "4.5",
       "total_ratings": 89
     },
     {
@@ -39,7 +39,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Lecturer",
       "school": "School of Technology",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.8",
+      "rating": "3.5",
       "total_ratings": 41
     },
     {
@@ -59,7 +59,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Adjunct Faculty",
       "school": "School of Liberal Arts and Humanities",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.2",
+      "rating": "4.2",
       "total_ratings": 28
     },
     {
@@ -69,7 +69,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Professor",
       "school": "School of Law",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.9",
+      "rating": "3.4",
       "total_ratings": 107
     },
     {
@@ -79,7 +79,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
       "faculty_designation": "Associate Professor",
       "school": "School of Architecture and Planning",
       "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.5",
+      "rating": "4.4",
       "total_ratings": 63
     },
     {
@@ -313,9 +313,12 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
                     itemBuilder: (BuildContext context) {
                       return [
                         'School of Technology',
+                        'School of Architecture and Planning',
                         'School of Business',
                         'School of Law',
                         'School of Sciences',
+                        'School of Arts and Design',
+                        'School of Liberal Arts and Humanities'
                       ].map((String school) {
                         return PopupMenuItem<String>(
                           value: school,
@@ -416,7 +419,7 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
                                 children: [
                                   Text(
                                     faculty['rating'].toString(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -425,12 +428,45 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
                                   ...List.generate(5, (index) {
                                     double rating =
                                         double.parse(faculty['rating']);
-                                    return Icon(
-                                      index < rating.floor()
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      color: AppColors.primary,
-                                      size: 20,
+                                    int fullStars = rating.floor();
+                                    double decimal = rating - fullStars;
+
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 4.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: AppColors.primary),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            Icon(
+                                              Icons.star_border,
+                                              color: AppColors.primary,
+                                              size: 20,
+                                            ),
+                                            if (index < fullStars)
+                                              Icon(
+                                                Icons.star,
+                                                color: AppColors.primary,
+                                                size: 20,
+                                              )
+                                            else if (index == fullStars &&
+                                                decimal > 0)
+                                              ClipRect(
+                                                clipper: _StarClipper(decimal),
+                                                child: Icon(
+                                                  Icons.star,
+                                                  color: AppColors.primary,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
                                     );
                                   }),
                                 ],
@@ -448,5 +484,22 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
         ],
       ),
     );
+  }
+}
+
+class _StarClipper extends CustomClipper<Rect> {
+  final double fillPercentage;
+
+  _StarClipper(this.fillPercentage);
+
+  @override
+  Rect getClip(Size size) {
+    double clippedWidth = (size.width * fillPercentage).roundToDouble();
+    return Rect.fromLTWH(0, 0, clippedWidth, size.height);
+  }
+
+  @override
+  bool shouldReclip(_StarClipper oldClipper) {
+    return oldClipper.fillPercentage != fillPercentage;
   }
 }

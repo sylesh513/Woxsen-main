@@ -19,6 +19,7 @@ class FeedbackFormProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// This function notifies the listeners.
   Map<String, Map<String, String>> sections = {
     'section1': {'q1': '', 'q2': ''},
     'section2': {'q1': '', 'q2': ''},
