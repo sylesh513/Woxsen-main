@@ -20,6 +20,8 @@ class ListStore {
   List<String> facultiesList = [];
 
   // MBA SUBJECT LIST
+
+  // MBA BA
   List<String> mbaBaSem1 = [
     'Introduction to Python',
     'Introduction to Marketing Mgmt',
@@ -31,29 +33,17 @@ class ListStore {
     'International Seminar',
     'Computer Applications for Business',
   ];
-  List<String> mbaFsSem1 = [
-    'Introduction of Financial services',
-    'Introduction to Marketing Mgmt',
-    'Business Statistics',
-    'Accounting for Managers',
-    'Managerial Communication',
-    'Microeconomics',
-    'International Seminar',
-    'Computer Applications for Business',
+
+  List<String> mbaBaSem2 = [
+    "Ethics, Responsibility and Sustainability",
+    "Foundations on Data Analytics",
+    "Cyber Law",
+    "Corporate Finance",
+    "SQL / NoSQL Based Data Architectures",
+    "Business Research Methods - I",
+    "Advanced Marketing Management"
   ];
-  List<String> mbaGenSem1 = [
-    'Introduction to Marketing Mgmt',
-    'Business Statistics',
-    'Business Strategy',
-    'Managerial Economics',
-    'Accounting for Managers',
-    'Managerial Communication',
-    'International Seminar',
-    'Computer Applications',
-    'Organizational Behavior',
-    'Identity & Logical Intelligence',
-    'Case Study Writing and Analysis',
-  ];
+
   List<String> mbaBaSem4 = [
     'Social Media Analytics',
     'Neural Networks & Deep Learning',
@@ -70,6 +60,37 @@ class ListStore {
     'Case Study Writing and Analysis',
     'International Seminar',
   ];
+
+  List<String> mbaBaSem5 = [
+    "Global Marketing",
+    "Advanced Marketing Management",
+    "B2B Marketing",
+    "HR Metrics and Analytics",
+    "Cross-Cultural and International Human Resource Management"
+  ];
+
+  // MBA FS
+  List<String> mbaFsSem1 = [
+    'Introduction of Financial services',
+    'Introduction to Marketing Mgmt',
+    'Business Statistics',
+    'Accounting for Managers',
+    'Managerial Communication',
+    'Microeconomics',
+    'International Seminar',
+    'Computer Applications for Business',
+  ];
+
+  List<String> mbaFsSem2 = [
+    "Corporate Finance",
+    "Indian and US Tax",
+    "Organizational Behavior & Human Resource Management",
+    "Quantitative Security Analysis and Portfolio Management",
+    "Financial Product & Markets",
+    "Macroeconomics",
+    "Indirect Taxes"
+  ];
+
   List<String> mbaFsSem4 = [
     'Financial Derivative and risk management (Electives)',
     'Financial reporting and Analysis',
@@ -82,6 +103,36 @@ class ListStore {
     'Career Readiness for Modern Workplace',
     'Case Study Writing and Analysis',
     'International Seminar',
+  ];
+
+  List<String> mbaFsSem5 = [
+    "Alternative Investments",
+    "Indian and US Tax",
+    "Machine Learning in FinServ"
+  ];
+
+  // MBA GEN
+  List<String> mbaGenSem1 = [
+    'Introduction to Marketing Mgmt',
+    'Business Statistics',
+    'Business Strategy',
+    'Managerial Economics',
+    'Accounting for Managers',
+    'Managerial Communication',
+    'International Seminar',
+    'Computer Applications',
+    'Organizational Behavior',
+    'Identity & Logical Intelligence',
+    'Case Study Writing and Analysis',
+  ];
+
+  List<String> mbaGenSem2 = [
+    "Ethics, Responsibility and Sustainability",
+    "Advanced Marketing Management",
+    "Fundamentals of Data Analytics",
+    "Operations Management",
+    "Business Research Methods - I",
+    "Reflecting Self"
   ];
   List<String> mbaGenSem4 = [
     'Existential Dialogues',
@@ -105,6 +156,15 @@ class ListStore {
     'Data Visualization',
     'AI in Business',
     'Foundation of Machine Learning with AWS',
+  ];
+
+  List<String> mbaGenSem5 = [
+    "Indirect Taxes",
+    "HR Metrics and Analytics",
+    "Talent Management",
+    "B2B Marketing",
+    "Brand Management",
+    "Global Marketing"
   ];
 
   // BBA SUBJECT LIST

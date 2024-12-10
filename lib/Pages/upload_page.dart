@@ -623,8 +623,12 @@ class _UploadPageState extends State<UploadPage> {
         } else if (_selSpec == 'MBA GEN') {
           if (_selSem == 'Semester 1') {
             store.subjectsList = store.mbaGenSem1;
+          } else if (_selSem == 'Semester 2') {
+            store.subjectsList = store.mbaGenSem2;
           } else if (_selSem == 'Semester 4') {
             store.subjectsList = store.mbaGenSem4;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.mbaGenSem5;
           }
           dropdownValue == 'Course Outline'
               ? showSection = false
@@ -633,15 +637,23 @@ class _UploadPageState extends State<UploadPage> {
           showSection = false;
           if (_selSem == 'Semester 1') {
             store.subjectsList = store.mbaBaSem1;
+          } else if (_selSem == 'Semester 2') {
+            store.subjectsList = store.mbaBaSem2;
           } else if (_selSem == 'Semester 4') {
             store.subjectsList = store.mbaBaSem4;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.mbaBaSem5;
           }
         } else if (_selSpec == 'MBA FS') {
           showSection = false;
           if (_selSem == 'Semester 1') {
             store.subjectsList = store.mbaFsSem1;
+          } else if (_selSem == 'Semester 2') {
+            store.subjectsList = store.mbaFsSem2;
           } else if (_selSem == 'Semester 4') {
             store.subjectsList = store.mbaFsSem4;
+          } else if (_selSem == 'Semester 5') {
+            store.subjectsList = store.mbaFsSem5;
           }
         } else if (_selSpec == 'BBA GEN') {
           showSection = false;

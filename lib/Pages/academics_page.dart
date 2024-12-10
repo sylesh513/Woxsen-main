@@ -16,6 +16,7 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:http/http.dart' as http;
 import 'package:woxsen/Values/subjects_list.dart';
 import 'package:woxsen/utils/colors.dart';
+import 'package:woxsen/utils/roles.dart';
 
 class Academics extends StatefulWidget {
   const Academics({super.key});
@@ -38,6 +39,7 @@ class _AcademicsState extends State<Academics> {
   String? selectedSubjectFb;
 
   bool fetchingFaculties = false;
+  String role = 'role';
 
   List<File> _pdfs = [];
 
@@ -45,9 +47,17 @@ class _AcademicsState extends State<Academics> {
   @override
   void initState() {
     super.initState();
+    getRole();
     store.getCourse();
     updateSubjectsList();
     _loadUserEmail();
+  }
+
+  void getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
   }
 
   Future<void> _loadUserEmail() async {
@@ -392,9 +402,17 @@ class _AcademicsState extends State<Academics> {
                                               store.subjectsList =
                                                   store.mbaGenSem1;
                                             } else if (dropdownValue ==
+                                                'Semester 2') {
+                                              store.subjectsList =
+                                                  store.mbaGenSem2;
+                                            } else if (dropdownValue ==
                                                 'Semester 4') {
                                               store.subjectsList =
                                                   store.mbaGenSem4;
+                                            } else if (dropdownValue ==
+                                                'Semester 5') {
+                                              store.subjectsList =
+                                                  store.mbaGenSem5;
                                             }
                                             showSection = true;
                                           } else {
@@ -406,9 +424,17 @@ class _AcademicsState extends State<Academics> {
                                               store.subjectsList =
                                                   store.mbaBaSem1;
                                             } else if (dropdownValue ==
+                                                'Semester 2') {
+                                              store.subjectsList =
+                                                  store.mbaBaSem2;
+                                            } else if (dropdownValue ==
                                                 'Semester 4') {
                                               store.subjectsList =
                                                   store.mbaBaSem4;
+                                            } else if (dropdownValue ==
+                                                'Semester 5') {
+                                              store.subjectsList =
+                                                  store.mbaBaSem5;
                                             }
                                           } else if (selectedSpecialization ==
                                               'MBA FS') {
@@ -416,9 +442,17 @@ class _AcademicsState extends State<Academics> {
                                               store.subjectsList =
                                                   store.mbaFsSem1;
                                             } else if (dropdownValue ==
+                                                'Semester 2') {
+                                              store.subjectsList =
+                                                  store.mbaFsSem2;
+                                            } else if (dropdownValue ==
                                                 'Semester 4') {
                                               store.subjectsList =
                                                   store.mbaFsSem4;
+                                            } else if (dropdownValue ==
+                                                'Semester 5') {
+                                              store.subjectsList =
+                                                  store.mbaFsSem5;
                                             }
                                           }
                                         });
@@ -587,9 +621,17 @@ class _AcademicsState extends State<Academics> {
                                             store.subjectsList =
                                                 store.mbaGenSem1;
                                           } else if (dropdownValue ==
+                                              'Semester 2') {
+                                            store.subjectsList =
+                                                store.mbaGenSem2;
+                                          } else if (dropdownValue ==
                                               'Semester 4') {
                                             store.subjectsList =
                                                 store.mbaGenSem4;
+                                          } else if (dropdownValue ==
+                                              'Semester 5') {
+                                            store.subjectsList =
+                                                store.mbaGenSem5;
                                           }
 
                                           showSection = true;
@@ -604,9 +646,17 @@ class _AcademicsState extends State<Academics> {
                                             store.subjectsList =
                                                 store.mbaBaSem1;
                                           } else if (dropdownValue ==
+                                              'Semester 2') {
+                                            store.subjectsList =
+                                                store.mbaBaSem2;
+                                          } else if (dropdownValue ==
                                               'Semester 4') {
                                             store.subjectsList =
                                                 store.mbaBaSem4;
+                                          } else if (dropdownValue ==
+                                              'Semester 5') {
+                                            store.subjectsList =
+                                                store.mbaBaSem5;
                                           }
                                         } else if (selectedSpecialization ==
                                             'MBA FS') {
@@ -614,9 +664,17 @@ class _AcademicsState extends State<Academics> {
                                             store.subjectsList =
                                                 store.mbaFsSem1;
                                           } else if (dropdownValue ==
+                                              'Semester 2') {
+                                            store.subjectsList =
+                                                store.mbaFsSem2;
+                                          } else if (dropdownValue ==
                                               'Semester 4') {
                                             store.subjectsList =
                                                 store.mbaFsSem4;
+                                          } else if (dropdownValue ==
+                                              'Semester 5') {
+                                            store.subjectsList =
+                                                store.mbaFsSem5;
                                           }
                                         }
                                       });
@@ -785,78 +843,52 @@ class _AcademicsState extends State<Academics> {
                 ),
 
               // FACULTY RATING
-              const SizedBox(height: 20),
-              // if (!store.isFaculty)
-              ElevatedButton(
-                onPressed: () async {
-                  if (dropdownValue == null) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Please select a semester'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else if (dropdownValue != null) {
-                    return showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        debugPrint(
-                            'Selected Subject Here 👍:  $selectedSubject');
-                        debugPrint(
-                            'Drop down value aka Semester 👍:  $dropdownValue');
-                        return StatefulBuilder(
-                          builder: (BuildContext context,
-                              StateSetter setDialogState) {
-                            return AlertDialog(
-                              title: const Text('Select Options '),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  DropdownButton<String>(
-                                    value: selectedSubjectFb,
-                                    hint: const Text('Select Subject'),
-                                    onChanged: (String? newValue) {
-                                      setDialogState(() {
-                                        selectedSubjectFb = newValue;
-                                        selectedFaculty = null;
-                                      });
-                                      fetchFaculties().then((_) {
-                                        setDialogState(() {});
-                                      });
-                                    },
-                                    items: store.subjectsList
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  // store.facultiesList.isNotEmpty
-                                  if (fetchingFaculties)
-                                    const CircularProgressIndicator(),
-                                  if (!fetchingFaculties &&
-                                      store.facultiesList.isNotEmpty)
+              if (role == ROLE_STUDENT) const SizedBox(height: 20),
+              if (role == ROLE_STUDENT)
+                ElevatedButton(
+                  onPressed: () async {
+                    if (dropdownValue == null) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Please select a semester'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else if (dropdownValue != null) {
+                      return showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return StatefulBuilder(
+                            builder: (BuildContext context,
+                                StateSetter setDialogState) {
+                              return AlertDialog(
+                                title: const Text('Select Options '),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
                                     DropdownButton<String>(
-                                      value: selectedFaculty,
-                                      hint: const Text('Select Faculty'),
+                                      value: selectedSubjectFb,
+                                      hint: const Text('Select Subject'),
                                       onChanged: (String? newValue) {
                                         setDialogState(() {
-                                          selectedFaculty = newValue;
+                                          selectedSubjectFb = newValue;
+                                          selectedFaculty = null;
+                                        });
+                                        fetchFaculties().then((_) {
+                                          setDialogState(() {});
                                         });
                                       },
-                                      items: store.facultiesList
+                                      items: store.subjectsList
                                           .map<DropdownMenuItem<String>>(
                                               (String value) {
                                         return DropdownMenuItem<String>(
@@ -865,96 +897,120 @@ class _AcademicsState extends State<Academics> {
                                         );
                                       }).toList(),
                                     ),
-                                ],
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: !store.facultiesList
-                                          .contains(selectedFaculty)
-                                      ? null
-                                      : () {
-                                          // need to pass specialization, subject, faculty data
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  FacultyFeedbackForm(
-                                                      faculty_name:
-                                                          selectedFaculty!,
-                                                      subject:
-                                                          selectedSubjectFb!,
-                                                      semester: dropdownValue!,
-                                                      course:
-                                                          selectedSpecialization!,
-                                                      email: userEmail!),
-                                            ),
-                                          );
-
-                                          // Handle OK action
+                                    // store.facultiesList.isNotEmpty
+                                    if (fetchingFaculties)
+                                      const CircularProgressIndicator(),
+                                    if (!fetchingFaculties &&
+                                        store.facultiesList.isNotEmpty)
+                                      DropdownButton<String>(
+                                        value: selectedFaculty,
+                                        hint: const Text('Select Faculty'),
+                                        onChanged: (String? newValue) {
+                                          setDialogState(() {
+                                            selectedFaculty = newValue;
+                                          });
                                         },
-                                  child: !store.facultiesList
-                                              .contains(selectedFaculty) &&
-                                          !fetchingFaculties
-                                      ? const Text('OK')
-                                      : const Text('Continue'),
+                                        items: store.facultiesList
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                      ),
+                                  ],
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    // Handle Cancel action
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                      0xffE7E7E7), // Change background color to white
-                  minimumSize:
-                      const Size(270, 63), // Change dimensions of the button
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16), // Adjust padding if needed
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ), // Adjust border radius if
-                ),
-                child: const Text(
-                  'Give Feedback',
-                  style: TextStyle(color: Colors.black, fontSize: 24),
-                ),
-              ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: !store.facultiesList
+                                            .contains(selectedFaculty)
+                                        ? null
+                                        : () {
+                                            // need to pass specialization, subject, faculty data
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FacultyFeedbackForm(
+                                                        faculty_name:
+                                                            selectedFaculty!,
+                                                        subject:
+                                                            selectedSubjectFb!,
+                                                        semester:
+                                                            dropdownValue!,
+                                                        course:
+                                                            selectedSpecialization!,
+                                                        email: userEmail!),
+                                              ),
+                                            );
 
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const FacultyRatingScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                      0xffE7E7E7), // Change background color to white
-                  minimumSize:
-                      const Size(270, 63), // Change dimensions of the button
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16), // Adjust padding if needed
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ), // Adjust border radius if
+                                            // Handle OK action
+                                          },
+                                    child: !store.facultiesList
+                                                .contains(selectedFaculty) &&
+                                            !fetchingFaculties
+                                        ? const Text('OK')
+                                        : const Text('Continue'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      // Handle Cancel action
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 63), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'Give Feedback',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
                 ),
-                child: const Text(
-                  'See Feedback',
-                  style: TextStyle(color: Colors.black, fontSize: 24),
+
+              // if (store.isFaculty) const SizedBox(height: 20),
+              if (store.isFaculty)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FacultyRatingScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(
+                        0xffE7E7E7), // Change background color to white
+                    minimumSize:
+                        const Size(270, 63), // Change dimensions of the button
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16), // Adjust padding if needed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ), // Adjust border radius if
+                  ),
+                  child: const Text(
+                    'See Feedback',
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 20),
               if (store.isFaculty)
@@ -1101,23 +1157,35 @@ class _AcademicsState extends State<Academics> {
       if (selectedSpecialization == 'MBA GEN') {
         if (dropdownValue == 'Semester 1') {
           store.subjectsList = store.mbaGenSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          store.subjectsList = store.mbaGenSem2;
         } else if (dropdownValue == 'Semester 4') {
           store.subjectsList = store.mbaGenSem4;
+        } else if (dropdownValue == 'Semester 5') {
+          store.subjectsList = store.mbaGenSem5;
         }
         showSection = true;
       } else if (selectedSpecialization == 'MBA BA') {
         showSection = false;
         if (dropdownValue == 'Semester 1') {
           store.subjectsList = store.mbaBaSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          store.subjectsList = store.mbaBaSem2;
         } else if (dropdownValue == 'Semester 4') {
           store.subjectsList = store.mbaBaSem4;
+        } else if (dropdownValue == 'Semester 5') {
+          store.subjectsList = store.mbaBaSem5;
         }
       } else if (selectedSpecialization == 'MBA FS') {
         showSection = false;
         if (dropdownValue == 'Semester 1') {
           store.subjectsList = store.mbaFsSem1;
+        } else if (dropdownValue == 'Semester 2') {
+          store.subjectsList = store.mbaFsSem2;
         } else if (dropdownValue == 'Semester 4') {
           store.subjectsList = store.mbaFsSem4;
+        } else if (dropdownValue == 'Semester 5') {
+          store.subjectsList = store.mbaFsSem5;
         }
       } else if (selectedSpecialization == 'BBA GEN') {
         showSection = false;
@@ -1209,14 +1277,15 @@ class _AcademicsState extends State<Academics> {
 
     debugPrint('🏃‍♂️ - -- - - -- - -- - -- - -- -- - ');
 
-    final url = Uri.parse('http://10.7.0.23:4000/api/get_faculties');
+    // final url = Uri.parse('http://10.7.0.23:4000/api/get_faculties');
+    final String apiUrl = '${store.woxUrl}/api/get_faculties';
 
     try {
       setState(() {
         fetchingFaculties = true;
       });
       final response = await http.post(
-        url,
+        Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'specialization': selectedSpecialization,

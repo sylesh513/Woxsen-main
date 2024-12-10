@@ -10,7 +10,8 @@ class UserPreferences {
   static const _course = 'course';
   bool faculty = false;
   static const _emailKey = 'email';
-  static const String woxUrl = "http://10.7.0.23:8080";
+  static const String woxUrl = "https://44.223.154.253:8080"; // PRODUCTION URL
+  // static const String woxUrl = "http://10.7.0.23:8080";  // LOCAL URL
   // static const String woxUrl = "http://52.20.1.249:5000";
   static const String jobsUrl = "http://10.106.16.71:8000";
   ListStore store = ListStore();

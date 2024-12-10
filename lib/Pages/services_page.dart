@@ -7,6 +7,8 @@ import 'package:woxsen/Pages/menu_page.dart';
 import 'package:woxsen/Values/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:woxsen/Values/login_status.dart';
+import 'package:woxsen/utils/roles.dart';
 
 class Services extends StatefulWidget {
   const Services({super.key});
@@ -18,6 +20,20 @@ class Services extends StatefulWidget {
 class _ServicesState extends State<Services> {
   final Uri _busLink = Uri.parse('https://woubus.woxsen.edu.in/login');
   final Uri _martLink = Uri.parse('http://44.208.243.74:8000');
+  String role = 'role';
+
+  @override
+  void initState() {
+    super.initState();
+    getRole();
+  }
+
+  void getRole() async {
+    String roleType = await UserPreferences.getRole();
+    setState(() {
+      role = roleType;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,35 +251,36 @@ class _ServicesState extends State<Services> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LabBookingScreen()),
-                    );
+              if (role == ROLE_FACULTY) const SizedBox(height: 20),
+              if (role == ROLE_FACULTY)
+                Container(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LabBookingScreen()),
+                      );
 // Navigator.pushNamed(context, AppRoutes.loginPage);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shadowColor: Colors.black,
-                    backgroundColor: const Color(
-                        0xffE7E7E7), // Change background color to white
-                    minimumSize:
-                        const Size(270, 70), // Change dimensions of the button
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16), // Adjust padding if needed
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ), // Adjust border radius if
-                  ),
-                  child: const Text(
-                    'Lab Booking',
-                    style: TextStyle(color: Colors.black, fontSize: 24),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shadowColor: Colors.black,
+                      backgroundColor: const Color(
+                          0xffE7E7E7), // Change background color to white
+                      minimumSize: const Size(
+                          270, 70), // Change dimensions of the button
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16), // Adjust padding if needed
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ), // Adjust border radius if
+                    ),
+                    child: const Text(
+                      'Lab Booking',
+                      style: TextStyle(color: Colors.black, fontSize: 24),
+                    ),
                   ),
                 ),
-              ),
             ],
           )),
         ],

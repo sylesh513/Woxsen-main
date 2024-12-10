@@ -36,9 +36,11 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
     'subjective_questions': <Map<String, dynamic>>[]
   };
 
+  // final String apiUrl = '${store.woxUrl}/api/sub_as_list';
+
   Future<void> getFeedbackQuestions() async {
-    // final String apiUrl = '${store.woxUrl}/api/feedback_questions';
-    const String apiUrl = 'http://10.7.0.23:4000/api/feedback_questions';
+    final String apiUrl = '${store.woxUrl}/api/feedback_questions';
+    // const String apiUrl = 'http://10.7.0.23:4000/api/feedback_questions';
 
     try {
       final response =
@@ -67,13 +69,12 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
   }
 
   Future<void> submitFeedbackForm(FeedbackFormProvider provider) async {
-    debugPrint('SUBMIT FEEDBACK CALLED');
-
     setState(() {
       _isLoading = true;
     });
 
-    const String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
+    final String apiUrl = '${store.woxUrl}/api/faculty_feedback';
+    // const String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
 
     try {
       final response = await http.post(
@@ -91,12 +92,13 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
           'subject': '${widget.subject}',
         }),
       );
-
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Feedback submitted successfully!')),
         );
-        Navigator.pop(context); // Return to previous screen
+        // Navigator.of(context, rootNavigator: true)
+        //     .pop();
+        Navigator.pushNamed(context, '/Academics'); // Return to previous screen
       } else {
         throw Exception('Failed to submit feedback');
       }
@@ -313,14 +315,6 @@ class _FacultyFeedbackForm extends State<FacultyFeedbackForm> {
       child: ElevatedButton(
         onPressed: () {
           if (isFormComplete()) {
-            // debugPrint('Subjective Answer : ${provider.subjectiveAnswers}');
-            // debugPrint('Objective Answer : ${provider.objectiveAnswers}');
-            debugPrint('CALLED');
-
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   const SnackBar(content: Text('Feedback submitted successfully!')),
-            // );
-
             submitFeedbackForm(provider);
           } else {
             AlertDialog(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:woxsen/Values/subjects_list.dart';
 import 'package:woxsen/utils/colors.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FacultyRatingScreen extends StatefulWidget {
   const FacultyRatingScreen({Key? key}) : super(key: key);
@@ -11,223 +14,66 @@ class FacultyRatingScreen extends StatefulWidget {
 class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
   final TextEditingController _searchController = TextEditingController();
   String? selectedSchool;
-  List<Map<String, dynamic>> facultyList = [
-    {
-      "id": 1,
-      "faculty_name": "Dr. John Doe 1",
-      "faculty_email": "john.doe1@university.edu",
-      "faculty_designation": "Associate Professor",
-      "school": "School of Business",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.3",
-      "total_ratings": 72
-    },
-    {
-      "id": 2,
-      "faculty_name": "Dr. John Doe 2",
-      "faculty_email": "john.doe2@university.edu",
-      "faculty_designation": "Professor",
-      "school": "School of Arts and Design",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.5",
-      "total_ratings": 89
-    },
-    {
-      "id": 3,
-      "faculty_name": "Dr. John Doe 3",
-      "faculty_email": "john.doe3@university.edu",
-      "faculty_designation": "Lecturer",
-      "school": "School of Technology",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.5",
-      "total_ratings": 41
-    },
-    {
-      "id": 4,
-      "faculty_name": "Dr. John Doe 4",
-      "faculty_email": "john.doe4@university.edu",
-      "faculty_designation": "Assistant Professor",
-      "school": "School of Sciences",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.5",
-      "total_ratings": 95
-    },
-    {
-      "id": 5,
-      "faculty_name": "Dr. John Doe 5",
-      "faculty_email": "john.doe5@university.edu",
-      "faculty_designation": "Adjunct Faculty",
-      "school": "School of Liberal Arts and Humanities",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.2",
-      "total_ratings": 28
-    },
-    {
-      "id": 6,
-      "faculty_name": "Dr. John Doe 6",
-      "faculty_email": "john.doe6@university.edu",
-      "faculty_designation": "Professor",
-      "school": "School of Law",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.4",
-      "total_ratings": 107
-    },
-    {
-      "id": 7,
-      "faculty_name": "Dr. John Doe 7",
-      "faculty_email": "john.doe7@university.edu",
-      "faculty_designation": "Associate Professor",
-      "school": "School of Architecture and Planning",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.4",
-      "total_ratings": 63
-    },
-    {
-      "id": 8,
-      "faculty_name": "Dr. John Doe 8",
-      "faculty_email": "john.doe8@university.edu",
-      "faculty_designation": "Lecturer",
-      "school": "School of Business",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.3",
-      "total_ratings": 52
-    },
-    {
-      "id": 9,
-      "faculty_name": "Dr. John Doe 9",
-      "faculty_email": "john.doe9@university.edu",
-      "faculty_designation": "Assistant Professor",
-      "school": "School of Technology",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.0",
-      "total_ratings": 81
-    },
-    {
-      "id": 10,
-      "faculty_name": "Dr. John Doe 10",
-      "faculty_email": "john.doe10@university.edu",
-      "faculty_designation": "Professor",
-      "school": "School of Sciences",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.8",
-      "total_ratings": 99
-    },
-    {
-      "id": 11,
-      "faculty_name": "Dr. John Doe 11",
-      "faculty_email": "john.doe11@university.edu",
-      "faculty_designation": "Adjunct Faculty",
-      "school": "School of Arts and Design",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.7",
-      "total_ratings": 37
-    },
-    {
-      "id": 12,
-      "faculty_name": "Dr. John Doe 12",
-      "faculty_email": "john.doe12@university.edu",
-      "faculty_designation": "Associate Professor",
-      "school": "School of Liberal Arts and Humanities",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.2",
-      "total_ratings": 76
-    },
-    {
-      "id": 13,
-      "faculty_name": "Dr. John Doe 13",
-      "faculty_email": "john.doe13@university.edu",
-      "faculty_designation": "Lecturer",
-      "school": "School of Law",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.9",
-      "total_ratings": 45
-    },
-    {
-      "id": 14,
-      "faculty_name": "Dr. John Doe 14",
-      "faculty_email": "john.doe14@university.edu",
-      "faculty_designation": "Professor",
-      "school": "School of Architecture and Planning",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.6",
-      "total_ratings": 88
-    },
-    {
-      "id": 15,
-      "faculty_name": "Dr. John Doe 15",
-      "faculty_email": "john.doe15@university.edu",
-      "faculty_designation": "Assistant Professor",
-      "school": "School of Business",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.4",
-      "total_ratings": 59
-    },
-    {
-      "id": 16,
-      "faculty_name": "Dr. John Doe 16",
-      "faculty_email": "john.doe16@university.edu",
-      "faculty_designation": "Adjunct Faculty",
-      "school": "School of Technology",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.4",
-      "total_ratings": 70
-    },
-    {
-      "id": 17,
-      "faculty_name": "Dr. John Doe 17",
-      "faculty_email": "john.doe17@university.edu",
-      "faculty_designation": "Professor",
-      "school": "School of Sciences",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.9",
-      "total_ratings": 103
-    },
-    {
-      "id": 18,
-      "faculty_name": "Dr. John Doe 18",
-      "faculty_email": "john.doe18@university.edu",
-      "faculty_designation": "Associate Professor",
-      "school": "School of Arts and Design",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.6",
-      "total_ratings": 42
-    },
-    {
-      "id": 19,
-      "faculty_name": "Dr. John Doe 19",
-      "faculty_email": "john.doe19@university.edu",
-      "faculty_designation": "Lecturer",
-      "school": "School of Liberal Arts and Humanities",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "4.1",
-      "total_ratings": 84
-    },
-    {
-      "id": 20,
-      "faculty_name": "Dr. John Doe 20",
-      "faculty_email": "john.doe20@university.edu",
-      "faculty_designation": "Assistant Professor",
-      "school": "School of Law",
-      "profile_image_url": "https://placehold.co/200x200/png",
-      "rating": "3.8",
-      "total_ratings": 67
-    }
-  ];
+
   List<Map<String, dynamic>> filteredFacultyList = [];
+  List<Map<String, dynamic>> facultiesRatings = [];
+  List<Map<String, dynamic>> facultiesData = [];
+  bool isLoading = false;
+  ListStore store = ListStore();
 
   @override
   void initState() {
     super.initState();
-    filteredFacultyList = facultyList;
+    filteredFacultyList = facultiesData;
+    fetchFacultiesFeedback();
+  }
+
+  void fetchFacultiesFeedback() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    // const String apiUrl =
+    //     'http://10.7.0.23:4000/api/faculty_ratings';
+    String apiUrl = '${store.woxUrl}/api/faculty_ratings';
+// change endpoint
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        List jsonResponse = jsonDecode(response.body);
+        debugPrint('JSON RESPONSE : $jsonResponse');
+
+        setState(() {
+          facultiesData = List<Map<String, dynamic>>.from(jsonResponse);
+          filteredFacultyList = facultiesData;
+        });
+      } else {
+        throw Exception('Failed to load faculty ratings');
+      }
+    } catch (e) {
+      print('Error fetching faculty ratings: $e');
+      throw e;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void filterFaculty(String query) {
+    debugPrint('query : $query');
+
     setState(() {
-      filteredFacultyList = facultyList.where((faculty) {
+      filteredFacultyList = [...facultiesData].where((faculty) {
         final nameMatch =
             faculty['faculty_name'].toLowerCase().contains(query.toLowerCase());
         final schoolMatch =
             selectedSchool == null || faculty['school'] == selectedSchool;
+
+        debugPrint('nameMatch : $nameMatch');
+        debugPrint('schoolMatch : $schoolMatch');
         return nameMatch && schoolMatch;
       }).toList();
     });
@@ -235,6 +81,8 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('filtered data : $filteredFacultyList');
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
@@ -262,10 +110,8 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.filter_list),
-                    onPressed: () {
-                      // Implement filter action
-                    },
+                    icon: const Icon(Icons.refresh),
+                    onPressed: fetchFacultiesFeedback,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -295,8 +141,8 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
                   ),
                   child: PopupMenuButton<String>(
                     child: const Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       child: Row(
                         children: [
                           Text('Select School'),
@@ -332,154 +178,176 @@ class _FacultyRatingScreenState extends State<FacultyRatingScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: filteredFacultyList.length,
-              itemBuilder: (context, index) {
-                final faculty = filteredFacultyList[index];
-                return Card.outlined(
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(
-                      color:
-                          AppColors.border, // Replace with desired border color
-                      width: 1.5, // Replace with desired border width
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            faculty['profile_image_url'] ?? '',
-                            width: 140,
-                            height: 140,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(
-                                Icons.error,
-                                color: AppColors.primary,
-                                size: 80,
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                faculty['faculty_name'],
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : (filteredFacultyList.isEmpty || facultiesData.isEmpty)
+                    ? const Center(
+                        child: Text(
+                        'No ratings found',
+                        style: TextStyle(fontSize: 20, color: Colors.black),
+                      ))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: filteredFacultyList.length,
+                        itemBuilder: (context, index) {
+                          final faculty = filteredFacultyList[index];
+                          return Card.outlined(
+                            color: const Color.fromARGB(255, 255, 255, 255),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(
+                                color: AppColors.border,
+                                width: 1.5,
                               ),
-                              Text(
-                                faculty['faculty_designation'],
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              Row(
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.email,
-                                      size: 16, color: AppColors.primary),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    faculty['faculty_email'],
-                                    style: TextStyle(
-                                      color: Colors.grey,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      faculty['profile_image_url'] ?? '',
+                                      width: 140,
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons.person,
+                                          color: AppColors.primary,
+                                          size: 80,
+                                        );
+                                      },
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      },
                                     ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Based on ${faculty['total_ratings']} feedbacks',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    faculty['rating'].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  ...List.generate(5, (index) {
-                                    double rating =
-                                        double.parse(faculty['rating']);
-                                    int fullStars = rating.floor();
-                                    double decimal = rating - fullStars;
-
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 4.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: AppColors.primary),
-                                          borderRadius:
-                                              BorderRadius.circular(4),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          faculty['faculty_name'],
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primary,
+                                          ),
                                         ),
-                                        child: Stack(
+                                        Text(
+                                          faculty['faculty_designation'],
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        Row(
                                           children: [
-                                            Icon(
-                                              Icons.star_border,
-                                              color: AppColors.primary,
-                                              size: 20,
-                                            ),
-                                            if (index < fullStars)
-                                              Icon(
-                                                Icons.star,
-                                                color: AppColors.primary,
-                                                size: 20,
-                                              )
-                                            else if (index == fullStars &&
-                                                decimal > 0)
-                                              ClipRect(
-                                                clipper: _StarClipper(decimal),
-                                                child: Icon(
-                                                  Icons.star,
-                                                  color: AppColors.primary,
-                                                  size: 20,
-                                                ),
+                                            Icon(Icons.email,
+                                                size: 16,
+                                                color: AppColors.primary),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              faculty['faculty_email'],
+                                              style: TextStyle(
+                                                color: Colors.grey,
                                               ),
+                                            ),
                                           ],
                                         ),
-                                      ),
-                                    );
-                                  }),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Based on ${faculty['total_ratings_count']} feedback(s)',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${faculty['avg_rating']}',
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            ...List.generate(5, (index) {
+                                              double rating =
+                                                  faculty['avg_rating'];
+                                              int fullStars = rating.floor();
+                                              double decimal =
+                                                  rating - fullStars;
+
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 4.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color:
+                                                            AppColors.primary),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.star_border,
+                                                        color:
+                                                            AppColors.primary,
+                                                        size: 20,
+                                                      ),
+                                                      if (index < fullStars)
+                                                        Icon(
+                                                          Icons.star,
+                                                          color:
+                                                              AppColors.primary,
+                                                          size: 20,
+                                                        )
+                                                      else if (index ==
+                                                              fullStars &&
+                                                          decimal > 0)
+                                                        ClipRect(
+                                                          clipper: _StarClipper(
+                                                              decimal),
+                                                          child: Icon(
+                                                            Icons.star,
+                                                            color: AppColors
+                                                                .primary,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                            ),
+                          );
+                        },
+                      ),
           ),
         ],
       ),

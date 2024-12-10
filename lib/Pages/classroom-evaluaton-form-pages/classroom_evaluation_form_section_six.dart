@@ -58,8 +58,8 @@ class _EvaluationFormSection6State
       final provider =
           Provider.of<FeedbackFormProvider>(context, listen: false);
 
-      String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
-      // String apiUrl = '${store.woxUrl}/api/faculty_feedback';
+      // String apiUrl = 'http://10.7.0.23:4000/api/faculty_feedback';
+      String apiUrl = '${store.woxUrl}/api/faculty_feedback';
 
       var updatedFeedbackData = convertFeedbackToNumerical(provider.sections);
 
